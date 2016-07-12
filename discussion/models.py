@@ -18,10 +18,10 @@ class Category(models.Model):
 
 class Forum(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
-    category = models.ForeignKey(Category, verbose_name=_('Category'), null=True, blank=True)
+    category = models.ManyToManyField(Category, verbose_name=_('category'))
 
     title = models.CharField(_('Title'), max_length=255)
-    text = models.TextField(_('Question'), null=True, blank=True)
+    text = models.TextField(_('text'), null=True, blank=True)
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=255, editable=False, unique=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
 
@@ -29,20 +29,19 @@ class Forum(models.Model):
 
 
 class Tag(models.Model):
-    pass
+    name = models.CharField(_('name'), max_length=255)
 
 
 class BasePost(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'))
-    tags = models.ManyToManyField(Tag, verbose_name=_('tags'), null=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
+    tags = models.ManyToManyField(Tag, verbose_name=_('tags'))
 
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
     # last_edit = models.DateTimeField(auto_now_add=True)
-    is_hidden = models.BooleanField(verbose_name=_('Hidden'), default=False)
+    is_hidden = models.BooleanField(verbose_name=_('hidden'), default=False)
     hidden_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_('User'),
-        related_name='hidden_questions',
+        verbose_name=_('hidden_by'),
         null=True, blank=True)
     # FIXME hidden_notice?
     hidden_justification = models.TextField(_('Justification'), null=True, blank=True)
@@ -101,7 +100,7 @@ class Reaction(models.Model):
 
 
 class TopicReaction(Reaction):
-    topic = models.ForeignKey(Topic, related_name='')
+    topic = models.ForeignKey(Topic)
 
 
 class TopicUse(TopicReaction):
@@ -112,16 +111,8 @@ class TopicLike(TopicReaction):
     pass
 
 
-class CommentReaction(Reaction):
-    comment = models.ForeignKey(Comment, related_name='uses')
-
-
-class Use(Reaction):
-    pass
-
-
-class Like(Reaction):
-    pass
+class CommentLike(Reaction):
+    comment = models.ForeignKey(Comment, related_name='likes')
 
 
 class TopicNotification(models.Model):

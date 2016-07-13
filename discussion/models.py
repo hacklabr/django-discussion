@@ -18,7 +18,7 @@ class Category(models.Model):
 
 class Forum(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
-    category = models.ManyToManyField(Category, verbose_name=_('category'))
+    category = models.ManyToManyField(Category, verbose_name=_('category'), null=True, blank=True)
 
     title = models.CharField(_('Title'), max_length=255)
     text = models.TextField(_('text'), null=True, blank=True)
@@ -34,7 +34,7 @@ class Tag(models.Model):
 
 class BasePost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
-    tags = models.ManyToManyField(Tag, verbose_name=_('tags'))
+    tags = models.ManyToManyField(Tag, verbose_name=_('tags'), null=True, blank=True)
 
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
     # last_edit = models.DateTimeField(auto_now_add=True)
@@ -64,6 +64,7 @@ class BasePost(models.Model):
 class Topic(BasePost):
 
     forum = models.ForeignKey(Forum, verbose_name=_('forum'))
+    category = models.ManyToManyField(Category, verbose_name=_('category'), null=True, blank=True)
 
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=64, editable=False, unique=True)
     title = models.CharField(_('Title'), max_length=255)

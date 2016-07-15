@@ -18,10 +18,10 @@ class Category(models.Model):
 
 class Forum(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
-    category = models.ManyToManyField(Category, verbose_name=_('category'), null=True, blank=True)
+    category = models.ManyToManyField(Category, verbose_name=_('category'))
 
     title = models.CharField(_('Title'), max_length=255)
-    text = models.TextField(_('text'), null=True, blank=True)
+    text = models.TextField(_('text'), blank=True)
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=255, editable=False, unique=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
 
@@ -34,7 +34,7 @@ class Tag(models.Model):
 
 class BasePost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
-    tags = models.ManyToManyField(Tag, verbose_name=_('tags'), null=True, blank=True)
+    tags = models.ManyToManyField(Tag, verbose_name=_('tags'))
 
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
     # last_edit = models.DateTimeField(auto_now_add=True)
@@ -64,16 +64,13 @@ class BasePost(models.Model):
 class Topic(BasePost):
 
     forum = models.ForeignKey(Forum, verbose_name=_('forum'))
-    category = models.ManyToManyField(Category, verbose_name=_('category'), null=True, blank=True)
+    categories = models.ManyToManyField(Category, verbose_name=_('categories'))
 
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=64, editable=False, unique=True)
     title = models.CharField(_('Title'), max_length=255)
-    text = models.TextField(_('Question'))
+    content = models.TextField(_('content'), null=True, blank=True)
 
     is_private = models.BooleanField(_("private"), default=False)
-
-    def __unicode__(self):
-        return self.title
 
     # @property
     # def count_votes(self):
@@ -86,9 +83,6 @@ class Comment(BasePost):
 
     slug = AutoSlugField(_('Slug'), populate_from='text', max_length=64, editable=False, unique=True)
     text = models.TextField(_('comment'))
-
-    def __unicode__(self):
-        return self.text
 
     # @property
     # def count_votes(self):

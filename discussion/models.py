@@ -3,19 +3,25 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from autoslug import AutoSlugField
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Category(models.Model):
     parent = models.ForeignKey('self', verbose_name=_("category parent"), null=True, blank=True)
     # author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
 
-    title = models.CharField(_("title"), max_length=124)
+    name = models.CharField(_("title"), max_length=124)
     slug = AutoSlugField(populate_from="title", unique=True)
     description = models.TextField(_("description"), blank=True)
     color = models.CharField(_("color"), max_length=7, blank=True,
                              help_text=_("Title color in hex format (i.e: #1aafd0)."))
 
+    def __str__(self):
+        return self.title
 
+
+@python_2_unicode_compatible
 class Forum(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
     category = models.ManyToManyField(Category, verbose_name=_('category'))
@@ -27,6 +33,9 @@ class Forum(models.Model):
 
     is_private = models.BooleanField(_("private"), default=False)
 
+    def __str__(self):
+        return self.title
+
 
 class Tag(models.Model):
     name = models.CharField(_('name'), max_length=255)
@@ -36,8 +45,8 @@ class BasePost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
     tags = models.ManyToManyField(Tag, verbose_name=_('tags'))
 
-    timestamp = models.DateTimeField(auto_now_add=True, editable=False)
-    # last_edit = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    edited_at = models.DateTimeField(auto_now=True)
     is_hidden = models.BooleanField(verbose_name=_('hidden'), default=False)
     hidden_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -63,14 +72,17 @@ class BasePost(models.Model):
 
 class Topic(BasePost):
 
-    forum = models.ForeignKey(Forum, verbose_name=_('forum'))
-    categories = models.ManyToManyField(Category, verbose_name=_('categories'))
+    forum = models.ForeignKey(Forum, verbose_name=_('forum'), related_name='topics')
+    categories = models.ManyToManyField(Category, verbose_name=_('categories'), related_name='topics')
 
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=64, editable=False, unique=True)
     title = models.CharField(_('Title'), max_length=255)
     content = models.TextField(_('content'), null=True, blank=True)
 
     is_private = models.BooleanField(_("private"), default=False)
+
+    def __str__(self):
+        return self.title
 
     # @property
     # def count_votes(self):
@@ -87,6 +99,9 @@ class Comment(BasePost):
     # @property
     # def count_votes(self):
     #     return self.votes.aggregate(models.Sum('value'))['value__sum'] or 0
+
+    def __str__(self):
+        return self.title + ' | ' + self.text
 
 
 class Reaction(models.Model):

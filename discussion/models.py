@@ -12,13 +12,13 @@ class Category(models.Model):
     # author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
 
     name = models.CharField(_("title"), max_length=124)
-    slug = AutoSlugField(populate_from="title", unique=True)
+    slug = AutoSlugField(populate_from="name", unique=True)
     description = models.TextField(_("description"), blank=True)
     color = models.CharField(_("color"), max_length=7, blank=True,
                              help_text=_("Title color in hex format (i.e: #1aafd0)."))
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 @python_2_unicode_compatible
@@ -39,6 +39,9 @@ class Forum(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(_('name'), max_length=255)
+
+    def __str__(self):
+        return self.name
 
 
 class BasePost(models.Model):

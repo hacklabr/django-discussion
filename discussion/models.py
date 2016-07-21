@@ -37,6 +37,7 @@ class Forum(models.Model):
         return self.title
 
 
+@python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(_('name'), max_length=255)
 
@@ -49,7 +50,7 @@ class BasePost(models.Model):
     tags = models.ManyToManyField(Tag, verbose_name=_('tags'))
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    edited_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_hidden = models.BooleanField(verbose_name=_('hidden'), default=False)
     hidden_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -64,15 +65,8 @@ class BasePost(models.Model):
     class Meta:
         abstract = True
 
-    @property
-    def likes_count(self):
-        pass
 
-    @property
-    def uses_count(self):
-        pass
-
-
+@python_2_unicode_compatible
 class Topic(BasePost):
 
     forum = models.ForeignKey(Forum, verbose_name=_('forum'), related_name='topics')
@@ -87,41 +81,56 @@ class Topic(BasePost):
     def __str__(self):
         return self.title
 
-    # @property
-    # def count_votes(self):
-    #     return self.votes.aggregate(models.Sum('value'))['value__sum'] or 0
+    @property
+    def count_likes(self):
+        return self.likes.count()
+
+    @property
+    def count_uses(self):
+        return self.uses.count()
+
+    @property
+    def count_replies(self):
+        return self.comments.count()
+
+    @property
+    def last_update(self):
+        return self.comments.latest('updated_at').updated_at
 
 
+@python_2_unicode_compatible
 class Comment(BasePost):
-    parent = models.ForeignKey('self', verbose_name=_("comment parent"), related_name='parent_comment', null=True, blank=True)
-    topic = models.ForeignKey(Topic, related_name='topics')
+    parent = models.ForeignKey('self',
+                               verbose_name=_("comment parent"),
+                               related_name='parent_comment',
+                               null=True, blank=True)
+    topic = models.ForeignKey(Topic, related_name='comments')
 
     slug = AutoSlugField(_('Slug'), populate_from='text', max_length=64, editable=False, unique=True)
     text = models.TextField(_('comment'))
 
-    # @property
-    # def count_votes(self):
-    #     return self.votes.aggregate(models.Sum('value'))['value__sum'] or 0
+    @property
+    def count_likes(self):
+        return self.likes.count()
 
     def __str__(self):
-        return self.title + ' | ' + self.text
+        return self.text
 
 
 class Reaction(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
     timestamp = models.DateTimeField(auto_now=True)
 
-
-class TopicReaction(Reaction):
-    topic = models.ForeignKey(Topic)
-
-
-class TopicUse(TopicReaction):
-    pass
+    class Meta:
+        abstract = True
 
 
-class TopicLike(TopicReaction):
-    pass
+class TopicUse(Reaction):
+    topic = models.ForeignKey(Topic, related_name='uses')
+
+
+class TopicLike(Reaction):
+    topic = models.ForeignKey(Topic, related_name='likes')
 
 
 class CommentLike(Reaction):

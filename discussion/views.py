@@ -1,9 +1,14 @@
 from rest_framework import viewsets
+from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import pagination
+from rest_framework.response import Response
 
 from discussion.serializers import (CategorySerializer, ForumSerializer, TopicSerializer, CommentSerializer,
-                                    TagSerializer, TopicNotificationSerializer, )
-from discussion.models import Category, Forum, Topic, Comment, Tag, TopicNotification
+                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer, TopicUseSerializer,
+                                    CommentLikeSerializer,)
+from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike, TopicUse,
+                               CommentLike,)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -27,6 +32,12 @@ class ForumViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+class SimpleLimitPagination(pagination.LimitOffsetPagination):
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+
 class TopicViewSet(viewsets.ModelViewSet):
     """
     """
@@ -34,6 +45,9 @@ class TopicViewSet(viewsets.ModelViewSet):
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = (filters.OrderingFilter,)
+    ordering_fields = ('updated_at',)
+    pagination_class = SimpleLimitPagination
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -60,4 +74,40 @@ class TopicNotificationViewSet(viewsets.ModelViewSet):
 
     queryset = TopicNotification.objects.all()
     serializer_class = TopicNotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class BaseUserReactionViewSet(viewsets.ModelViewSet):
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class TopicLikeViewSet(BaseUserReactionViewSet):
+    """
+    """
+
+    queryset = TopicLike.objects.all()
+    serializer_class = TopicLikeSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class TopicUseViewSet(BaseUserReactionViewSet):
+    """
+    """
+
+    queryset = TopicUse.objects.all()
+    serializer_class = TopicUseSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class CommentLikeViewSet(BaseUserReactionViewSet):
+    """
+    """
+
+    queryset = CommentLike.objects.all()
+    serializer_class = CommentLikeSerializer
     permission_classes = [IsAuthenticated]

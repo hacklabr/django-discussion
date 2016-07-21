@@ -5,6 +5,7 @@
     app.controller('ForumCtrl', ['$scope', 'Forum', 'Topic',
         function ($scope, Forum, Topic) {
             $scope.forums = Forum.query({});
+            $scope.latest_topics = Topic.query({limit: 6, ordering: 'updated_at'})
         }
     ]);
 

@@ -1,6 +1,9 @@
 # Test dependencies go here.
 -r base.txt
 
+# PostgreSQL adapter for the Python
+psycopg2==2.6
+
 coverage==4.1
 mock>=1.0.1
 flake8>=2.1.0

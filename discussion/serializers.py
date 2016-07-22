@@ -50,7 +50,7 @@ class TopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_private', 'author',
-                  'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'forum',)
+                  'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum',)
         depth = 1
 
 

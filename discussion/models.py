@@ -5,7 +5,7 @@ from autoslug import AutoSlugField
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
-
+from django.utils import timezone
 
 @python_2_unicode_compatible
 class Category(models.Model):
@@ -58,8 +58,8 @@ class BasePost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
     tags = models.ManyToManyField(Tag, verbose_name=_('tags'))
 
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
     is_hidden = models.BooleanField(verbose_name=_('hidden'), default=False)
     hidden_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

@@ -81,6 +81,8 @@ class Topic(BasePost):
     forum = models.ForeignKey(Forum, verbose_name=_('forum'), related_name='topics')
     categories = models.ManyToManyField(Category, verbose_name=_('categories'), related_name='topics')
 
+    last_activity_at = models.DateTimeField()
+
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=64, editable=False, unique=True)
     title = models.CharField(_('Title'), max_length=255)
     content = models.TextField(_('content'), null=True, blank=True)
@@ -152,13 +154,14 @@ class TopicNotification(models.Model):
         ('mention', _("Mention")),
         ('comment', _("Comment")),
         ('new_topic', _("New Topic")),
+        ('new_comment', _("New Comment")),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='topic_notifications')
     topic = models.ForeignKey('Topic')
     comment = models.ForeignKey('Comment', null=True, blank=True)
 
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now=True)
     action = models.CharField(choices=ACTION_CHOICES, default='undefined', max_length=64)
     is_read = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)

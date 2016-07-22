@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from autoslug import AutoSlugField
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -23,7 +24,7 @@ class Category(models.Model):
 
 @python_2_unicode_compatible
 class Forum(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), blank=True, null=True)
     category = models.ManyToManyField(Category, verbose_name=_('category'))
 
     title = models.CharField(_('Title'), max_length=255)
@@ -31,7 +32,15 @@ class Forum(models.Model):
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=255, editable=False, unique=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
 
-    is_private = models.BooleanField(_("private"), default=False)
+    is_public = models.BooleanField(_("public"), default=False)
+
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_('groups'),
+        blank=True,
+        help_text=_('The Groups that can have access to this forum. If empty, there are no group restrictions.'),
+        related_name="groups",
+    )
 
     def __str__(self):
         return self.title
@@ -76,7 +85,7 @@ class Topic(BasePost):
     title = models.CharField(_('Title'), max_length=255)
     content = models.TextField(_('content'), null=True, blank=True)
 
-    is_private = models.BooleanField(_("private"), default=False)
+    is_public = models.BooleanField(_("public"), default=False)
 
     def __str__(self):
         return self.title
@@ -142,6 +151,7 @@ class TopicNotification(models.Model):
         ('undefined', _("Undefined")),
         ('mention', _("Mention")),
         ('comment', _("Comment")),
+        ('new_topic', _("New Topic")),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='topic_notifications')

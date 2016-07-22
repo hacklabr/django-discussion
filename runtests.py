@@ -9,7 +9,9 @@ try:
         USE_TZ=True,
         DATABASES={
             "default": {
-                "ENGINE": "django.db.backends.sqlite3",
+                # removed due to bug in django: https://code.djangoproject.com/ticket/24424
+                # "ENGINE": "django.db.backends.sqlite3",
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
             }
         },
         ROOT_URLCONF="discussion.urls",

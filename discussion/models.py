@@ -205,7 +205,7 @@ class BaseHistory(BasePost):
         self.author = instance.author
         # if instance.tags:
         #     self.tags = instance.tags
-        self.last_edit = instance.timestamp
+        self.last_edit = instance.updated_at
         self.is_hidden = instance.is_hidden
         self.hidden_by = instance.hidden_by
         self.hidden_justification = instance.hidden_justification

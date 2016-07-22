@@ -21,15 +21,14 @@ class TestSignals(TestCase):
             username='jacob', email='jacob@asfasdfas.com', password='top_secret')
 
         self.comment = models.Category.objects.create(
-            title='Title',
+            name='Title',
             description='Test text Test text Test text Test text Test text',
-            author=self.user.pk
         )
 
         self.forum = models.Forum.objects.create(author=self.user, title="Forum Title")
 
         self.topic = models.Topic(
-            author=self.user, forum=self.forum, title="Topic Title", text="Topic example text")
+            author=self.user, forum=self.forum, title="Topic Title", content="Topic example text")
         self.topic.save()
 
     def test_post_save_post(self):

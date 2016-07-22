@@ -8,6 +8,9 @@ from django.contrib.auth import get_user_model, models
 @receiver(post_save, sender=Topic)
 def topic_created_or_updated(instance, **kwargs):
 
+    # Adjust last_activity_at in Topic
+    instance.last_activity_at = instance.updated_at
+
     User = get_user_model()
     forum = instance.forum
 
@@ -31,8 +34,8 @@ def topic_created_or_updated(instance, **kwargs):
 @receiver(post_save, sender=Comment)
 def comment_created_or_updated(instance, **kwargs):
 
-    TopicNotification.objects.create(
-        user=instance.author, topic=instance.topic, comment=instance, action='comment')
+    # Adjust last_activity_at in Topic
+    instance.topic.last_activity_at = instance.updated_at
 
     coment_revision = CommentHistory()
     coment_revision.create_or_update_revision(instance=instance)

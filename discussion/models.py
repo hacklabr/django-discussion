@@ -104,21 +104,17 @@ class Topic(BasePost):
     def count_replies(self):
         return self.comments.count()
 
-    @property
-    def last_update(self):
-        return self.comments.latest('updated_at').updated_at
-
 
 @python_2_unicode_compatible
 class Comment(BasePost):
     parent = models.ForeignKey('self',
                                verbose_name=_("comment parent"),
-                               related_name='parent_comment',
+                               related_name='comment_replies',
                                null=True, blank=True)
     topic = models.ForeignKey(Topic, related_name='comments')
 
     slug = AutoSlugField(_('Slug'), populate_from='text', max_length=64, editable=False, unique=True)
-    text = models.TextField(_('comment'))
+    text = models.TextField(_('text'))
 
     @property
     def count_likes(self):
@@ -139,13 +135,22 @@ class Reaction(models.Model):
 class TopicUse(Reaction):
     topic = models.ForeignKey(Topic, related_name='uses')
 
+    class Meta:
+        unique_together = ('user', 'topic')
+
 
 class TopicLike(Reaction):
     topic = models.ForeignKey(Topic, related_name='likes')
 
+    class Meta:
+        unique_together = ('user', 'topic')
+
 
 class CommentLike(Reaction):
     comment = models.ForeignKey(Comment, related_name='likes')
+
+    class Meta:
+        unique_together = ('user', 'comment')
 
 
 class TopicNotification(models.Model):

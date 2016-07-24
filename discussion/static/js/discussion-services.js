@@ -14,10 +14,16 @@
             {'update': {'method': 'PUT'} });
     }]);
 
-//    app.factory('', ['$resource', function($resource){
-//        return $resource('/api//:id',
-//            {'id' : '@id'},
-//            {'update': {'method': 'PUT'} });
-//    }]);
+    app.factory('TopicLike', ['$resource', function($resource){
+        return $resource('/discussion/api/topic_like/:id',
+            {'id' : '@id'},
+            {'update': {'method': 'PUT'} });
+    }]);
+
+    app.factory('CommentLike', ['$resource', function($resource){
+        return $resource('/discussion/api/comment_like/:id',
+            {'id' : '@id'},
+            {'update': {'method': 'PUT'} });
+    }]);
 
 })(window.angular);

@@ -23,8 +23,8 @@ class BaseTopicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Topic
-        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_private', 'author',
-                  'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'last_update',)
+        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
+                  'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies',)
         depth = 1
 
 
@@ -35,30 +35,75 @@ class ForumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_private', 'author', 'category', 'latest_topics',)
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics',)
         depth = 1
 
     @staticmethod
     def get_latest_topics(obj):
-        return BaseTopicSerializer(Topic.objects.all()[:5], many=True).data
+        # return BaseTopicSerializer(Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5], many=True).data
+        return BaseTopicSerializer(Topic.objects.filter(forum=obj)[:5], many=True).data
+
+
+class BaseCommentSerializer(serializers.ModelSerializer):
+
+    author = BaseUserSerializer()
+    user_like = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+
+    def get_user_like(self, obj):
+        request = self.context.get("request")
+        try:
+            return obj.likes.get(user=request.user).id
+        except CommentLike.DoesNotExist:
+            pass
+        return 0
+
+
+class CommentReplySerializer(BaseCommentSerializer):
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author',
+                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like')
+        depth = 1
+
+
+class CommentSerializer(BaseCommentSerializer):
+
+    comment_replies = CommentReplySerializer(many=True)
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author',
+                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like',)
+        depth = 1
 
 
 class TopicSerializer(serializers.ModelSerializer):
 
     author = BaseUserSerializer()
+    comments = serializers.SerializerMethodField()
+    user_like = serializers.SerializerMethodField()
 
     class Meta:
         model = Topic
-        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_private', 'author',
-                  'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum',)
+        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
+                  'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum', 'comments',
+                  'user_like',)
         depth = 1
 
+    def get_comments(self, obj):
+        queryset = obj.comments.filter(parent=None)
+        return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
-class CommentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Comment
-        depth = 1
+    def get_user_like(self, obj):
+        request = self.context.get("request")
+        try:
+            return obj.likes.get(user=request.user).id
+        except TopicLike.DoesNotExist:
+            return 0
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -79,18 +124,11 @@ class TopicLikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TopicLike
-        depth = 1
-
-
-class TopicUseSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = TopicUse
-        depth = 1
+        exclude = ('user',)
 
 
 class CommentLikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommentLike
-        depth = 1
+        exclude = ('user',)

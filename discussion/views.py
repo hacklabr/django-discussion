@@ -5,9 +5,9 @@ from rest_framework import pagination
 from rest_framework.response import Response
 
 from discussion.serializers import (CategorySerializer, ForumSerializer, TopicSerializer, CommentSerializer,
-                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer, TopicUseSerializer,
+                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
                                     CommentLikeSerializer,)
-from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike, TopicUse,
+from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike,)
 
 
@@ -80,10 +80,10 @@ class TopicNotificationViewSet(viewsets.ModelViewSet):
 class BaseUserReactionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(user=self.request.user)
 
 
 class TopicLikeViewSet(BaseUserReactionViewSet):
@@ -92,15 +92,6 @@ class TopicLikeViewSet(BaseUserReactionViewSet):
 
     queryset = TopicLike.objects.all()
     serializer_class = TopicLikeSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class TopicUseViewSet(BaseUserReactionViewSet):
-    """
-    """
-
-    queryset = TopicUse.objects.all()
-    serializer_class = TopicUseSerializer
     permission_classes = [IsAuthenticated]
 
 

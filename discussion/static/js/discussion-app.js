@@ -5,6 +5,7 @@
         'discussion.controllers',
         'discussion.services',
         'django',
+        'ui.tinymce',
     ]);
 
     app.config(['$resourceProvider', function($resourceProvider) {

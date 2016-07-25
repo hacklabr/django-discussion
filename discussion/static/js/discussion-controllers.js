@@ -14,6 +14,17 @@
             var topic_id = $location.hash();
             $scope.topic = Topic.get({id: topic_id})
 
+            $scope.tinymceOptions = {
+                inline: false,
+                menubar: false,
+                plugins : 'advlist autolink link image lists charmap print preview',
+                toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                skin: 'lightgray',
+                theme : 'modern',
+                language: 'pt_BR',
+                language_url : '/static/vendor/tinymce/langs/pt_BR.js',
+            };
+
             $scope.topic_like = function(topic) {
                 if (topic.user_like) {
                     TopicLike.delete({id:topic.user_like});

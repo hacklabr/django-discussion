@@ -81,7 +81,7 @@ class Topic(BasePost):
     forum = models.ForeignKey(Forum, verbose_name=_('forum'), related_name='topics')
     categories = models.ManyToManyField(Category, verbose_name=_('categories'), related_name='topics')
 
-    last_activity_at = models.DateTimeField()
+    last_activity_at = models.DateTimeField(default=timezone.now)
 
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=64, editable=False, unique=True)
     title = models.CharField(_('Title'), max_length=255)

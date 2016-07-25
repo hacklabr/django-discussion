@@ -19,12 +19,21 @@ def topic_created_or_updated(instance, **kwargs):
         users = []
 
     for one_user in users:
+        try:
+            notification = TopicNotification.objects.get(
+                user=one_user,
+                topic=instance,
+            )
+        except TopicNotification.DoesNotExist:
+            notification = TopicNotification.objects.create(
+                user=one_user,
+                topic=instance,
+                action='new_topic',
+            )
+
         # Create the New Topic notification for appropriate users
-        TopicNotification.objects.create(
-            user=one_user,
-            topic=instance,
-            action='new_topic',
-        )
+        notification.is_read = False
+        notification.save()
 
     # TODO take real group permissions into account when triggering notifications
 
@@ -56,7 +65,7 @@ def comment_created_or_updated(instance, **kwargs):
     for one_user in users:
         # Check if the current user already has a pending notification for this topic
         try:
-            notification = TopicNotification.objects.filter(
+            notification = TopicNotification.objects.get(
                 user=one_user,
                 topic=instance.topic,
             )
@@ -68,7 +77,7 @@ def comment_created_or_updated(instance, **kwargs):
 
         notification.action = 'new_comment'
         notification.is_read = False
-        notification.is_read = False
+        notification.save()
 
     coment_revision = CommentHistory()
     coment_revision.create_or_update_revision(instance=instance)

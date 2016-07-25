@@ -47,19 +47,46 @@ def comment_created_or_updated(instance, **kwargs):
     # Users that must be notified
     users = []
 
+    # Trigger: a comment has been made
+    # Trigger: an answer to a comment has been made
     # Notify the topic creator
     users.append(instance.topic.author)
 
-    # Notify people that already commented ou answered to comments in this topic
-    for comment in Comment.objects.filter(topic=instance.topic):
-        users.append(comment.author)
-
+    # Trigger: a comment has been made
+    # Trigger: an answer to a comment has been made
     # Notify anyone who has reacted to the main topic message
     for react in TopicLike.objects.filter(topic=instance.topic):
         users.append(react.user)
 
     for react in TopicUse.objects.filter(topic=instance.topic):
         users.append(react.user)
+
+
+    if not instance.parent: # If the comment is not an answer to another comment
+        # Trigger: a comment has been made
+        # Notify people that already commented ou answered to comments in this topic
+        for comment in Comment.objects.filter(topic=instance.topic):
+            users.append(comment.author)
+    else:
+        # Trigger: an answer to a comment has been made
+        # Notify the author of the parent comment
+        users.append(instance.parent.author)
+
+        for react in CommentLike.objects.filter(comment=instance.parent):
+            # Trigger: an answer to a comment has been made
+            # Notify people that have reacted to the parent comment
+            users.append(react.user)
+
+        for comment in Comment.objects.filter(topic=instance.topic, parent=instance.parent):
+            # Trigger: an answer to a comment has been made
+            # Notify who has answered the same parent comment
+            users.append(comment.author)
+
+            for react in CommentLike.objects.filter(comment=comment):
+                # Trigger: an answer to a comment has been made
+                # Notify people that have reacted to answers to the parent comment
+                users.append(react.user)
+
 
     # Create (or update) the nedded notifications
     for one_user in users:

@@ -161,6 +161,7 @@ class TopicNotification(models.Model):
         ('new_topic', _("New Topic")),
         ('new_comment', _("New Comment")),
         ('new_reaction', _("New Reaction")),
+        ('new_reaction_comment', _("New Reaction to a Comment")),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='topic_notifications')

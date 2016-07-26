@@ -112,6 +112,42 @@ def comment_created_or_updated(instance, **kwargs):
     coment_revision.create_or_update_revision(instance=instance)
 
 
+@receiver(post_save, sender=TopicLike)
+@receiver(post_save, sender=TopicUse)
+def reaction_created_or_updated(instance, **kwargs):
+
+    # Users that must be notified
+    users = []
+
+    # Trigger: reaction to a topic
+    # Notify topic creator
+    users.append(instance.topic.author)
+
+    # Trigger: reaction to a topic
+    # Notify everybody that has reacted to the topic
+    for react in TopicLike.objects.filter(topic=instance.topic):
+        users.append(react.user)
+
+    for react in TopicUse.objects.filter(topic=instance.topic):
+        users.append(react.user)
+
+    for one_user in users:
+        # Check if the current user already has a pending notification for this topic
+        try:
+            notification = TopicNotification.objects.get(
+                user=one_user,
+                topic=instance.topic,
+            )
+        except TopicNotification.DoesNotExist:
+            notification = TopicNotification.objects.create(
+                user=one_user,
+                topic=instance.topic,
+            )
+
+        notification.action = 'new_reaction'
+        notification.is_read = False
+        notification.save()
+
 
 # def topic_viewed(request, topic):
 #     # Todo test detail views

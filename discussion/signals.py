@@ -158,17 +158,35 @@ def reaction_created_or_updated(instance, **kwargs):
     users = []
 
     # Trigger: reaction to a comment
+    # Trigger: reaction to an answer of a comment
     # Notify topic creator
     users.append(instance.comment.topic.author)
 
     # Trigger: reaction to a comment
-    # Notify the comment author
+    # Trigger: reaction to an answer of a comment
+    # Notify the comment/answer author
     users.append(instance.comment.author)
 
-    # Trigger: reaction to a comment
-    # Notify who has already reacted to the comment
-    for react in CommentLike.objects.filter(comment=instance.comment):
-        users.append(react.user)
+    if not instance.comment.parent: # If this comment is not an answer
+        # Trigger: reaction to a comment
+        # Notify who has already reacted to the comment
+        for react in CommentLike.objects.filter(comment=instance.comment):
+            users.append(react.user)
+    else: # If this comment is an answer to another comment
+        # Trigger: reaction to an answer of a comment
+        # Notify the author of the parent comment
+        users.append(instance.comment.parent.author)
+
+        # Trigger: reaction to an answer of a comment
+        # Notify who has already answered the same parent comment
+        for answer in Comment.objects.filter(parent=instance.comment.parent):
+            users.append(answer.author)
+
+        # Trigger: reaction to an answer of a comment
+        # Notify who has reacted to the parent comment
+        for react in CommentLike.objects.filter(comment=instance.comment.parent):
+            users.append(react.user)
+
 
     # Create (or update) the nedded notifications
     for one_user in users:

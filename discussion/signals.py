@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from discussion.models import Topic, Comment, CommentHistory, TopicNotification, TopicLike, TopicUse
+from discussion.models import Topic, Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model, models
 
@@ -131,6 +131,7 @@ def reaction_created_or_updated(instance, **kwargs):
     for react in TopicUse.objects.filter(topic=instance.topic):
         users.append(react.user)
 
+    # Create (or update) the nedded notifications
     for one_user in users:
         # Check if the current user already has a pending notification for this topic
         try:
@@ -145,6 +146,46 @@ def reaction_created_or_updated(instance, **kwargs):
             )
 
         notification.action = 'new_reaction'
+        notification.is_read = False
+        notification.save()
+
+
+
+@receiver(post_save, sender=CommentLike)
+def reaction_created_or_updated(instance, **kwargs):
+
+    # Users that must be notified
+    users = []
+
+    # Trigger: reaction to a comment
+    # Notify topic creator
+    users.append(instance.comment.topic.author)
+
+    # Trigger: reaction to a comment
+    # Notify the comment author
+    users.append(instance.comment.author)
+
+    # Trigger: reaction to a comment
+    # Notify who has already reacted to the comment
+    for react in CommentLike.objects.filter(comment=instance.comment):
+        users.append(react.user)
+
+    # Create (or update) the nedded notifications
+    for one_user in users:
+        # Check if the current user already has a pending notification for this comment
+        try:
+            notification = TopicNotification.objects.get(
+                user=one_user,
+                topic=instance.comment.topic,
+            )
+        except TopicNotification.DoesNotExist:
+            notification = TopicNotification.objects.create(
+                user=one_user,
+                topic=instance.comment.topic,
+            )
+
+        notification.comment = instance.comment
+        notification.action = 'new_reaction_comment'
         notification.is_read = False
         notification.save()
 

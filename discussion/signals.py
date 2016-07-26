@@ -100,9 +100,11 @@ def comment_created_or_updated(instance, **kwargs):
             notification = TopicNotification.objects.create(
                 user=one_user,
                 topic=instance.topic,
+                comment=instance,
             )
 
         notification.action = 'new_comment'
+        notification.comment = instance
         notification.is_read = False
         notification.save()
 

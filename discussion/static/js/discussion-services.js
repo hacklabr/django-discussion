@@ -20,6 +20,12 @@
             {'update': {'method': 'PUT'} });
     }]);
 
+    app.factory('Comment', ['$resource', function($resource){
+        return $resource('/discussion/api/comment/:id',
+            {'id' : '@id'},
+            {'update': {'method': 'PUT'} });
+    }]);
+
     app.factory('CommentLike', ['$resource', function($resource){
         return $resource('/discussion/api/comment_like/:id',
             {'id' : '@id'},

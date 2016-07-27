@@ -9,8 +9,8 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$location', 'Forum', 'Topic', 'TopicLike', 'CommentLike',
-        function ($scope, $location, Forum, Topic, TopicLike, CommentLike) {
+    app.controller('TopicCtrl', ['$scope', '$location', 'Forum', 'Topic', 'Comment', 'TopicLike', 'CommentLike',
+        function ($scope, $location, Forum, Topic, Comment, TopicLike, CommentLike) {
             var topic_id = $location.hash();
             $scope.topic = Topic.get({id: topic_id})
 
@@ -24,6 +24,26 @@
                 language: 'pt_BR',
                 language_url : '/static/vendor/tinymce/langs/pt_BR.js',
             };
+
+            $scope.save_comment = function(topic, parent_comment) {
+                var new_comment = new Comment();
+                new_comment.topic = topic.id;
+                if (parent_comment) {
+                    new_comment.parent = parent_comment.id;
+                    new_comment.text = parent_comment.new_comment;
+                    parent_comment.comment_replies.unshift(new_comment);
+                } else {
+                    new_comment.text = topic.new_comment;
+                    topic.show_comment_input = false;
+                    topic.comments.unshift(new_comment);
+                }
+
+                new_comment.$save();
+
+//                Comment.save(comment_data, function(new_comment){
+//                    topic.comments
+//                });
+            }
 
             $scope.topic_like = function(topic) {
                 if (topic.user_like) {

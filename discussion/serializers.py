@@ -46,7 +46,7 @@ class ForumSerializer(serializers.ModelSerializer):
 
 class BaseCommentSerializer(serializers.ModelSerializer):
 
-    author = BaseUserSerializer()
+    author = BaseUserSerializer(read_only=True)
     user_like = serializers.SerializerMethodField()
 
     class Meta:
@@ -72,13 +72,13 @@ class CommentReplySerializer(BaseCommentSerializer):
 
 class CommentSerializer(BaseCommentSerializer):
 
-    comment_replies = CommentReplySerializer(many=True)
+    comment_replies = CommentReplySerializer(many=True, read_only=True)
 
     class Meta:
         model = Comment
-        fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author',
+        fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author', 'topic',
                   'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like',)
-        depth = 1
+        # depth = 1
 
 
 class TopicSerializer(serializers.ModelSerializer):

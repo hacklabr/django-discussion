@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike, TopicUse,
+from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike,)
 from accounts.serializers import TimtecUserSerializer
 
@@ -24,7 +24,7 @@ class BaseTopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
-                  'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies',)
+                  'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'last_activity_at')
         depth = 1
 
 
@@ -40,8 +40,8 @@ class ForumSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_latest_topics(obj):
-        # return BaseTopicSerializer(Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5], many=True).data
-        return BaseTopicSerializer(Topic.objects.filter(forum=obj)[:5], many=True).data
+        return BaseTopicSerializer(Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5], many=True).data
+        # return BaseTopicSerializer(Topic.objects.filter(forum=obj)[:5], many=True).data
 
 
 class BaseCommentSerializer(serializers.ModelSerializer):
@@ -91,7 +91,7 @@ class TopicSerializer(serializers.ModelSerializer):
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
                   'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum', 'comments',
-                  'user_like',)
+                  'user_like', 'last_activity_at',)
         depth = 1
 
     def get_comments(self, obj):

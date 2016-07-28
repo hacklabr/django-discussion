@@ -7,6 +7,7 @@ from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 
+
 @python_2_unicode_compatible
 class Category(models.Model):
     parent = models.ForeignKey('self', verbose_name=_("category parent"), null=True, blank=True)
@@ -25,7 +26,7 @@ class Category(models.Model):
 @python_2_unicode_compatible
 class Forum(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), blank=True, null=True)
-    category = models.ManyToManyField(Category, verbose_name=_('category'))
+    category = models.ManyToManyField(Category, verbose_name=_('category'), blank=True)
 
     title = models.CharField(_('Title'), max_length=255)
     text = models.TextField(_('text'), blank=True)
@@ -56,7 +57,7 @@ class Tag(models.Model):
 
 class BasePost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
-    tags = models.ManyToManyField(Tag, verbose_name=_('tags'))
+    tags = models.ManyToManyField(Tag, verbose_name=_('tags'), blank=True)
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)

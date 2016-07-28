@@ -167,7 +167,9 @@ class TopicNotification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='topic_notifications')
     topic = models.ForeignKey('Topic')
     comment = models.ForeignKey('Comment', null=True, blank=True)
-
+    comment_like = models.ForeignKey('CommentLike', null=True, blank=True)
+    topic_like = models.ForeignKey('TopicLike', null=True, blank=True)
+    
     date = models.DateTimeField(auto_now=True)
     action = models.CharField(choices=ACTION_CHOICES, default='undefined', max_length=64)
     is_read = models.BooleanField(default=False)

@@ -56,7 +56,7 @@ class Tag(models.Model):
 
 class BasePost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
-    tags = models.ManyToManyField(Tag, verbose_name=_('tags'))
+    tags = models.ManyToManyField(Tag, verbose_name=_('tags'), null=True, blank=True)
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)

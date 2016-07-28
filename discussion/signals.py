@@ -147,6 +147,7 @@ def reaction_created_or_updated(instance, **kwargs):
 
         notification.action = 'new_reaction'
         notification.is_read = False
+        notification.topic_like = instance
         notification.save()
 
 
@@ -205,6 +206,7 @@ def reaction_created_or_updated(instance, **kwargs):
         notification.comment = instance.comment
         notification.action = 'new_reaction_comment'
         notification.is_read = False
+        notification.comment_like = instance
         notification.save()
 
 

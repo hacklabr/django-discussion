@@ -32,4 +32,10 @@
             {'update': {'method': 'PUT'} });
     }]);
 
+    app.factory('Notification', ['$resource', function($resource){
+        return $resource('/discussion/api/topic-notification/:id',
+            {'id' : '@id'},
+            {'update': {'method': 'PUT'} });
+    }]);
+
 })(window.angular);

@@ -82,6 +82,12 @@ class TopicNotificationViewSet(viewsets.ModelViewSet):
     serializer_class = TopicNotificationSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        queryset = super(TopicNotificationViewSet, self).get_queryset()
+        return queryset.filter(user=self.request.user)
+        #return queryset.filter(user=71)[:10]
+        #return queryset.all()[:10]
+
 
 class BaseUserReactionViewSet(viewsets.ModelViewSet):
 

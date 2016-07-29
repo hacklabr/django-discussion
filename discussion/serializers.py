@@ -41,7 +41,6 @@ class ForumSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_latest_topics(obj):
         return BaseTopicSerializer(Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5], many=True).data
-        # return BaseTopicSerializer(Topic.objects.filter(forum=obj)[:5], many=True).data
 
 
 class BaseCommentSerializer(serializers.ModelSerializer):
@@ -72,6 +71,7 @@ class CommentReplySerializer(BaseCommentSerializer):
 
 class CommentSerializer(BaseCommentSerializer):
 
+    author = BaseUserSerializer(read_only=True)
     comment_replies = CommentReplySerializer(many=True, read_only=True)
 
     class Meta:
@@ -116,6 +116,7 @@ class TagSerializer(serializers.ModelSerializer):
 class TopicNotificationSerializer(serializers.ModelSerializer):
 
     topic = BaseTopicSerializer()
+    comment = BaseCommentSerializer()
 
     class Meta:
         model = TopicNotification

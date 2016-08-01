@@ -28,6 +28,13 @@ class BaseTopicSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class BaseForumSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Forum
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category')
+
+
 class ForumSerializer(serializers.ModelSerializer):
 
     author = BaseUserSerializer()
@@ -83,16 +90,16 @@ class CommentSerializer(BaseCommentSerializer):
 
 class TopicSerializer(serializers.ModelSerializer):
 
-    author = BaseUserSerializer()
+    author = BaseUserSerializer(read_only=True)
     comments = serializers.SerializerMethodField()
     user_like = serializers.SerializerMethodField()
+    forum_info = BaseForumSerializer(read_only=True)
 
     class Meta:
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
                   'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum', 'comments',
-                  'user_like', 'last_activity_at',)
-        depth = 1
+                  'user_like', 'last_activity_at','forum_info', )
 
     def get_comments(self, obj):
         queryset = obj.comments.filter(parent=None)

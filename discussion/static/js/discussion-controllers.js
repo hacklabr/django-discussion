@@ -6,6 +6,21 @@
         function ($scope, Forum, Topic) {
             $scope.forums = Forum.query({});
             $scope.latest_topics = Topic.query({limit: 6, ordering: 'updated_at'})
+            console.log($scope.forums);
+        }
+    ]);
+
+    app.controller('NewTopicCtrl', ['$scope', '$location', 'Forum', 'Topic',
+        function ($scope, $location, Forum, Topic) {
+            $scope.forums = Forum.query();
+            $scope.new_topic = new Topic();
+            $scope.save_topic = function(topic) {
+                $scope.sending = true;
+                $scope.new_topic.forum = 1;
+                $scope.new_topic.$save(function(msg){
+                    window.location = '/discussion/topic##'+msg.id;
+                });
+            }
         }
     ]);
 

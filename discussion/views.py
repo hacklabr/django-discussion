@@ -49,6 +49,12 @@ class TopicViewSet(viewsets.ModelViewSet):
     ordering_fields = ('updated_at',)
     pagination_class = SimpleLimitPagination
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
@@ -84,8 +90,8 @@ class TopicNotificationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super(TopicNotificationViewSet, self).get_queryset()
-        return queryset.filter(user=self.request.user)
-        #return queryset.filter(user=71)[:10]
+        #return queryset.filter(user=self.request.user)
+        return queryset.filter(user=71)[:10]
         #return queryset.all()[:10]
 
 

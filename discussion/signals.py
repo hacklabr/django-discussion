@@ -1,8 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from discussion.models import Topic, Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
-from django.contrib.auth.models import Group
-from django.contrib.auth import get_user_model, models
+from django.contrib.auth import get_user_model
+
 
 @receiver(post_save, sender=Topic)
 def topic_created_or_updated(instance, **kwargs):
@@ -13,7 +13,7 @@ def topic_created_or_updated(instance, **kwargs):
     User = get_user_model()
     forum = instance.forum
 
-    if forum.is_public == True:
+    if forum.is_public is True:
         users = User.objects.all()
     else:
         users = []
@@ -61,8 +61,7 @@ def comment_created_or_updated(instance, **kwargs):
     for react in TopicUse.objects.filter(topic=instance.topic):
         users.append(react.user)
 
-
-    if not instance.parent: # If the comment is not an answer to another comment
+    if not instance.parent:  # If the comment is not an answer to another comment
         # Trigger: a comment has been made
         # Notify people that already commented ou answered to comments in this topic
         for comment in Comment.objects.filter(topic=instance.topic):
@@ -86,7 +85,6 @@ def comment_created_or_updated(instance, **kwargs):
                 # Trigger: an answer to a comment has been made
                 # Notify people that have reacted to answers to the parent comment
                 users.append(react.user)
-
 
     # Create (or update) the nedded notifications
     for one_user in users:
@@ -114,7 +112,7 @@ def comment_created_or_updated(instance, **kwargs):
 
 @receiver(post_save, sender=TopicLike)
 @receiver(post_save, sender=TopicUse)
-def reaction_created_or_updated(instance, **kwargs):
+def topic_reaction_created_or_updated(instance, **kwargs):
 
     # Users that must be notified
     users = []
@@ -151,9 +149,8 @@ def reaction_created_or_updated(instance, **kwargs):
         notification.save()
 
 
-
 @receiver(post_save, sender=CommentLike)
-def reaction_created_or_updated(instance, **kwargs):
+def comment_reaction_created_or_updated(instance, **kwargs):
 
     # Users that must be notified
     users = []
@@ -168,12 +165,12 @@ def reaction_created_or_updated(instance, **kwargs):
     # Notify the comment/answer author
     users.append(instance.comment.author)
 
-    if not instance.comment.parent: # If this comment is not an answer
+    if not instance.comment.parent:  # If this comment is not an answer
         # Trigger: reaction to a comment
         # Notify who has already reacted to the comment
         for react in CommentLike.objects.filter(comment=instance.comment):
             users.append(react.user)
-    else: # If this comment is an answer to another comment
+    else:  # If this comment is an answer to another comment
         # Trigger: reaction to an answer of a comment
         # Notify the author of the parent comment
         users.append(instance.comment.parent.author)
@@ -187,7 +184,6 @@ def reaction_created_or_updated(instance, **kwargs):
         # Notify who has reacted to the parent comment
         for react in CommentLike.objects.filter(comment=instance.comment.parent):
             users.append(react.user)
-
 
     # Create (or update) the nedded notifications
     for one_user in users:

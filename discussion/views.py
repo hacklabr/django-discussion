@@ -84,9 +84,12 @@ class TopicNotificationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super(TopicNotificationViewSet, self).get_queryset()
-        return queryset.filter(user=self.request.user)
-        #return queryset.filter(user=71)[:10]
-        #return queryset.all()[:10]
+        queryset = queryset.filter(user=self.request.user)
+
+        limit_to = self.request.query_params.get('limit_to', None)
+        if limit_to:
+            queryset = queryset[:int(limit_to)]
+        return queryset
 
 
 class BaseUserReactionViewSet(viewsets.ModelViewSet):

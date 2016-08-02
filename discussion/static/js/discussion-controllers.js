@@ -10,15 +10,16 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$location', 'Forum', 'Topic',
-        function ($scope, $location, Forum, Topic) {
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic',
+        function ($scope,  $window, $location, Forum, Topic) {
             $scope.forums = Forum.query();
             $scope.new_topic = new Topic();
             $scope.save_topic = function(topic) {
                 $scope.sending = true;
                 $scope.new_topic.forum = 1;
-                $scope.new_topic.$save(function(msg){
-                    window.location = '/discussion/topic##'+msg.id;
+                $scope.new_topic.$save(function(topic){
+                    var url = '/discussion/topic##'+topic.id;
+                    $window.location.href = '/discussion/topic/##'+topic.id;;
                 });
             }
         }

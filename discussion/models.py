@@ -80,7 +80,7 @@ class BasePost(models.Model):
 class Topic(BasePost):
 
     forum = models.ForeignKey(Forum, verbose_name=_('forum'), related_name='topics')
-    categories = models.ManyToManyField(Category, verbose_name=_('categories'), related_name='topics')
+    categories = models.ManyToManyField(Category, verbose_name=_('categories'), related_name='topics', blank=True)
 
     last_activity_at = models.DateTimeField(default=timezone.now)
 
@@ -170,7 +170,7 @@ class TopicNotification(models.Model):
     comment = models.ForeignKey('Comment', null=True, blank=True)
     comment_like = models.ForeignKey('CommentLike', null=True, blank=True)
     topic_like = models.ForeignKey('TopicLike', null=True, blank=True)
-    
+
     date = models.DateTimeField(auto_now=True)
     action = models.CharField(choices=ACTION_CHOICES, default='undefined', max_length=64)
     is_read = models.BooleanField(default=False)

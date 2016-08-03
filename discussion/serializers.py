@@ -85,7 +85,7 @@ class CommentSerializer(BaseCommentSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author', 'topic',
-                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like',)
+                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like', 'parent', )
         # depth = 1
 
 

@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import pagination
 from rest_framework.response import Response
 
-from discussion.serializers import (CategorySerializer, ForumSerializer, TopicSerializer, CommentSerializer,
+from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSerializer, CommentSerializer,
                                     TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
                                     CommentLikeSerializer,)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
@@ -31,6 +31,17 @@ class ForumViewSet(viewsets.ModelViewSet):
     serializer_class = ForumSerializer
     permission_classes = [IsAuthenticated]
 
+
+class ForumSearchViewSet(viewsets.ModelViewSet):
+    """
+    """
+
+    queryset = Forum.objects.all()
+    serializer_class = ForumSearchSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('title', 'text',)
+    # search_fields = ('title', 'text', 'topics__title', 'topics__content', 'topics__comment__text', )
 
 class SimpleLimitPagination(pagination.LimitOffsetPagination):
 

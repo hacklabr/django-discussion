@@ -153,3 +153,12 @@ class CommentLikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentLike
         exclude = ('user',)
+
+
+class ForumSearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Forum
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category', 'topics', )
+        depth = 1
+

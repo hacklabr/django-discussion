@@ -93,6 +93,8 @@ class TopicSerializer(serializers.ModelSerializer):
 
     author = BaseUserSerializer(read_only=True)
     comments = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
     user_like = serializers.SerializerMethodField()
     forum_info = BaseForumSerializer(source='forum', read_only=True)
 
@@ -105,6 +107,14 @@ class TopicSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
         queryset = obj.comments.filter(parent=None)
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
+
+    def get_categories(self, obj):
+        queryset = obj.categories.filter(parent=None)
+        return CategorySerializer(instance=queryset, many=True, **{'context': self.context}).data
+
+    def get_tags(self, obj):
+        queryset = obj.categories.filter(parent=None)
+        return TagSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
     def get_user_like(self, obj):
         request = self.context.get("request")

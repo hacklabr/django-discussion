@@ -55,6 +55,25 @@ class Tag(models.Model):
         return self.name
 
 
+def get_upload_path(instance):
+    if isinstance(instance, Topic):
+        return u'/forum/images/{0}'.format(instance.topic.slug)
+    else:
+        return u'/forum/images/{0}'.format(instance.comment.slug)
+
+
+class TopicFile(models.Model):
+    name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
+    topic = models.ForeignKey('Topic', related_name='topic')
+    file = models.FileField(upload_to=get_upload_path)
+
+
+class CommentFile(models.Model):
+    name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
+    comment = models.ForeignKey('Comment', related_name='comment')
+    file = models.FileField(upload_to=get_upload_path)
+
+
 class BasePost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
     tags = models.ManyToManyField(Tag, verbose_name=_('tags'), blank=True)

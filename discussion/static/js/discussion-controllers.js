@@ -2,11 +2,27 @@
     'use strict';
     var app = angular.module('discussion.controllers', ['ngSanitize']);
 
-    app.controller('ForumCtrl', ['$scope', 'Forum', 'Topic',
-        function ($scope, Forum, Topic) {
-            $scope.forums = Forum.query({});
-            $scope.latest_topics = Topic.query({limit: 6, ordering: 'updated_at'})
-            console.log($scope.forums);
+    app.controller('ForumCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic',
+        function ($scope, $window, $location, Forum, Topic) {
+            function normalInit() {
+                $scope.forums = Forum.query({});
+                $scope.latest_topics = Topic.query({limit: 6, ordering: 'updated_at'})
+            }
+            var forum_id = $location.hash();
+            if(forum_id) {
+                $scope.forum = Forum.get({id: forum_id},function(res){
+                    $scope.forum_single = true;
+                    $scope.forums = [];
+                    res.latest_topics = Topic.query({limit: 100, ordering: 'updated_at'},function(){
+                        $scope.topics_loaded = true;
+                    });
+                    $scope.forums.push(res); // to reuse template's ng-repeat
+                },function(err){
+                    normalInit();
+                });
+            } else {
+                normalInit();
+            }
         }
     ]);
 
@@ -19,7 +35,7 @@
                 $scope.new_topic.forum = 1;
                 $scope.new_topic.$save(function(topic){
                     var url = '/discussion/topic##'+topic.id;
-                    $window.location.href = '/discussion/topic/##'+topic.id;;
+                    $window.location.href = url;
                 });
             }
         }
@@ -28,7 +44,7 @@
     app.controller('TopicCtrl', ['$scope', '$location', 'Forum', 'Topic', 'Comment', 'TopicLike', 'CommentLike',
         function ($scope, $location, Forum, Topic, Comment, TopicLike, CommentLike) {
             var topic_id = $location.hash();
-            $scope.topic = Topic.get({id: topic_id})
+            $scope.topic = Topic.get({id: topic_id});
 
             $scope.tinymceOptions = {
                 inline: false,

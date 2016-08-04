@@ -67,11 +67,17 @@ class TopicFile(models.Model):
     topic = models.ForeignKey('Topic', related_name='attachment')
     file = models.FileField(upload_to=get_upload_path)
 
+    def __unicode__(self):
+        return self.name
+
 
 class CommentFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
     comment = models.ForeignKey('Comment', related_name='attachment')
     file = models.FileField(upload_to=get_upload_path)
+
+    def __unicode__(self):
+        return self.name
 
 
 class BasePost(models.Model):
@@ -201,12 +207,9 @@ class TopicNotification(models.Model):
         verbose_name = _("topic notification")
         verbose_name_plural = _("topics notification")
 
-    def get_absolute_url(self):
-        return self.comment.get_absolute_url()
-
     @property
     def text_action(self):
-        return ACTION_CHOICES[self.action][1]
+        return self.ACTION_CHOICES[self.action][1]
 
     @property
     def is_mention(self):

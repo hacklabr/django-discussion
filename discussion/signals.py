@@ -13,10 +13,18 @@ def topic_created_or_updated(instance, **kwargs):
     User = get_user_model()
     forum = instance.forum
 
-    if forum.is_public is True:
+    # Users that must be notified
+    users = []
+
+    if forum.is_public is True:  # if the forum is public, every user should be notified and the groups check is not necessary
         users = User.objects.all()
-    else:
-        users = []
+    else:  # if the forum is not public, only members from groups registered in the forum must be notified
+        for group in forum.groups.all():
+            for u in User.objects.filter(groups=group):
+                users.append(u)
+
+    # Remove the original author from the notifications list
+    users = [user for user in users if user != instance.author]
 
     for one_user in users:
         try:

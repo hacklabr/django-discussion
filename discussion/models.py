@@ -64,13 +64,13 @@ def get_upload_path(instance):
 
 class TopicFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
-    topic = models.ForeignKey('Topic', related_name='topic')
+    topic = models.ForeignKey('Topic', related_name='attachment')
     file = models.FileField(upload_to=get_upload_path)
 
 
 class CommentFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
-    comment = models.ForeignKey('Comment', related_name='comment')
+    comment = models.ForeignKey('Comment', related_name='attachment')
     file = models.FileField(upload_to=get_upload_path)
 
 

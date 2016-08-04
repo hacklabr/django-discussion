@@ -2,8 +2,8 @@
     'use strict';
     var app = angular.module('discussion.controllers', ['ngSanitize']);
 
-    app.controller('ForumCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic',
-        function ($scope, $window, $location, Forum, Topic) {
+    app.controller('ForumCtrl', ['$scope', '$window', '$http', '$location', 'Forum', 'Topic',
+        function ($scope, $window, $http, $location, Forum, Topic) {
             function normalInit() {
                 $scope.forums = Forum.query({});
                 $scope.latest_topics = Topic.query({limit: 6, ordering: 'updated_at'})
@@ -24,9 +24,15 @@
                 normalInit();
             }
             $scope.getResults = function(txt) {
-                return [0,1,2,3,4]
+                if(txt.length > 2) {
+                    return $http.get('/discussion/api/search/?search='+txt)
+                    .then(function(results){
+                        if(results.data.length > 0) {
+                            return results.data[0].topics;
+                        }
+                    });
+                }
             }
-            $scope.states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Dakota', 'North Carolina', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'];
         }
     ]);
 

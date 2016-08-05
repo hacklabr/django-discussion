@@ -13,9 +13,12 @@
                 $scope.forum = Forum.get({id: forum_id},function(res){
                     $scope.forum_single = true;
                     $scope.forums = [];
-                    res.latest_topics = Topic.query({limit: 100, ordering: 'updated_at'},function(){
-                        $scope.topics_loaded = true;
-                    });
+                    res.latest_topics = Topic.query({
+                        limit: 100,
+                        forum: forum_id,
+                        ordering: '-last_activity_at'}, function(){
+                            $scope.topics_loaded = true;
+                        });
                     $scope.forums.push(res); // to reuse template's ng-repeat
                 },function(err){
                     normalInit();

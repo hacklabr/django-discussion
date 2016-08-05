@@ -47,8 +47,9 @@ class TopicViewSet(viewsets.ModelViewSet):
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = (filters.OrderingFilter,)
-    ordering_fields = ('last_activity_at',)
+    filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
+    ordering_fields = ('last_activity_at', )
+    filter_fields = ('forum', )
     # pagination_class = SimpleLimitPagination
 
     def perform_create(self, serializer):

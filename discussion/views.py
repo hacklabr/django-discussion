@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from django.db.models import Q
 
-from discussion.serializers import (CategorySerializer, ForumSerializer, TopicSerializer, CommentSerializer,
+from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSerializer, CommentSerializer,
                                     TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
                                     CommentLikeSerializer,)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
@@ -38,6 +38,18 @@ class ForumViewSet(viewsets.ModelViewSet):
         queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
 
         return queryset.distinct()
+
+
+class ForumSearchViewSet(viewsets.ModelViewSet):
+    """
+    """
+
+    queryset = Forum.objects.all()
+    serializer_class = ForumSearchSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('title', 'text',)
+    # search_fields = ('title', 'text', 'topics__title', 'topics__content', 'topics__comment__text', )
 
 
 class TopicViewSet(viewsets.ModelViewSet):

@@ -129,28 +129,30 @@ class TagSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class TopicNotificationSerializer(serializers.ModelSerializer):
-
-    topic = BaseTopicSerializer()
-    comment = BaseCommentSerializer()
-
-    class Meta:
-        model = TopicNotification
-        depth = 1
-
-
 class TopicLikeSerializer(serializers.ModelSerializer):
 
+    user = BaseUserSerializer(read_only=True)
     class Meta:
         model = TopicLike
-        exclude = ('user',)
 
 
 class CommentLikeSerializer(serializers.ModelSerializer):
 
+    user = BaseUserSerializer(read_only=True)
     class Meta:
         model = CommentLike
-        exclude = ('user',)
+
+
+class TopicNotificationSerializer(serializers.ModelSerializer):
+
+    topic = BaseTopicSerializer(read_only=True)
+    comment = BaseCommentSerializer(read_only=True)
+    topic_like = TopicLikeSerializer(read_only=True)
+    comment_like = CommentLikeSerializer(read_only=True)
+
+    class Meta:
+        model = TopicNotification
+        depth = 1
 
 
 class ForumSearchSerializer(serializers.ModelSerializer):

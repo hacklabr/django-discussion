@@ -6,7 +6,7 @@
         function ($scope, $window, $location, Forum, Topic) {
             function normalInit() {
                 $scope.forums = Forum.query({});
-                $scope.latest_topics = Topic.query({limit: 6, ordering: 'updated_at'})
+                $scope.latest_topics = Topic.query({limit: 6, ordering: '-last_activity_at'})
             }
             var forum_id = $location.hash();
             if(forum_id) {

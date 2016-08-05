@@ -33,7 +33,7 @@ class BaseForumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category')
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category', )
 
 
 class ForumSerializer(serializers.ModelSerializer):
@@ -43,7 +43,7 @@ class ForumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics',)
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', )
         depth = 1
 
     @staticmethod
@@ -73,7 +73,7 @@ class CommentReplySerializer(BaseCommentSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author',
-                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like')
+                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like', )
         depth = 1
 
 
@@ -109,12 +109,10 @@ class TopicSerializer(serializers.ModelSerializer):
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
     def get_categories(self, obj):
-        queryset = obj.categories.filter(parent=None)
-        return CategorySerializer(instance=queryset, many=True, **{'context': self.context}).data
+        return CategorySerializer(instance=obj.categories, many=True, **{'context': self.context}).data
 
     def get_tags(self, obj):
-        queryset = obj.categories.filter(parent=None)
-        return TagSerializer(instance=queryset, many=True, **{'context': self.context}).data
+        return TagSerializer(instance=obj.tags, many=True, **{'context': self.context}).data
 
     def get_user_like(self, obj):
         request = self.context.get("request")

@@ -4,7 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import pagination
 from rest_framework.response import Response
 
-from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSerializer, CommentSerializer,
+from django.db.models import Q
+
+from discussion.serializers import (CategorySerializer, ForumSerializer, TopicSerializer, CommentSerializer,
                                     TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
                                     CommentLikeSerializer,)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
@@ -31,22 +33,11 @@ class ForumViewSet(viewsets.ModelViewSet):
     serializer_class = ForumSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        queryset = super(ForumViewSet, self).get_queryset()
+        queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
 
-class ForumSearchViewSet(viewsets.ModelViewSet):
-    """
-    """
-
-    queryset = Forum.objects.all()
-    serializer_class = ForumSearchSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('title', 'text',)
-    # search_fields = ('title', 'text', 'topics__title', 'topics__content', 'topics__comment__text', )
-
-class SimpleLimitPagination(pagination.LimitOffsetPagination):
-
-    def get_paginated_response(self, data):
-        return Response(data)
+        return queryset.distinct()
 
 
 class TopicViewSet(viewsets.ModelViewSet):
@@ -56,15 +47,38 @@ class TopicViewSet(viewsets.ModelViewSet):
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = (filters.OrderingFilter,)
-    ordering_fields = ('updated_at',)
-    pagination_class = SimpleLimitPagination
+    filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
+    ordering_fields = ('last_activity_at', )
+    filter_fields = ('forum', )
+    # pagination_class = SimpleLimitPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_queryset(self):
+        queryset = super(TopicViewSet, self).get_queryset()
+
+        queryset = queryset.filter(
+            Q(forum__is_public=True) |
+            Q(forum__groups__in=self.request.user.groups.all())
+        )
+
+        return queryset
+
+    def filter_queryset(self, queryset):
+
+        queryset = super(TopicViewSet, self).filter_queryset(queryset)
+
+        queryset = queryset.distinct()
+
+        limit_to = self.request.query_params.get('limit', None)
+        if limit_to:
+            queryset = queryset[:int(limit_to)]
+
+        return queryset
 
 
 class CommentViewSet(viewsets.ModelViewSet):

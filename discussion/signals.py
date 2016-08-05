@@ -43,8 +43,6 @@ def topic_created_or_updated(instance, **kwargs):
         notification.is_read = False
         notification.save()
 
-    # TODO take real group permissions into account when triggering notifications
-
 
 @receiver(post_save, sender=Comment)
 def comment_created_or_updated(instance, **kwargs):
@@ -94,6 +92,9 @@ def comment_created_or_updated(instance, **kwargs):
                 # Notify people that have reacted to answers to the parent comment
                 users.append(react.user)
 
+    # Remove the original author from the notifications list
+    users = [user for user in users if user != instance.author]
+
     # Create (or update) the nedded notifications
     for one_user in users:
         # Check if the current user already has a pending notification for this topic
@@ -136,6 +137,9 @@ def topic_reaction_created_or_updated(instance, **kwargs):
 
     for react in TopicUse.objects.filter(topic=instance.topic):
         users.append(react.user)
+
+    # Remove the original reaction author from the notifications list
+    users = [user for user in users if user != instance.user]
 
     # Create (or update) the nedded notifications
     for one_user in users:
@@ -192,6 +196,9 @@ def comment_reaction_created_or_updated(instance, **kwargs):
         # Notify who has reacted to the parent comment
         for react in CommentLike.objects.filter(comment=instance.comment.parent):
             users.append(react.user)
+
+    # Remove the original author from the notifications list
+    users = [user for user in users if user != instance.user]
 
     # Create (or update) the nedded notifications
     for one_user in users:

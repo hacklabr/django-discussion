@@ -109,12 +109,10 @@ class TopicSerializer(serializers.ModelSerializer):
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
     def get_categories(self, obj):
-        queryset = obj.categories.filter(parent=None)
-        return CategorySerializer(instance=queryset, many=True, **{'context': self.context}).data
+        return CategorySerializer(instance=obj.categories, many=True, **{'context': self.context}).data
 
     def get_tags(self, obj):
-        queryset = obj.categories.filter(parent=None)
-        return TagSerializer(instance=queryset, many=True, **{'context': self.context}).data
+        return TagSerializer(instance=obj.tags, many=True, **{'context': self.context}).data
 
     def get_user_like(self, obj):
         request = self.context.get("request")

@@ -2,8 +2,8 @@
     'use strict';
     var app = angular.module('discussion.controllers', ['ngSanitize']);
 
-    app.controller('ForumCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic',
-        function ($scope, $window, $location, Forum, Topic) {
+    app.controller('ForumCtrl', ['$scope', '$window', '$http', '$location', 'Forum', 'Topic',
+        function ($scope, $window, $http, $location, Forum, Topic) {
             function normalInit() {
                 $scope.forums = Forum.query({});
                 $scope.latest_topics = Topic.query({limit: 6, ordering: '-last_activity_at'})
@@ -25,6 +25,16 @@
                 });
             } else {
                 normalInit();
+            }
+            $scope.getResults = function(txt) {
+                if(txt.length > 2) {
+                    return $http.get('/discussion/api/search/?search='+txt)
+                    .then(function(results){
+                        if(results.data.length > 0) {
+                            return results.data[0].topics;
+                        }
+                    });
+                }
             }
         }
     ]);

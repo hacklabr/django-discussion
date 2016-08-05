@@ -5,6 +5,7 @@
         'discussion.controllers',
         'discussion.services',
         'ui.tinymce',
+        'ui.bootstrap'
     ]);
 
     app.config(['$resourceProvider', function($resourceProvider) {

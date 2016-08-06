@@ -7,6 +7,8 @@ from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 
+import hashlib
+
 
 @python_2_unicode_compatible
 class Category(models.Model):
@@ -55,11 +57,14 @@ class Tag(models.Model):
         return self.name
 
 
-def get_upload_path(instance):
-    if isinstance(instance, Topic):
-        return u'/forum/images/{0}'.format(instance.topic.slug)
+def get_upload_path(instance, filename):
+    instance.file.open()
+    content = instance.file.read()
+    hash_name = hashlib.sha1(content).hexdigest()
+    if isinstance(instance, TopicFile):
+        return u'forum/{}/{}_{}'.format(instance.topic.slug, hash_name, instance.name)
     else:
-        return u'/forum/images/{0}'.format(instance.comment.slug)
+        return u'forum/{}/{}/{}_{}'.format(instance.comment.topic.slug, instance.comment.slug, hash_name, instance.name)
 
 
 class TopicFile(models.Model):

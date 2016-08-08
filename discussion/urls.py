@@ -21,10 +21,7 @@ router.register(r'search', ForumSearchViewSet)
 urlpatterns = [
 
     url(r'^api/', include(router.urls)),
-    url(r'^forum/', TemplateView.as_view(template_name="forum.html"), name='forum'),
-    url(r'^forum-detail/', TemplateView.as_view(template_name="forum.html"), name='forum-detail'),
+    url(r'^$', TemplateView.as_view(template_name="forum.html"), name='forum'),
     url(r'^topic/(?:#(?P<topic_id>[-a-zA-Z0-9_]+))?$', TemplateView.as_view(template_name="forum-topic.html")),
     url(r'^topic/new/', TemplateView.as_view(template_name="forum-new-topic.html")),
-    # url(r'^(#/topic/)(?P<topic_id>[-a-zA-Z0-9_]+)$', TemplateView.as_view(template_name="forum-thread.html")),
-    # url(r'^(?:#/topic/(?P<topic_id>[-a-zA-Z0-9_]+))$', TemplateView.as_view(template_name="forum-thread.html")),
 ]

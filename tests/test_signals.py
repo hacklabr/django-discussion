@@ -55,7 +55,7 @@ class TestSignals(TestCase):
         self.topic_trains = models.Topic(
             author=self.user_brown, forum=self.forum, title="Thoughts about trains?", content="Just thinking aloud")
         self.topic_trains.save()
-        notified_users = [t.user for t in TopicNotification.objects.filter(topic=self.topic_trains).all()]
+        notified_users = [t.user for t in TopicNotification.objects.filter(topic=self.topic_trains, action="new_topic")]
 
         # Biff should not have been notified, since he is not a time traveler
         self.assertNotIn(self.user_biff, notified_users)
@@ -74,7 +74,7 @@ class TestSignals(TestCase):
         public_topic.save()
 
         # Everybody, except for the author, should have been notified about the public_topic
-        notified_users = [n.user for n in TopicNotification.objects.filter(topic=public_topic).all()]
+        notified_users = [n.user for n in TopicNotification.objects.filter(topic=public_topic, action="new_topic")]
         all_other_users = [user for user in User.objects.all() if user != self.user_biff]
         self.assertEqual(set(all_other_users), set(notified_users))
 

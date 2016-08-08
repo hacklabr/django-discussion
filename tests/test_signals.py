@@ -5,7 +5,7 @@
 test_django-discussion
 ------------
 
-Tests for `django-discussion` models module.
+Tests for `django-discussion` signals module.
 """
 
 from django.test import TestCase
@@ -78,6 +78,53 @@ class TestSignals(TestCase):
         all_other_users = [user for user in User.objects.all() if user != self.user_biff]
         self.assertEqual(set(all_other_users), set(notified_users))
 
+    def test_post_save_comment(self):
+
+        # Event: new topic is created
+        topic = models.Topic(
+            author=self.user_brown, forum=self.forum, title="Thoughts about trains?", content="Just thinking aloud")
+        topic.save()
+
+        # Event: users react to the topic
+        TopicLike.objects.create(topic=topic, user=self.user_marty)
+        TopicLike.objects.create(topic=topic, user=self.user_jennifer)
+        react_users = [self.user_marty, self.user_jennifer]
+
+        comment = Comment.objects.create(author=self.user_biff, topic=topic, text="Some message")
+        notified_users_new_comment = [n.user for n in TopicNotification.objects.filter(topic=topic, comment=comment, action="new_comment")]
+
+        # The comment author should not be notified
+        self.assertNotIn(self.user_biff, notified_users_new_comment)
+
+        # Users that reacted to the topic should be notified
+        for user in react_users:
+            self.assertIn(user, notified_users_new_comment)
+
+        # The topic author should be notified about the last comment made
+        self.assertIn(self.user_brown, notified_users_new_comment)
+
+        # Make a new comment
+        another_comment = Comment.objects.create(author=self.user_lorraine, topic=topic, text="Some message")
+
+        notified_users_new_comment = [n.user for n in TopicNotification.objects.filter(topic=topic, comment=another_comment, action="new_comment")]
+
+        # The topic author should be notified about the last comment made
+        self.assertIn(self.user_brown, notified_users_new_comment)
+
+        # Notify who has already commented ou answered to comments in the same topic
+        self.assertIn(self.user_biff, notified_users_new_comment)
+
+        # Don't notify who hasn't interacted at all with this topic
+        self.assertNotIn(self.user_george, notified_users_new_comment)
+
+    def test_post_save_topic_reaction(self):
+        pass
+
+    def test_post_save_comment_reaction(self):
+        pass
+        # CommentLike.objects.create(user=self.user_lorraine, comment=comment)
+        #
+        # notified_users_new_like = [n.user for n in TopicNotification.objects.filter(topic=topic, comment=comment, action="new_reaction_comment")]
 
     def tearDown(self):
         pass

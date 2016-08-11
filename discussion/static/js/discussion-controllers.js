@@ -29,10 +29,10 @@
             }
             $scope.getResults = function(txt) {
                 if(txt.length > 2) {
-                    return $http.get('/discussion/api/search/?search='+txt)
+                    return $http.get('/discussion/api/typeahead/?search='+txt)
                     .then(function(results){
                         if(results.data.length > 0) {
-                            return results.data[0].topics;
+                            return results.data;
                         }
                     });
                 }

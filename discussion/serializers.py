@@ -162,3 +162,12 @@ class ForumSearchSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category', 'topics', )
         depth = 1
 
+
+class TopicSearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Topic
+        fields = ('id', 'title', 'content', 'slug', 'is_public', )
+        depth = 1
+
+

@@ -6,7 +6,13 @@
         function ($scope, $routeParams, $http, Forum, Topic) {
             function normalInit() {
                 $scope.forums = Forum.query({});
-                $scope.latest_topics = Topic.query({limit: 6, ordering: '-last_activity_at'})
+                $scope.latest_topics = Topic.query({
+                    limit: 6,
+                    ordering: '-last_activity_at',
+                    }, function(){
+                        $scope.topics_loaded = true;
+                    }
+                )
             }
 
             var forum_id = $routeParams.forumId;
@@ -17,9 +23,11 @@
                     res.latest_topics = Topic.query({
                         limit: 100,
                         forum: forum_id,
-                        ordering: '-last_activity_at'}, function(){
+                        ordering: '-last_activity_at'
+                        }, function(){
                             $scope.topics_loaded = true;
-                        });
+                        }
+                    );
                     $scope.forums.push(res); // to reuse template's ng-repeat
                 },function(err){
                     normalInit();
@@ -32,6 +40,11 @@
                     return $http.get('/discussion/api/typeahead/?search='+txt)
                     .then(function(results){
                         if(results.data.length > 0) {
+                            var res = [];
+                            results.data.unshift({
+                                title:"Sugestões de tópicos",
+                                disabled: true
+                            });
                             return results.data;
                         }
                     });

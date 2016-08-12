@@ -69,7 +69,7 @@ def get_upload_path(instance, filename):
 
 class TopicFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
-    topic = models.ForeignKey('Topic', related_name='attachment')
+    topic = models.ForeignKey('Topic', related_name='files')
     file = models.FileField(upload_to=get_upload_path)
 
     def __unicode__(self):
@@ -78,7 +78,7 @@ class TopicFile(models.Model):
 
 class CommentFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
-    comment = models.ForeignKey('Comment', related_name='attachment')
+    comment = models.ForeignKey('Comment', related_name='files')
     file = models.FileField(upload_to=get_upload_path)
 
     def __unicode__(self):

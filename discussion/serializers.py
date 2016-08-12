@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
-                               CommentLike,)
+                               CommentLike, TopicFile, CommentFile)
 from accounts.serializers import TimtecUserSerializer
 
 
@@ -77,16 +76,30 @@ class CommentReplySerializer(BaseCommentSerializer):
         depth = 1
 
 
+class CommentFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommentFile
+
+
 class CommentSerializer(BaseCommentSerializer):
 
     author = BaseUserSerializer(read_only=True)
     comment_replies = CommentReplySerializer(many=True, read_only=True)
+    files = CommentFileSerializer(many=True)
 
     class Meta:
         model = Comment
         fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author', 'topic',
-                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like', 'parent', )
+                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like', 'parent',
+                  'files', )
         # depth = 1
+
+
+class TopicFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TopicFile
 
 
 class TopicSerializer(serializers.ModelSerializer):
@@ -97,12 +110,13 @@ class TopicSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     user_like = serializers.SerializerMethodField()
     forum_info = BaseForumSerializer(source='forum', read_only=True)
+    files = TopicFileSerializer(many=True)
 
     class Meta:
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
                   'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum', 'comments',
-                  'user_like', 'last_activity_at', 'forum_info', )
+                  'user_like', 'last_activity_at', 'forum_info', 'files')
 
     def get_comments(self, obj):
         queryset = obj.comments.filter(parent=None)
@@ -132,6 +146,7 @@ class TagSerializer(serializers.ModelSerializer):
 class TopicLikeSerializer(serializers.ModelSerializer):
 
     user = BaseUserSerializer(read_only=True)
+
     class Meta:
         model = TopicLike
 
@@ -139,6 +154,7 @@ class TopicLikeSerializer(serializers.ModelSerializer):
 class CommentLikeSerializer(serializers.ModelSerializer):
 
     user = BaseUserSerializer(read_only=True)
+
     class Meta:
         model = CommentLike
 
@@ -169,5 +185,3 @@ class TopicSearchSerializer(serializers.ModelSerializer):
         model = Topic
         fields = ('id', 'title', 'content', 'slug', 'is_public', )
         depth = 1
-
-

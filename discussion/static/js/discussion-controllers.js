@@ -23,8 +23,7 @@
                     res.latest_topics = Topic.query({
                         limit: 100,
                         forum: forum_id,
-                        ordering: '-last_activity_at'
-                        }, function(){
+                        ordering: '-last_activity_at'}, function(topics){
                             $scope.topics_loaded = true;
                         }
                     );

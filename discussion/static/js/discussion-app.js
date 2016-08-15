@@ -6,7 +6,8 @@
         'discussion.services',
         'ngRoute',
         'ui.tinymce',
-        'ui.bootstrap'
+        'ui.bootstrap',
+        'ngFileUpload',
     ]);
 
     app.config(['$resourceProvider', function($resourceProvider) {

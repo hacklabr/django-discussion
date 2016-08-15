@@ -38,4 +38,46 @@
             {'update': {'method': 'PUT'} });
     }]);
 
+    app.factory('TopicFile', ['$resource', function($resource){
+         var topic_file = $resource('/discussion/api/topic-file/:id',
+            {'id' : '@id'},
+            {
+                'update': {'method': 'PUT'},
+                'patch': {'method': 'PATCH'}
+            });
+
+        topic_file.upload = function(file) {
+            return Upload.upload({
+                url: '/discussion/api/topic-file/',
+                data: {
+                    name: file.name,
+                    file: file
+                },
+                arrayKey: '',
+            });
+        };
+        return topic_file;
+    }]);
+
+    app.factory('CommentFile', ['$resource', 'Upload', function($resource, Upload){
+        var comment_file = $resource('/discussion/api/comment-file/:id',
+            {'id' : '@id'},
+            {
+                'update': {'method': 'PUT'},
+                'patch': {'method': 'PATCH'}
+            });
+
+        comment_file.upload = function(file) {
+            return Upload.upload({
+                url: '/discussion/api/comment-file/',
+                data: {
+                    name: file.name,
+                    file: file
+                },
+                arrayKey: '',
+            });
+        };
+        return comment_file
+    }]);
+
 })(window.angular);

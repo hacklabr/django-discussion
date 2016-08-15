@@ -1,14 +1,15 @@
 from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import parsers
 
 from django.db.models import Q
 
 from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer, TopicSerializer, CommentSerializer,
                                     TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
-                                    CommentLikeSerializer,)
+                                    CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
-                               CommentLike,)
+                               CommentLike, TopicFile, CommentFile,)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -160,6 +161,26 @@ class TopicLikeViewSet(BaseUserReactionViewSet):
     queryset = TopicLike.objects.all()
     serializer_class = TopicLikeSerializer
     permission_classes = [IsAuthenticated]
+
+
+class TopicFileViewSet(viewsets.ModelViewSet):
+    queryset = TopicFile.objects.all()
+    serializer_class = TopicFileSerializer
+    # parser_classes = (parsers.FileUploadParser,)
+    parser_classes = (parsers.FormParser, parsers.MultiPartParser,)
+    # parser_classes = (parsers.FormParser,)
+
+    # def perform_create(self, serializer):
+    #     import pdb;pdb.set_trace()
+    #     return super(TopicFileViewSet, self).perform_create(serializer)
+    #
+    # def perform_update(self, serializer):
+    #     return super(TopicFileViewSet, self).perform_update(serializer)
+
+
+class CommentFileViewSet(viewsets.ModelViewSet):
+    queryset = CommentFile.objects.all()
+    serializer_class = CommentFileSerializer
 
 
 class CommentLikeViewSet(BaseUserReactionViewSet):

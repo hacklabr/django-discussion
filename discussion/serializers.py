@@ -67,26 +67,28 @@ class BaseCommentSerializer(serializers.ModelSerializer):
         return 0
 
 
-class CommentReplySerializer(BaseCommentSerializer):
-
-    class Meta:
-        model = Comment
-        fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author',
-                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like', )
-        depth = 1
-
-
 class CommentFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommentFile
 
 
+class CommentReplySerializer(BaseCommentSerializer):
+
+    files = CommentFileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'created_at', 'updated_at', 'slug', 'text', 'author',
+                  'hidden_by', 'tags', 'count_likes', 'comment_replies', 'user_like', 'files',)
+        depth = 1
+
+
 class CommentSerializer(BaseCommentSerializer):
 
     author = BaseUserSerializer(read_only=True)
     comment_replies = CommentReplySerializer(many=True, read_only=True)
-    files = CommentFileSerializer(many=True)
+    files = CommentFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = Comment
@@ -119,7 +121,7 @@ class TopicSerializer(serializers.ModelSerializer):
                   'user_like', 'last_activity_at', 'forum_info', 'files')
 
     def get_comments(self, obj):
-        queryset = obj.comments.filter(parent=None)
+        queryset = obj.comments.filter(parent=None).order_by('-updated_at')
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
     def get_categories(self, obj):

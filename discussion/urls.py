@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
 from discussion.views import (CategoryViewSet, ForumViewSet, ForumSearchViewSet, TopicTypeaheadViewSet, TopicViewSet, CommentViewSet, TagViewSet,
-                              TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet,)
+                              TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet)
 
 from rest_framework import routers
 
@@ -15,7 +15,9 @@ router.register(r'comment', CommentViewSet)
 router.register(r'tag', TagViewSet)
 router.register(r'topic-notification', TopicNotificationViewSet)
 router.register(r'comment_like', CommentLikeViewSet)
+router.register(r'comment-file', CommentFileViewSet)
 router.register(r'topic_like', TopicLikeViewSet)
+router.register(r'topic-file', TopicFileViewSet)
 router.register(r'search', ForumSearchViewSet)
 router.register(r'typeahead', TopicTypeaheadViewSet)
 

@@ -112,7 +112,7 @@ class TopicSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     user_like = serializers.SerializerMethodField()
     forum_info = BaseForumSerializer(source='forum', read_only=True)
-    files = TopicFileSerializer(many=True)
+    files = TopicFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = Topic

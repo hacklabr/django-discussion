@@ -94,11 +94,11 @@
                         comment_file.comment = comment.id;
                         delete comment_file.file;
                         comment_file.$patch().then(function(comment_file_complete) {
-                            comment.files.push(comment_file_complete)
+                            comment.files.push(comment_file_complete);
                         });
-                    })
+                    });
                 });
-            }
+            };
 
             $scope.topic_like = function(topic) {
                 if (topic.user_like) {

@@ -52,17 +52,43 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic',
-        function ($scope,  $window, $location, Forum, Topic) {
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile',
+        function ($scope,  $window, $location, Forum, Topic, TopicFile) {
             $scope.forums = Forum.query();
             $scope.new_topic = new Topic();
             $scope.save_topic = function() {
                 $scope.sending = true;
                 // $scope.new_topic.forum = 1;
+                var topic_files = $scope.new_topic.files;
                 $scope.new_topic.$save(function(topic){
+                    angular.forEach(topic_files, function(topic_file) {
+                        topic_file.topic = topic.id;
+                        delete topic_file.file;
+                        topic_file.$patch().then(function(comment_file_complete) {
+                            topic.files.push(comment_file_complete);
+                        });
+                    })
                     var url = '/discussion/topic/#!/topic/'+topic.id;
                     $window.location.href = url;
                 });
+            }
+
+            $scope.uploadCommentFiles = function (file, topic) {
+
+                if (file) {
+                    TopicFile.upload(file).then(function (response) {
+                        var comment_file = new TopicFile(response.data);
+
+                        if (topic.files === undefined)
+                            topic.files = [];
+                        topic.files.push(comment_file);
+                        return {location: comment_file.file};
+                    }, function (response) {
+                        if (response.status > 0) {
+                            $scope.errorMsg = response.status + ': ' + response.data;
+                        }
+                    });
+                }
             }
         }
     ]);

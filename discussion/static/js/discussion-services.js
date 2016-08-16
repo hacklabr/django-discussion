@@ -38,7 +38,7 @@
             {'update': {'method': 'PUT'} });
     }]);
 
-    app.factory('TopicFile', ['$resource', function($resource){
+    app.factory('TopicFile', ['$resource', 'Upload', function($resource, Upload){
          var topic_file = $resource('/discussion/api/topic-file/:id',
             {'id' : '@id'},
             {
@@ -48,7 +48,7 @@
 
         topic_file.upload = function(file) {
             return Upload.upload({
-                url: '/discussion/api/topic-file/',
+                url: '/discussion/api/topic-file',
                 data: {
                     name: file.name,
                     file: file
@@ -69,7 +69,7 @@
 
         comment_file.upload = function(file) {
             return Upload.upload({
-                url: '/discussion/api/comment-file/',
+                url: '/discussion/api/comment-file',
                 data: {
                     name: file.name,
                     file: file

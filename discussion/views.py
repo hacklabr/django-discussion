@@ -166,16 +166,6 @@ class TopicLikeViewSet(BaseUserReactionViewSet):
 class TopicFileViewSet(viewsets.ModelViewSet):
     queryset = TopicFile.objects.all()
     serializer_class = TopicFileSerializer
-    # parser_classes = (parsers.FileUploadParser,)
-    parser_classes = (parsers.FormParser, parsers.MultiPartParser,)
-    # parser_classes = (parsers.FormParser,)
-
-    # def perform_create(self, serializer):
-    #     import pdb;pdb.set_trace()
-    #     return super(TopicFileViewSet, self).perform_create(serializer)
-    #
-    # def perform_update(self, serializer):
-    #     return super(TopicFileViewSet, self).perform_update(serializer)
 
 
 class CommentFileViewSet(viewsets.ModelViewSet):

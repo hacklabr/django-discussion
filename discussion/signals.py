@@ -16,12 +16,22 @@ def topic_created_or_updated(instance, **kwargs):
     # Users that must be notified
     users = []
 
-    if forum.is_public is True:  # if the forum is public, every user should be notified and the groups check is not necessary
-        users = User.objects.all()
-    else:  # if the forum is not public, only members from groups registered in the forum must be notified
-        for group in forum.groups.all():
-            for u in User.objects.filter(groups=group):
-                users.append(u)
+    # If the topic is an answer, usual notification rules don't apply
+    # The detection can be made by using the forum number as reference
+    # If its greater then 13, the forum must be a activity specific one
+    if instance.forum.id > 13:
+        # This topic is an answer to a discussion activity
+        # Whoever has access to the same course must be notified
+        pass
+
+    else:
+        # This is a regular topic
+        if forum.is_public is True:  # if the forum is public, every user should be notified and the groups check is not necessary
+            users = User.objects.all()
+        else:  # if the forum is not public, only members from groups registered in the forum must be notified
+            for group in forum.groups.all():
+                for u in User.objects.filter(groups=group):
+                    users.append(u)
 
     # Remove the original author from the notifications list
     users = [user for user in users if user != instance.author]

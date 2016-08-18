@@ -41,7 +41,7 @@ class Forum(models.Model):
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=255, editable=False, unique=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
 
-    type = models.CharField(choices=TYPE_CHOICES, default='discussion', max_length=64)
+    forum_type = models.CharField(choices=TYPE_CHOICES, default='discussion', max_length=64)
 
     is_public = models.BooleanField(_("public"), default=False)
 

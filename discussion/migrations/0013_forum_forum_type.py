@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='forum',
-            name='type',
+            name='forum_type',
             field=models.CharField(default=b'discussion', max_length=64, choices=[(b'discussion', 'Discussion'), (b'activity', 'Activity')]),
         ),
     ]

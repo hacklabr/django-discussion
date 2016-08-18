@@ -27,6 +27,12 @@ class Category(models.Model):
 
 @python_2_unicode_compatible
 class Forum(models.Model):
+
+    TYPE_CHOICES = (
+        ('discussion', _('Discussion')),
+        ('activity', _('Activity')),
+    )
+
     author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), blank=True, null=True)
     category = models.ManyToManyField(Category, verbose_name=_('category'), blank=True)
 
@@ -34,6 +40,8 @@ class Forum(models.Model):
     text = models.TextField(_('text'), blank=True)
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=255, editable=False, unique=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
+
+    type = models.CharField(choices=TYPE_CHOICES, default='discussion', max_length=64)
 
     is_public = models.BooleanField(_("public"), default=False)
 
@@ -67,6 +75,7 @@ def get_upload_path(instance, filename):
         return u'forum/{}/{}/{}_{}'.format(instance.comment.topic.slug, instance.comment.slug, hash_name, instance.name)
     else:
         return u'forum/{}_{}'.format(hash_name, instance.name)
+
 
 class TopicFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)

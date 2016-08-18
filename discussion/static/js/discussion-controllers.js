@@ -5,6 +5,8 @@
     app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', 'Forum', 'Topic',
         function ($scope, $routeParams, $http, Forum, Topic) {
             function normalInit() {
+                $scope.filters = undefined;
+                $scope.forum_search = false;
                 $scope.forums = Forum.query({});
                 $scope.latest_topics = Topic.query({
                     limit: 6,
@@ -14,9 +16,7 @@
                     }
                 )
             }
-
-            var forum_id = $routeParams.forumId;
-            if(forum_id) {
+            function singleInit() {
                 $scope.forum = Forum.get({id: forum_id},function(res){
                     $scope.forum_single = true;
                     $scope.forums = [];
@@ -31,9 +31,16 @@
                 },function(err){
                     normalInit();
                 });
+            }
+
+            var forum_id = $routeParams.forumId;
+
+            if(forum_id) {
+                singleInit();
             } else {
                 normalInit();
             }
+
             $scope.getResults = function(txt) {
                 if(txt.length > 2) {
                     return $http.get('/discussion/api/typeahead/?search='+txt)
@@ -48,6 +55,69 @@
                         }
                     });
                 }
+            }
+
+            $scope.forumFilter = function(operation,type,filter_obj) {
+                if(!$scope.filters) {
+                    $scope.filters = {};
+                    $scope.filters.categories = []
+                    $scope.filters.tags = []
+                    $scope.filters_query = {};
+                    $scope.filters_query.categories = []
+                    $scope.filters_query.tags = []
+                }
+
+                if(operation == 'clear') {
+                    if(forum_id) {
+                        singleInit();
+                    } else {
+                        normalInit();
+                    }
+                    return;
+                }
+
+                if(type == 'cat') {
+                    if(operation == 'add') {
+                        if($scope.filters_query.categories.indexOf(filter_obj.id) > -1) {
+                            return;
+                        }
+                        $scope.filters.categories.push(filter_obj);
+                        $scope.filters_query.categories.push(filter_obj.id);
+                    }
+                    else {
+                        $scope.filters.categories.splice( $scope.filters.categories.indexOf(filter_obj), 1 );
+                        $scope.filters_query.categories.splice( $scope.filters_query.categories.indexOf(filter_obj.id), 1 );
+                    }
+                }
+                else {
+                    if(operation == 'add') {
+                        if($scope.filters_query.tags.indexOf(filter_obj.id) > -1) {
+                            return;
+                        }
+                        $scope.filters.tags.push(filter_obj);
+                        $scope.filters_query.tags.push(filter_obj.id);
+                    }
+                    else {
+                        $scope.filters.tags.splice( $scope.filters.tags.indexOf(filter_obj), 1 );
+                        $scope.filters_query.tags.splice( $scope.filters_query.tags.indexOf(filter_obj.id), 1 );
+                    }
+                }
+
+                if($scope.filters.categories.length + $scope.filters.tags.length === 0) {
+                    if(forum_id) {
+                        singleInit();
+                    } else {
+                        normalInit();
+                    }
+                    return;
+                }
+
+                $scope.forums = Forum.query({ // TODO: when single forum, filter only within it
+                    categories : $scope.filters_query.categories, //array with cat id's
+                    tags : $scope.filters_query.tags //array with tag id's
+                }, function(r) {
+                    $scope.forum_search = true;
+                });
             }
         }
     ]);

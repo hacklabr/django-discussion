@@ -34,6 +34,7 @@ class ForumViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super(ForumViewSet, self).get_queryset()
+        queryset = queryset.order_by('id')
         queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
 
         return queryset.distinct()

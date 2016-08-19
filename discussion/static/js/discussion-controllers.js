@@ -23,7 +23,7 @@
                     $scope.forum_search = false;
                     $scope.forum_single = true;
                     $scope.forums = [];
-                    res.latest_topics = Topic.query({
+                    res.topics = Topic.query({
                         limit: 100,
                         forum: forum_id,
                         ordering: '-last_activity_at'}, function(topics){

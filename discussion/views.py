@@ -38,6 +38,12 @@ class ForumViewSet(viewsets.ModelViewSet):
 
         return queryset.distinct()
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class ForumSearchViewSet(viewsets.ModelViewSet):
     """

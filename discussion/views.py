@@ -89,10 +89,15 @@ class TopicViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super(TopicViewSet, self).get_queryset()
 
-        queryset = queryset.filter(
-            Q(forum__is_public=True) |
-            Q(forum__groups__in=self.request.user.groups.all())
-        )
+        activity = self.request.query_params.get('activity', None)
+        if activity:
+            queryset = queryset.filter(forum__forum_type='activity')
+        else:
+            queryset = queryset.filter(forum__forum_type='discussion')
+            queryset = queryset.filter(
+                Q(forum__is_public=True) |
+                Q(forum__groups__in=self.request.user.groups.all())
+            )
 
         return queryset
 

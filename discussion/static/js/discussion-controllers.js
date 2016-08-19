@@ -7,6 +7,7 @@
             function normalInit() {
                 $scope.filters = undefined;
                 $scope.forum_search = false;
+                $scope.forum_single = false;
                 $scope.forums = Forum.query({});
                 $scope.latest_topics = Topic.query({
                     limit: 6,
@@ -18,6 +19,8 @@
             }
             function singleInit() {
                 $scope.forum = Forum.get({id: forum_id},function(res){
+                    $scope.filters = undefined;
+                    $scope.forum_search = false;
                     $scope.forum_single = true;
                     $scope.forums = [];
                     res.latest_topics = Topic.query({

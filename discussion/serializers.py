@@ -37,7 +37,7 @@ class BaseForumSerializer(serializers.ModelSerializer):
 
 class ForumSerializer(serializers.ModelSerializer):
 
-    author = BaseUserSerializer()
+    author = BaseUserSerializer(read_only=True)
     latest_topics = serializers.SerializerMethodField()
 
     class Meta:

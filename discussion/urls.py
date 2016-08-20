@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 
 from discussion.views import (CategoryViewSet, ForumViewSet, ForumSearchViewSet, TopicTypeaheadViewSet, TopicViewSet, CommentViewSet, TagViewSet,
                               TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet)
@@ -27,4 +28,5 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="forum.html"), name='forum'),
     url(r'^topic/(?:#(?P<topic_id>[-a-zA-Z0-9_]+))?$', TemplateView.as_view(template_name="forum-topic.html")),
     url(r'^topic/new/', TemplateView.as_view(template_name="forum-new-topic.html")),
+    url(r'^home/$', RedirectView.as_view(url='/discussion/', permanent=False), name='forum-home'),
 ]

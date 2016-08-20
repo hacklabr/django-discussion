@@ -93,6 +93,9 @@ class TopicViewSet(viewsets.ModelViewSet):
         activity = self.request.query_params.get('activity', None)
         if activity:
             queryset = queryset.filter(forum__forum_type='activity')
+            exclude_cur_user = self.request.query_params.get('exclude_cur_user', None)
+            if exclude_cur_user:
+                queryset = queryset.exclude(author=self.request.user)
         else:
             queryset = queryset.filter(forum__forum_type='discussion')
             queryset = queryset.filter(

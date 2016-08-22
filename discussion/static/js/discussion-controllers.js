@@ -125,9 +125,11 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile',
-        function ($scope,  $window, $location, Forum, Topic, TopicFile) {
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile', 'Category', 'Tag',
+        function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag) {
             $scope.forums = Forum.query();
+            $scope.categories = Category.query();
+            $scope.tags = Tags.query();
             $scope.new_topic = new Topic();
             $scope.save_topic = function() {
                 $scope.sending = true;

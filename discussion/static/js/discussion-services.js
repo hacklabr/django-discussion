@@ -80,4 +80,16 @@
         return comment_file
     }]);
 
+    app.factory('Category', ['$resource', function($resource){
+        return $resource('/discussion/api/category/:id',
+            {'id' : '@id'},
+            {'update': {'method': 'PUT'} });
+    }]);
+
+    app.factory('Tag', ['$resource', function($resource){
+        return $resource('/discussion/api/tag/:id',
+            {'id' : '@id'},
+            {'update': {'method': 'PUT'} });
+    }]);
+
 })(window.angular);

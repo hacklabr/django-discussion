@@ -129,7 +129,7 @@
         function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag) {
             $scope.forums = Forum.query();
             $scope.categories = Category.query();
-            $scope.tags = Tags.query();
+            $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
             $scope.save_topic = function() {
                 $scope.sending = true;

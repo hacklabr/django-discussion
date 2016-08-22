@@ -18,6 +18,13 @@ class CategorySerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class TagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tag
+        depth = 1
+
+
 class BaseTopicSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -138,6 +145,18 @@ class TopicSerializer(serializers.ModelSerializer):
                   'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum', 'comments',
                   'user_like', 'last_activity_at', 'forum_info', 'files')
 
+    def create(self, validated_data):
+        cat_ids = self.initial_data.pop('categories')
+        topic = Topic.objects.create(**validated_data)
+        for cat in cat_ids:
+            topic.categories.add(Category.objects.get(id=cat))
+
+        tag_ids = self.initial_data.pop('tags')
+        for tag in tag_ids:
+            topic.tags.add(Tag.objects.get(id=tag))
+
+        return topic
+
     def get_comments(self, obj):
         queryset = obj.comments.filter(parent=None).order_by('-updated_at')
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
@@ -154,13 +173,6 @@ class TopicSerializer(serializers.ModelSerializer):
             return obj.likes.get(user=request.user).id
         except TopicLike.DoesNotExist:
             return 0
-
-
-class TagSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Tag
-        depth = 1
 
 
 class TopicLikeSerializer(serializers.ModelSerializer):

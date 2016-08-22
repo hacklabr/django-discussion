@@ -166,8 +166,8 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', 'uiTinymceConfig', 'Forum', 'Topic', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile',
-        function ($scope, $routeParams, uiTinymceConfig, Forum, Topic, Comment, TopicLike, CommentLike, CommentFile) {
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', 'uiTinymceConfig', 'Forum', 'Topic', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile',
+        function ($scope, $routeParams, $sce, uiTinymceConfig, Forum, Topic, Comment, TopicLike, CommentLike, CommentFile) {
 
             $scope.topic = Topic.get({id: $routeParams.topicId});
 
@@ -264,6 +264,9 @@
                 }
             }
 
+            $scope.get_as_safe_html = function(html_content) {
+                return $sce.trustAsHtml(html_content);
+            }
         }
     ]);
 

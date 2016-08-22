@@ -1,7 +1,6 @@
 from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import parsers
 
 from django.db.models import Q
 
@@ -181,11 +180,13 @@ class TopicLikeViewSet(BaseUserReactionViewSet):
 class TopicFileViewSet(viewsets.ModelViewSet):
     queryset = TopicFile.objects.all()
     serializer_class = TopicFileSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class CommentFileViewSet(viewsets.ModelViewSet):
     queryset = CommentFile.objects.all()
     serializer_class = CommentFileSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class CommentLikeViewSet(BaseUserReactionViewSet):

@@ -146,14 +146,23 @@ class TopicSerializer(serializers.ModelSerializer):
                   'user_like', 'last_activity_at', 'forum_info', 'files')
 
     def create(self, validated_data):
-        cat_ids = self.initial_data.pop('categories')
         topic = Topic.objects.create(**validated_data)
-        for cat in cat_ids:
-            topic.categories.add(Category.objects.get(id=cat))
+        # If categories were specified
+        if 'categories' in self.initial_data.keys():
+            categories = self.initial_data.pop('categories')
+            for cat in categories:
+                topic.categories.add(Category.objects.get(id=cat['id']))
 
-        tag_ids = self.initial_data.pop('tags')
-        for tag in tag_ids:
-            topic.tags.add(Tag.objects.get(id=tag))
+        # If tags were specified
+        if 'tags' in self.initial_data.keys():
+            tags = self.initial_data.pop('tags')
+            for tag in tags:
+                # Check if it's a new tag
+                if 'isTag' in tag.keys():
+                    tag = Tag.objects.create(name=tag['name'])
+                else:
+                    tag = Tag.objects.get(id=tag['id'])
+                topic.tags.add(tag)
 
         return topic
 

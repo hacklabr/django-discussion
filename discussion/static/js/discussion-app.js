@@ -8,6 +8,8 @@
         'ui.tinymce',
         'ui.bootstrap',
         'ngFileUpload',
+        'ui.select',
+        'ngSanitize',
     ]);
 
     app.config(['$locationProvider', '$routeProvider',

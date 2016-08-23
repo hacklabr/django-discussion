@@ -148,6 +148,14 @@
                 });
             }
 
+            // Turn new tags into serializable objects
+            $scope.tagTransform = function (newTag) {
+                var item = {
+                    name: newTag
+                 };
+                 return item;
+            };
+
             $scope.uploadCommentFiles = function (file, topic) {
 
                 if (file) {

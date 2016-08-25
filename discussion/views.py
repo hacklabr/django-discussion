@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
+from permissions import IsAuthor
 
 from django.db.models import Q
 
@@ -78,6 +79,7 @@ class TopicViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
     ordering_fields = ('last_activity_at', )
     filter_fields = ('forum', )
+    permission_classes = (IsAuthor, )
     # pagination_class = SimpleLimitPagination
 
     def perform_create(self, serializer):

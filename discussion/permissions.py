@@ -1,0 +1,18 @@
+from rest_framework import permissions
+from discussion.models import Topic
+
+
+class IsAuthor(permissions.BasePermission):
+    """
+    Custom permission to only allow a topic author to edit its own topic
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        elif request.user and request.user.is_superuser:
+            return True
+        elif request.user.is_authenticated() and isinstance(obj, Topic) and obj.author == request.user:
+            return True

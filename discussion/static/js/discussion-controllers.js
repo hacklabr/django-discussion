@@ -132,6 +132,10 @@
             $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
             $scope.save_topic = function() {
+                // if there is no content, the edit form must not disappear from screen
+                if($scope.new_topic.content === undefined || $scope.new_topic.content === ""){
+                    return;
+                }
                 $scope.sending = true;
                 // $scope.new_topic.forum = 1;
                 var topic_files = $scope.new_topic.files;

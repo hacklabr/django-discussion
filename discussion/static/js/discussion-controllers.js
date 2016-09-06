@@ -176,11 +176,12 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile',
-        function ($scope, $routeParams, $sce, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, Comment, TopicLike, CommentLike, CommentFile) {
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser',
+        function ($scope, $routeParams, $sce, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, Comment, TopicLike, CommentLike, CommentFile, CurrentUser) {
 
             $scope.topic = Topic.get({id: $routeParams.topicId});
-
+            $scope.user = CurrentUser;
+            
             uiTinymceConfig.automatic_uploads = true;
 
             // Prepare for topic editing

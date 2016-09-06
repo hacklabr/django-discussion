@@ -176,12 +176,59 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', 'uiTinymceConfig', 'Forum', 'Topic', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile',
-        function ($scope, $routeParams, $sce, uiTinymceConfig, Forum, Topic, Comment, TopicLike, CommentLike, CommentFile) {
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile',
+        function ($scope, $routeParams, $sce, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, Comment, TopicLike, CommentLike, CommentFile) {
 
             $scope.topic = Topic.get({id: $routeParams.topicId});
 
             uiTinymceConfig.automatic_uploads = true;
+
+            // Prepare for topic editing
+            $scope.forums = Forum.query();
+            $scope.categories = Category.query();
+            $scope.tags = Tag.query();
+            // angular.copy($scope.topic, $scope.current_topic);
+            $scope.update_topic = function() {
+                var topic_files = $scope.topic.files;
+                $scope.topic.$update(function(topic){
+                    angular.forEach(topic_files, function(topic_file) {
+                        if(topic_file instanceof TopicFile){ // Prepare only new files for store in the topic
+                          topic_file.topic = topic.id;
+                          delete topic_file.file;
+                          topic_file.$patch().then(function(comment_file_complete) {
+                              topic.files.push(comment_file_complete);
+                          });
+                        }
+                    });
+                    $scope.updating = false;
+                });
+            };
+
+            $scope.uploadTopicFiles = function (file, topic) {
+
+                if (file) {
+                    TopicFile.upload(file).then(function (response) {
+                        var comment_file = new TopicFile(response.data);
+
+                        if (topic.files === undefined)
+                            topic.files = [];
+                        topic.files.push(comment_file);
+                        return {location: comment_file.file};
+                    }, function (response) {
+                        if (response.status > 0) {
+                            $scope.errorMsg = response.status + ': ' + response.data;
+                        }
+                    });
+                }
+            };
+
+            // Turn new tags into serializable objects
+            $scope.tagTransform = function (newTag) {
+                var item = {
+                    name: newTag
+                 };
+                 return item;
+            };
 
             $scope.save_comment = function(topic, parent_comment) {
                 var new_comment = new Comment();

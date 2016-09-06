@@ -166,6 +166,31 @@ class TopicSerializer(serializers.ModelSerializer):
 
         return topic
 
+    def update(self, instance, validated_data):
+        # Clean current categories
+        instance.categories.clear()
+        # If categories were specified
+        if 'categories' in self.initial_data.keys():
+            categories = self.initial_data.pop('categories')
+            for cat in categories:
+                instance.categories.add(Category.objects.get(id=cat['id']))
+
+        # Clean current tags
+        instance.tags.clear()
+        # If tags were specified
+        if 'tags' in self.initial_data.keys():
+            tags = self.initial_data.pop('tags')
+            for tag in tags:
+                # Check if it's a new tag
+                if 'isTag' in tag.keys():
+                    tag = Tag.objects.create(name=tag['name'])
+                else:
+                    tag = Tag.objects.get(id=tag['id'])
+                instance.tags.add(tag)
+
+        instance.save()
+        return instance
+
     def get_comments(self, obj):
         queryset = obj.comments.filter(parent=None).order_by('-updated_at')
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data

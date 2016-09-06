@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
-from permissions import IsAuthor
+from permissions import IsTopicAuthor, IsCommentAuthor
 
 from django.db.models import Q
 
@@ -75,11 +75,10 @@ class TopicViewSet(viewsets.ModelViewSet):
 
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
-    permission_classes = [IsAuthenticated]
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
     ordering_fields = ('last_activity_at', )
     filter_fields = ('forum', )
-    permission_classes = (IsAuthor, )
+    permission_classes = (IsAuthenticated, IsTopicAuthor, )
     # pagination_class = SimpleLimitPagination
 
     def perform_create(self, serializer):
@@ -125,7 +124,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated, IsCommentAuthor, )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

@@ -181,7 +181,7 @@
 
             $scope.topic = Topic.get({id: $routeParams.topicId});
             $scope.user = CurrentUser;
-            
+
             uiTinymceConfig.automatic_uploads = true;
 
             // Prepare for topic editing
@@ -255,6 +255,27 @@
                         });
                     });
                 });
+            };
+
+            $scope.update_comment = function(changed_comment) {
+                var comment_files = $scope.topic.new_comment_files;
+                // Get the correct comment instance from the server
+                Comment.get({id: changed_comment.id}, function(comment){
+                  comment.text = changed_comment.new_text;
+                  comment.$update().then(function(comment) {
+                      angular.forEach(comment_files, function(comment_file) {
+                            if(comment_file instanceof CommentFile){ // Prepare only new files for store in the topic
+                              comment_file.comment = comment.id;
+                              delete comment_file.file;
+                              comment_file.$patch().then(function(comment_file_complete) {
+                                  comment.files.push(comment_file_complete);
+                              });
+                          }
+                      });
+                  });
+                });
+                changed_comment.text = changed_comment.new_text;
+                changed_comment.updating = false;
             };
 
             $scope.topic_like = function(topic) {

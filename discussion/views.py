@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
 from permissions import IsTopicAuthor, IsCommentAuthor
 
 from django.db.models import Q
@@ -82,10 +83,10 @@ class TopicViewSet(viewsets.ModelViewSet):
     # pagination_class = SimpleLimitPagination
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user, updated_at=timezone.now())
 
     def perform_update(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user, updated_at=timezone.now())
 
     def get_queryset(self):
         queryset = super(TopicViewSet, self).get_queryset()
@@ -127,10 +128,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, IsCommentAuthor, )
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user, updated_at=timezone.now())
 
     def perform_update(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user, updated_at=timezone.now())
 
 
 class TagViewSet(viewsets.ModelViewSet):

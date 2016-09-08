@@ -7,9 +7,6 @@ from django.contrib.auth import get_user_model
 @receiver(post_save, sender=Topic)
 def topic_created_or_updated(instance, **kwargs):
 
-    # Adjust last_activity_at in Topic
-    instance.last_activity_at = instance.updated_at
-
     User = get_user_model()
     forum = instance.forum
 
@@ -59,6 +56,7 @@ def comment_created_or_updated(instance, **kwargs):
 
     # Adjust last_activity_at in Topic
     instance.topic.last_activity_at = instance.updated_at
+    instance.topic.save()
 
     # Users that must be notified
     users = []

@@ -159,8 +159,9 @@
             $scope.uploadCommentFiles = function (file, topic) {
 
                 if (file) {
+                    var comment_file;
                     TopicFile.upload(file).then(function (response) {
-                        var comment_file = new TopicFile(response.data);
+                        comment_file = new TopicFile(response.data);
 
                         if (topic.files === undefined)
                             topic.files = [];
@@ -170,9 +171,11 @@
                         if (response.status > 0) {
                             $scope.errorMsg = response.status + ': ' + response.data;
                         }
+                    }, function(evt){
+                        topic.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
                     });
                 }
-            }
+            };
         }
     ]);
 
@@ -219,6 +222,8 @@
                         if (response.status > 0) {
                             $scope.errorMsg = response.status + ': ' + response.data;
                         }
+                    }, function (evt) {
+                        topic.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
                     });
                 }
             };
@@ -322,7 +327,7 @@
             // };
 
             // ng-file-upload
-            $scope.uploadCommentFiles = function (file, topic) {
+            $scope.uploadCommentFiles = function (file, topic, progress) {
 
                 if (file) {
                     CommentFile.upload(file).then(function (response) {
@@ -337,8 +342,7 @@
                             $scope.errorMsg = response.status + ': ' + response.data;
                         }
                     }, function (evt) {
-                        // $scope.progress =
-                        //     Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+                        progress.p = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
                     });
                 }
             }

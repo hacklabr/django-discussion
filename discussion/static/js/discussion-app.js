@@ -4,6 +4,7 @@
     var app = angular.module('discussion', [
         'discussion.controllers',
         'discussion.services',
+        'discussion.directives',
         'ngRoute',
         'ui.tinymce',
         'ui.bootstrap',

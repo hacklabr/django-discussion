@@ -15,8 +15,8 @@ def topic_created_or_updated(instance, **kwargs):
 
     # If the topic is an answer, usual notification rules don't apply
     # The detection can be made by using the forum number as reference
-    # If its between 26 and 46, the forum must be a activity specific one
-    if instance.forum.id not in range(26, 47):  # 47 is excluded in this range function
+    # If its between 26 and 38, the forum must be a activity specific one
+    if instance.forum.id not in range(26, 39):  # 39 is excluded in this range function
         # This topic is an answer to a discussion activity
         # Whoever has access to the same course must be notified
         pass

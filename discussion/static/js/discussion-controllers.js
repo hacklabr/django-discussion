@@ -243,18 +243,10 @@
             };
 
             $scope.save_comment = function(comment, parent_comment) {
-                // var new_comment = new Comment();
-                // var new_comment_files = [];
-                // new_comment.topic = topic.id;
                 if (parent_comment) {
                     comment.parent = parent_comment.id;
-                    // new_comment.text = parent_comment.new_comment;
-                    // new_comment_files = parent_comment.new_comment_files;
                     parent_comment.comment_replies.unshift(comment);
                 } else {
-                    // new_comment.text = topic.new_comment;
-                    // comment.topic.show_comment_input = false;
-                    // new_comment_files = topic.new_comment_files;
                     comment.topic.comments.unshift(comment);
                 }
                 // Store files to be saved after the comment
@@ -274,12 +266,13 @@
                             comment.files.push(comment_file_complete);
                         });
                     });
+                    doneCallBack = false;
                 });
             };
 
             $scope.update_comment = function(changed_comment) {
                 var comment_files = changed_comment.files;
-                // delete changed_comment.files;
+
                 // Get the correct comment instance from the server
                 Comment.get({id: changed_comment.id}, function(comment){
                   comment.text = changed_comment.text;

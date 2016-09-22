@@ -11,15 +11,16 @@
                     files: '=',
                     progress: '=',
                     editable: '=',
+                    isTopic: '=',
                 },
                 controller: ['$scope', 'TopicFile', 'CommentFile', function($scope, TopicFile, CommentFile){
-                    // $scope.deleteFile = function(i, post_files){
-                    //     if($scope.isTopic)
-                    //         TopicFile.delete({id: post_files[i].id});
-                    //     else
-                    //         CommentFile.delete({id: post_files[i].id});
-                    //     post_files.splice(i,1);
-                    // };
+                    $scope.deleteFile = function(i){
+                        if($scope.isTopic)
+                            TopicFile.delete({id: $scope.files[i].id});
+                        else
+                            CommentFile.delete({id: $scope.files[i].id});
+                        $scope.files.splice(i,1);
+                    };
                 }],
             };
         }

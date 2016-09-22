@@ -170,9 +170,11 @@
                         if (response.status > 0) {
                             $scope.errorMsg = response.status + ': ' + response.data;
                         }
+                    }, function (evt) {
+                        topic.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
                     });
                 }
-            }
+            };
         }
     ]);
 
@@ -219,6 +221,8 @@
                         if (response.status > 0) {
                             $scope.errorMsg = response.status + ': ' + response.data;
                         }
+                    }, function (evt) {
+                        topic.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
                     });
                 }
             };
@@ -274,10 +278,11 @@
             };
 
             $scope.update_comment = function(changed_comment) {
-                var comment_files = $scope.topic.new_comment_files;
+                var comment_files = changed_comment.files;
+                // delete changed_comment.files;
                 // Get the correct comment instance from the server
                 Comment.get({id: changed_comment.id}, function(comment){
-                  comment.text = changed_comment.new_text;
+                  comment.text = changed_comment.text;
                   angular.copy(comment, changed_comment);
                   comment.$update().then(function(comment) {
                       angular.forEach(comment_files, function(comment_file) {
@@ -291,7 +296,6 @@
                       });
                   });
                 });
-                changed_comment.updating = false;
             };
 
             $scope.topic_like = function(topic) {

@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from django.utils import timezone
 from permissions import IsTopicAuthor, IsCommentAuthor
 
@@ -70,6 +71,12 @@ class TopicTypeaheadViewSet(viewsets.ModelViewSet):
     search_fields = ('title', )
 
 
+class TopicPagination(PageNumberPagination):
+    page_size = 50
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 class TopicViewSet(viewsets.ModelViewSet):
     """
     """
@@ -80,7 +87,6 @@ class TopicViewSet(viewsets.ModelViewSet):
     ordering_fields = ('last_activity_at', )
     filter_fields = ('forum', )
     permission_classes = (IsAuthenticated, IsTopicAuthor, )
-    # pagination_class = SimpleLimitPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, updated_at=timezone.now())
@@ -117,6 +123,10 @@ class TopicViewSet(viewsets.ModelViewSet):
             queryset = queryset[:int(limit_to)]
 
         return queryset
+
+
+class TopicPageViewSet(TopicViewSet):
+    pagination_class = TopicPagination
 
 
 class CommentViewSet(viewsets.ModelViewSet):

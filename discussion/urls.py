@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
-from discussion.views import (CategoryViewSet, ForumViewSet, ForumSearchViewSet, TopicTypeaheadViewSet, TopicViewSet, CommentViewSet, TagViewSet,
+from discussion.views import (CategoryViewSet, ForumViewSet, ForumSearchViewSet, TopicTypeaheadViewSet, TopicViewSet, CommentViewSet, TagViewSet, TopicPageViewSet,
                               TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet)
 
 from rest_framework import routers
@@ -12,6 +12,7 @@ router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'category', CategoryViewSet)
 router.register(r'forum', ForumViewSet)
 router.register(r'topic', TopicViewSet)
+router.register(r'topic_page', TopicPageViewSet)
 router.register(r'comment', CommentViewSet)
 router.register(r'tag', TagViewSet)
 router.register(r'topic-notification', TopicNotificationViewSet)

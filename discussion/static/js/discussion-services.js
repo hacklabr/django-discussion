@@ -14,6 +14,10 @@
             {'update': {'method': 'PUT'} });
     }]);
 
+    app.factory('TopicPage', ['$resource', function($resource){
+        return $resource('/discussion/api/topic_page');
+    }]);
+
     app.factory('TopicLike', ['$resource', function($resource){
         return $resource('/discussion/api/topic_like/:id',
             {'id' : '@id'},

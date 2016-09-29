@@ -2,8 +2,8 @@
     'use strict';
     var app = angular.module('discussion.controllers', ['ngSanitize']);
 
-    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', 'Forum', 'Topic',
-        function ($scope, $routeParams, $http, Forum, Topic) {
+    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', 'Forum', 'Topic', 'TopicPage',
+        function ($scope, $routeParams, $http, Forum, Topic, TopicPage) {
             function normalInit() {
                 $scope.filters = undefined;
                 $scope.forum_search = false;
@@ -15,26 +15,57 @@
                     }, function(){
                         $scope.topics_loaded = true;
                     }
-                )
+                );
             }
+
+            // Pagination controls
+            $scope.forum_page_size = 5;
+            $scope.pageChanged = function(){
+              console.log($scope.forum.current_page);
+              $scope.forum.page = TopicPage.get({
+                  page: $scope.forum.current_page,
+                  page_size: $scope.forum_page_size,
+                  forum: forum_id,
+                  ordering: '-last_activity_at'},
+                  function(page){
+                      $scope.forum.topics = page.results;
+                      $scope.topics_loaded = true;
+                  },
+                  function(err){
+                      console.log("Erro ao carregar os tópicos");
+                  }
+              );
+            };
+
             function singleInit() {
-                $scope.forum = Forum.get({id: forum_id},function(res){
+                Forum.get({id: forum_id},function(forum){
                     $scope.filters = undefined;
                     $scope.forum_search = false;
                     $scope.forum_single = true;
                     $scope.forums = [];
-                    res.topics = Topic.query({
-                        limit: 100,
+                    $scope.forum = forum;
+                    $scope.forum.current_page = 1;
+                    $scope.forum.page = TopicPage.get({
+                        page: 1,
+                        page_size: $scope.forum_page_size,
                         forum: forum_id,
-                        ordering: '-last_activity_at'}, function(topics){
+                        ordering: '-last_activity_at'},
+                        function(page){
+                            $scope.forum.topics = page.results;
+                            $scope.forum_topics_total = page.count;
                             $scope.topics_loaded = true;
+                        },
+                        function(err){
+                            console.log("Erro ao carregar os tópicos");
                         }
                     );
-                    $scope.forums.push(res); // to reuse template's ng-repeat
+                    $scope.forums.push(forum); // to reuse template's ng-repeat
                 },function(err){
                     normalInit();
                 });
             }
+
+
 
             var forum_id = $routeParams.forumId;
 

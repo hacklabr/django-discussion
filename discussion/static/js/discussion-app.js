@@ -11,6 +11,7 @@
         'ngFileUpload',
         'ui.select',
         'ngSanitize',
+        'ngAnimate',
     ]);
 
     app.config(['$locationProvider', '$routeProvider',

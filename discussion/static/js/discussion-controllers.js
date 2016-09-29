@@ -19,12 +19,13 @@
             }
 
             // Pagination controls
-            $scope.forum_page_size = 5;
+            $scope.forum_page_size = 10;
+            $scope.forum_topics_page = 20;
             $scope.pageChanged = function(){
               console.log($scope.forum.current_page);
               $scope.forum.page = TopicPage.get({
                   page: $scope.forum.current_page,
-                  page_size: $scope.forum_page_size,
+                  page_size: $scope.forum_topics_page,
                   forum: forum_id,
                   ordering: '-last_activity_at'},
                   function(page){
@@ -47,7 +48,7 @@
                     $scope.forum.current_page = 1;
                     $scope.forum.page = TopicPage.get({
                         page: 1,
-                        page_size: $scope.forum_page_size,
+                        page_size: $scope.forum_topics_page,
                         forum: forum_id,
                         ordering: '-last_activity_at'},
                         function(page){

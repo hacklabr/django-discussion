@@ -199,7 +199,7 @@ class TopicSerializer(serializers.ModelSerializer):
         return instance
 
     def get_comments(self, obj):
-        queryset = obj.comments.filter(parent=None).order_by('-updated_at')
+        queryset = obj.comments.filter(parent=None).order_by('updated_at')
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
     def get_categories(self, obj):

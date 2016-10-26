@@ -277,9 +277,9 @@
             $scope.save_comment = function(comment, parent_comment) {
                 if (parent_comment) {
                     comment.parent = parent_comment.id;
-                    parent_comment.comment_replies.unshift(comment);
+                    parent_comment.comment_replies.push(comment);
                 } else {
-                    comment.topic.comments.unshift(comment);
+                    comment.topic.comments.push(comment);
                 }
                 // Store files to be saved after the comment
                 var files = [];

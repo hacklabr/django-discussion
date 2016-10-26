@@ -112,8 +112,12 @@ class CommentReplySerializer(BaseCommentSerializer):
 class CommentSerializer(BaseCommentSerializer):
 
     author = BaseUserSerializer(read_only=True)
-    comment_replies = CommentReplySerializer(many=True, read_only=True)
+    comment_replies = serializers.SerializerMethodField()
     files = CommentFileSerializer(many=True, read_only=True)
+
+    def get_comment_replies(self, obj):
+        queryset = obj.comment_replies.order_by('updated_at')
+        return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
     class Meta:
         model = Comment

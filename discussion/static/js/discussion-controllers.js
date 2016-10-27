@@ -275,14 +275,6 @@
                 $anchorScroll(newHash);
             };
 
-            // Handles scroll and show/hide events for the new comment form
-            $scope.scroll_new_comment = function(topic){
-                topic.show_comment_input = true;
-                var newHash = 'new-comment';
-                $anchorScroll(newHash);
-            };
-
-
             // Bootstrap functions for new comments and replies
             $scope.new_comment = function(){
                 var comment = new Comment();
@@ -296,6 +288,9 @@
                     parent_comment.comment_replies.push(comment);
                 } else {
                     comment.topic.comments.push(comment);
+
+                    // auto-scroll to the new comment position
+                    $anchorScroll("last-comment");
                 }
                 // Store files to be saved after the comment
                 var files = [];

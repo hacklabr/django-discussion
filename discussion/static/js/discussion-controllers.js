@@ -210,8 +210,8 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser',
-        function ($scope, $routeParams, $sce, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, Comment, TopicLike, CommentLike, CommentFile, CurrentUser) {
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser',
+        function ($scope, $routeParams, $sce, $location, $anchorScroll, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, Comment, TopicLike, CommentLike, CommentFile, CurrentUser) {
 
             $scope.topic = Topic.get({id: $routeParams.topicId});
             $scope.user = CurrentUser;
@@ -267,6 +267,22 @@
                  return item;
             };
 
+            // Handles scroll and show/hide events for the new replies form
+            $scope.new_reply = function(comment){
+                comment.show_comment_input = true;
+                $anchorScroll.yOffset = 200;
+                var newHash = 'new-answer-'+comment.id;
+                $anchorScroll(newHash);
+            };
+
+            // Handles scroll and show/hide events for the new comment form
+            $scope.scroll_new_comment = function(topic){
+                topic.show_comment_input = true;
+                var newHash = 'new-comment';
+                $anchorScroll(newHash);
+            };
+
+
             // Bootstrap functions for new comments and replies
             $scope.new_comment = function(){
                 var comment = new Comment();
@@ -298,7 +314,6 @@
                             comment.files.push(comment_file_complete);
                         });
                     });
-                    doneCallBack = false;
                 });
             };
 

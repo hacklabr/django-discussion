@@ -12,7 +12,12 @@
         'ui.select',
         'ngSanitize',
         'ngAnimate',
+        'duScroll',
     ]);
+
+    // Set new default values for 'duScroll'
+    app.value('duScrollDuration', 1000);
+    app.value('duScrollOffset', 100);
 
     app.config(['$locationProvider', '$routeProvider',
         function config($locationProvider, $routeProvider) {

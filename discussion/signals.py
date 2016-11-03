@@ -7,6 +7,10 @@ from django.contrib.auth import get_user_model
 @receiver(post_save, sender=Topic)
 def topic_created_or_updated(instance, **kwargs):
 
+    # if this topic was just updated, no notifications must be sent
+    if kwargs['created'] is False:
+        return
+
     User = get_user_model()
     forum = instance.forum
 
@@ -52,6 +56,10 @@ def topic_created_or_updated(instance, **kwargs):
 
 @receiver(post_save, sender=Comment)
 def comment_created_or_updated(instance, **kwargs):
+
+    # if this comment was just updated, no notifications must be sent
+    if kwargs['created'] is False:
+        return
 
     # Adjust last_activity_at in Topic
     instance.topic.last_activity_at = instance.updated_at

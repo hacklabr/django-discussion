@@ -1,7 +1,8 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 from django.utils import timezone
 from permissions import IsTopicAuthor, IsCommentAuthor
 
@@ -93,6 +94,26 @@ class TopicViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user, updated_at=timezone.now())
+
+    def retrieve(self, request, *args, **kwargs):
+        # Retrieve the topic that must be shown
+        try:
+            topic = Topic.objects.get(id=kwargs['pk'])
+        except Topic.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        topicSer = self.get_serializer(topic)
+
+        # Mark the last notification relative to the current topic-user pair as read
+        # The following operation is in a try-except block to account for the unlikely case where the user has never recieved a notification about the current topic. This is possible for new users.
+        try:
+            notification = TopicNotification.objects.get(topic=topic, user=request.user)
+            notification.is_read = True
+            notification.save()
+        except TopicNotification.DoesNotExist:
+            # There isn't a notification associated to the current topic-user pair
+            pass
+
+        return Response(topicSer.data)
 
     def get_queryset(self):
         queryset = super(TopicViewSet, self).get_queryset()

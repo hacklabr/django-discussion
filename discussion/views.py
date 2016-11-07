@@ -13,6 +13,7 @@ from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSe
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile,)
+from paralapraca.models import AnswerNotification
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -110,7 +111,15 @@ class TopicViewSet(viewsets.ModelViewSet):
             notification.is_read = True
             notification.save(skip_date=True)
         except TopicNotification.DoesNotExist:
-            # There isn't a notification associated to the current topic-user pair
+            # There isn't a topic notification associated to the current topic-user pair
+            pass
+
+        # Maybe is there an answer notification to mark as read?
+        try:
+            notification = AnswerNotification.objects.get(topic=topic, user=request.user)
+            notification.is_read = True
+            notification.save(skip_date=True)
+        except AnswerNotification.DoesNotExist:
             pass
 
         return Response(topicSer.data)

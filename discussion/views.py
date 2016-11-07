@@ -108,7 +108,7 @@ class TopicViewSet(viewsets.ModelViewSet):
         try:
             notification = TopicNotification.objects.get(topic=topic, user=request.user)
             notification.is_read = True
-            notification.save()
+            notification.save(skip_date=True)
         except TopicNotification.DoesNotExist:
             # There isn't a notification associated to the current topic-user pair
             pass

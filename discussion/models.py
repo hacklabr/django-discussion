@@ -212,7 +212,7 @@ class TopicNotification(models.Model):
     comment_like = models.ForeignKey('CommentLike', null=True, blank=True)
     topic_like = models.ForeignKey('TopicLike', null=True, blank=True)
 
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField()
     action = models.CharField(choices=ACTION_CHOICES, default='undefined', max_length=64)
     is_read = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -222,6 +222,12 @@ class TopicNotification(models.Model):
         ordering = ['-date', '-pk']
         verbose_name = _("topic notification")
         verbose_name_plural = _("topics notification")
+
+    def save(self, *args, **kwargs):
+        if not kwargs.pop('skip_date', False):
+            self.date = timezone.now()
+
+        super(TopicNotification, self).save(*args, **kwargs)
 
     @property
     def text_action(self):

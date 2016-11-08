@@ -44,8 +44,8 @@
     
     app.factory('AnswerNotification', ['$resource', function($resource){
         return $resource('/paralapraca/api/answer-notification/:id',
-            {'id' : '@id'},
-            {'update': {'method': 'PUT'} });
+            {'id' : '@topic'},
+            {'update': {'method': 'PUT', 'ignoreLoadingBar': true} });
     }]);
 
     app.factory('TopicFile', ['$resource', 'Upload', function($resource, Upload){

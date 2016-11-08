@@ -193,7 +193,7 @@ class TopicNotificationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super(TopicNotificationViewSet, self).get_queryset()
-        queryset = queryset.filter(user=self.request.user)
+        queryset = queryset.filter(user=self.request.user).exclude(action='new_activity')
 
         limit_to = self.request.query_params.get('limit_to', None)
         if limit_to:

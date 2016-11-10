@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
+from discussion.models import (Category, Forum, Topic, Comment, Tag,
+                               TopicNotification, TopicLike, TopicRead,
                                CommentLike, TopicFile, CommentFile)
 from accounts.serializers import TimtecUserSerializer
 
@@ -27,12 +28,24 @@ class TagSerializer(serializers.ModelSerializer):
 
 class BaseTopicSerializer(serializers.ModelSerializer):
 
+    read = serializers.SerializerMethodField()
+
     class Meta:
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
                   'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'last_activity_at',
-                  'forum', )
+                  'forum', 'read')
         depth = 1
+
+    def get_read(self, obj):
+        request = self.context.get("request")
+        # If there is a TopicRead instance, return the content of "is_read" field
+        try:
+            topic_read = TopicRead.objects.get(topic=obj, user=request.user)
+            return topic_read.is_read
+        except TopicRead.DoesNotExist:
+            # If there is no instance, the topic is not read yet
+            return False
 
 
 class BaseForumSerializer(serializers.ModelSerializer):
@@ -53,9 +66,8 @@ class ForumSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', 'forum_type', 'topics', )
         depth = 1
 
-    @staticmethod
-    def get_latest_topics(obj):
-        return BaseTopicSerializer(Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5], many=True).data
+    def get_latest_topics(self, obj):
+        return BaseTopicSerializer(Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
     def get_topics(self, obj):
         request = self.context.get("request")
@@ -70,9 +82,9 @@ class ForumSerializer(serializers.ModelSerializer):
 
             # only exec the query if any filter is present
             if categories or tags:
-                return BaseTopicSerializer(queryset.order_by('-last_activity_at'), many=True).data
+                return BaseTopicSerializer(queryset.order_by('-last_activity_at'), many=True, **{'context': self.context}).data
             else:
-                return BaseTopicSerializer(queryset.order_by('-last_activity_at')[:5], many=True).data
+                return BaseTopicSerializer(queryset.order_by('-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
 
 class BaseCommentSerializer(serializers.ModelSerializer):
@@ -142,12 +154,13 @@ class TopicSerializer(serializers.ModelSerializer):
     user_like = serializers.SerializerMethodField()
     forum_info = BaseForumSerializer(source='forum', read_only=True)
     files = TopicFileSerializer(many=True, read_only=True)
+    read = serializers.SerializerMethodField()
 
     class Meta:
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
                   'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum', 'comments',
-                  'user_like', 'last_activity_at', 'forum_info', 'files')
+                  'user_like', 'last_activity_at', 'forum_info', 'files', 'read')
 
     def create(self, validated_data):
         topic = Topic.objects.create(**validated_data)
@@ -218,6 +231,16 @@ class TopicSerializer(serializers.ModelSerializer):
             return obj.likes.get(user=request.user).id
         except TopicLike.DoesNotExist:
             return 0
+
+    def get_read(self, obj):
+        request = self.context.get("request")
+        # If there is a TopicRead instance, return the content of "is_read" field
+        try:
+            topic_read = TopicRead.objects.get(topic=obj, user=request.user)
+            return topic_read.is_read
+        except TopicRead.DoesNotExist:
+            # If there is no instance, the topic is not read yet
+            return False
 
 
 class TopicLikeSerializer(serializers.ModelSerializer):

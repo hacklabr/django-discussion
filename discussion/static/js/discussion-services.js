@@ -24,6 +24,12 @@
             {'update': {'method': 'PUT'} });
     }]);
 
+    app.factory('TopicRead', ['$resource', function($resource){
+        return $resource('/discussion/api/topic-read/:id',
+            {'id' : '@id'},
+            {'save': {'method': 'POST', 'ignoreLoadingBar': true} });
+    }]);
+
     app.factory('Comment', ['$resource', function($resource){
         return $resource('/discussion/api/comment/:id',
             {'id' : '@id'},
@@ -41,7 +47,7 @@
             {'id' : '@id'},
             {'update': {'method': 'PUT'} });
     }]);
-    
+
     app.factory('AnswerNotification', ['$resource', function($resource){
         return $resource('/paralapraca/api/answer-notification/:id',
             {'id' : '@topic'},

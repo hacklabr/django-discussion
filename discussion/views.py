@@ -12,7 +12,7 @@ from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSe
                                     TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
-                               CommentLike, TopicFile, CommentFile,)
+                               CommentLike, TopicFile, CommentFile, TopicRead)
 from paralapraca.models import AnswerNotification
 
 
@@ -94,7 +94,10 @@ class TopicViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, updated_at=timezone.now())
 
     def perform_update(self, serializer):
-        serializer.save(author=self.request.user, updated_at=timezone.now())
+        topic = serializer.save(author=self.request.user, updated_at=timezone.now())
+
+        # Since the topic is being updated, it must be marked as unread for all relevant users
+        TopicRead.objects.filter(topic=topic).update(is_read=False)
 
     def retrieve(self, request, *args, **kwargs):
         # Retrieve the topic that must be shown
@@ -159,6 +162,17 @@ class TopicPageViewSet(TopicViewSet):
     pagination_class = TopicPagination
 
 
+class TopicReadViewSet(viewsets.ModelViewSet):
+    queryset = TopicRead.objects.all()
+    permission_classes = (IsAuthenticated, )
+
+    def create(self, request):
+        topic_read, _ = TopicRead.objects.get_or_create(topic_id=int(request.data['topic']), user=request.user)
+        topic_read.is_read = True
+        topic_read.save()
+        return Response(status=status.HTTP_200_OK)
+
+
 class CommentViewSet(viewsets.ModelViewSet):
     """
     """
@@ -168,7 +182,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, IsCommentAuthor, )
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, updated_at=timezone.now())
+        comment = serializer.save(author=self.request.user, updated_at=timezone.now())
+
+        # Since there is a new comment, this topic must be marked as unread for all the relevant users
+        TopicRead.objects.filter(topic=comment.topic).update(is_read=False)
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user, updated_at=timezone.now())

@@ -210,10 +210,16 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser',
-        function ($scope, $routeParams, $sce, $location, $anchorScroll, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, Comment, TopicLike, CommentLike, CommentFile, CurrentUser) {
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser',
+        function ($scope, $routeParams, $sce, $location, $anchorScroll, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser) {
 
-            $scope.topic = Topic.get({id: $routeParams.topicId});
+            $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
+                // Mark topic as read
+                var topic_read = new TopicRead();
+                topic_read.topic = topic.id;
+                topic_read.is_read = true;
+                topic_read.$save();
+            });
             $scope.user = CurrentUser;
 
             uiTinymceConfig.automatic_uploads = true;
@@ -236,6 +242,11 @@
                         }
                     });
                     $scope.updating = false;
+                    // Mark topic as read
+                    var topic_read = new TopicRead();
+                    topic_read.topic = topic.id;
+                    topic_read.is_read = true;
+                    topic_read.$save();
                 });
             };
 

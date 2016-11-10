@@ -147,6 +147,19 @@ class Topic(BasePost):
 
 
 @python_2_unicode_compatible
+class TopicRead(models.Model):
+    topic = models.ForeignKey(Topic, related_name='read')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), related_name=_('%(class)s'))
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.topic.title + " " + self.user.username + " " + self.is_read
+
+    class Meta:
+        unique_together = ('user', 'topic')
+
+
+@python_2_unicode_compatible
 class Comment(BasePost):
     parent = models.ForeignKey('self',
                                verbose_name=_("comment parent"),

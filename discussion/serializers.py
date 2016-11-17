@@ -185,7 +185,6 @@ class TopicSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # Update topic fields
-        # import pdb; pdb.set_trace()
         instance.title = self.initial_data['title']
         instance.content = self.initial_data['content']
         instance.forum = Forum.objects.get(id=self.initial_data['forum'])

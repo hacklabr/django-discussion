@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from discussion.models import Topic, Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
+from paralapraca.models import UnreadNotification
 
 
 @receiver(post_save, sender=Topic)
@@ -49,6 +50,11 @@ def topic_created_or_updated(instance, **kwargs):
         # Create the New Topic notification for appropriate users
         notification.is_read = False
         notification.save()
+
+        # Increase the unread count for this user in 1
+        unread = UnreadNotification.objects.get(user=one_user)
+        unread.counter += 1
+        unread.save()
 
 
 @receiver(post_save, sender=Comment)

@@ -130,6 +130,7 @@ class TopicViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super(TopicViewSet, self).get_queryset()
 
+        # Test if the queryset must be of activities topics or regular ones
         activity = self.request.query_params.get('activity', None)
         if activity:
             queryset = queryset.filter(forum__forum_type='activity')
@@ -142,6 +143,10 @@ class TopicViewSet(viewsets.ModelViewSet):
                 Q(forum__is_public=True) |
                 Q(forum__groups__in=self.request.user.groups.all())
             )
+            # If there are search fields in the request, do the search
+            title = self.request.query_params.get('title', None)
+            if title:
+                queryset = queryset.filter(title__contains=title)
 
         return queryset
 

@@ -19,11 +19,12 @@
             }
 
             // Pagination controls
-            $scope.forum_page_size = 10;
+            $scope.forum_pages_max_number = 10;
             $scope.forum_topics_page = 20;
             $scope.pageChanged = function(){
               console.log($scope.forum.current_page);
               $scope.forum.page = TopicPage.get({
+                  title: $scope.current_search,  // if there is a search in progress, keep it
                   page: $scope.forum.current_page,
                   page_size: $scope.forum_topics_page,
                   forum: forum_id,
@@ -77,19 +78,30 @@
             }
 
             $scope.getResults = function(txt) {
-                if(txt.length > 2) {
-                    return $http.get('/discussion/api/typeahead/?search='+txt)
-                    .then(function(results){
-                        if(results.data.length > 0) {
-                            var res = [];
-                            results.data.unshift({
-                                title:"Sugestões de tópicos",
-                                disabled: true
-                            });
-                            return results.data;
-                        }
+                $scope.current_search = txt;
+                TopicPage.get({
+                    title: txt,
+                    page: 1,
+                    page_size: $scope.forum_topics_page,
+                    ordering: '-last_activity_at',
+                    ignoreLoadingBar: true},
+                    function(page){
+                        $scope.forums = [];
+                        $scope.forum = {};
+                        $scope.forum.title = "Resultados de busca";
+                        $scope.forum.current_page = 1;
+                        $scope.forum.topics = page.results;
+                        $scope.forum_topics_total = page.count;
+                        $scope.topics_loaded = true;
+
+                        $scope.filters = undefined;
+                        $scope.forum_search = true;
+                        $scope.forum_single = false;
+                        $scope.forums.push($scope.forum); // to reuse template's ng-repeat
+
+                    },function(err){
+                        normalInit();
                     });
-                }
             }
 
             $scope.forumFilter = function(operation,type,filter_obj) {

@@ -146,7 +146,7 @@ class TopicViewSet(viewsets.ModelViewSet):
             # If there are search fields in the request, do the search
             title = self.request.query_params.get('title', None)
             if title:
-                queryset = queryset.filter(title__contains=title)
+                queryset = queryset.filter(title__icontains=title)
 
         return queryset
 

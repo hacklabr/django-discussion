@@ -52,9 +52,7 @@ def topic_created_or_updated(instance, **kwargs):
         notification.save()
 
         # Increase the unread count for this user in 1
-        unread = UnreadNotification.objects.get(user=one_user)
-        unread.counter += 1
-        unread.save()
+        unread_notification_increment(one_user)
 
 
 @receiver(post_save, sender=Comment)
@@ -133,6 +131,9 @@ def comment_created_or_updated(instance, **kwargs):
         notification.is_read = False
         notification.save()
 
+        # Increase the unread count for this user in 1
+        unread_notification_increment(one_user)
+
     coment_revision = CommentHistory()
     coment_revision.create_or_update_revision(instance=instance)
 
@@ -177,6 +178,9 @@ def topic_reaction_created_or_updated(instance, **kwargs):
         notification.is_read = False
         notification.topic_like = instance
         notification.save()
+
+        # Increase the unread count for this user in 1
+        unread_notification_increment(one_user)
 
 
 @receiver(post_save, sender=CommentLike)
@@ -237,6 +241,20 @@ def comment_reaction_created_or_updated(instance, **kwargs):
         notification.is_read = False
         notification.comment_like = instance
         notification.save()
+
+        # Increase the unread count for this user in 1
+        unread_notification_increment(one_user)
+
+
+def unread_notification_increment(user):
+    # Only increment the counter if the user already has a UnreadNotification instance
+    try:
+        unread = UnreadNotification.objects.get(user=user)
+        unread.counter += 1
+        unread.save()
+    except UnreadNotification.DoesNotExist:
+        pass
+
 
 
 # def topic_viewed(request, topic):

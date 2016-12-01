@@ -144,9 +144,9 @@ class TopicViewSet(viewsets.ModelViewSet):
                 Q(forum__groups__in=self.request.user.groups.all())
             )
             # If there are search fields in the request, do the search
-            title = self.request.query_params.get('title', None)
-            if title:
-                queryset = queryset.filter(title__icontains=title)
+            search = self.request.query_params.get('search', None)
+            if search:
+                queryset = queryset.filter(Q(title__icontains=search) | Q(content__icontains=search))
 
         return queryset
 

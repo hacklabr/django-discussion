@@ -1,58 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth import get_user_model
-from discussion.models import Topic, Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
+from discussion.models import Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
 from paralapraca.models import UnreadNotification
-
-
-@receiver(post_save, sender=Topic)
-def topic_created_or_updated(instance, **kwargs):
-
-    # if this topic was just updated, no notifications must be sent
-    if kwargs['created'] is False:
-        return
-
-    User = get_user_model()
-    forum = instance.forum
-
-    # Users that must be notified
-    users = []
-
-    # import ipdb; ipdb.set_trace()
-    # If the topic is an answer, usual notification rules don't apply
-    if instance.forum.forum_type == 'activity':
-        return
-
-    else:
-        # This is a regular topic
-        if forum.is_public is True:  # if the forum is public, every user should be notified and the groups check is not necessary
-            users = User.objects.all()
-        else:  # if the forum is not public, only members from groups registered in the forum must be notified
-            for group in forum.groups.all():
-                for u in User.objects.filter(groups=group):
-                    users.append(u)
-
-    # Remove the original author from the notifications list
-    users = [user for user in users if user != instance.author]
-    for one_user in users:
-        try:
-            notification = TopicNotification.objects.get(
-                user=one_user,
-                topic=instance,
-            )
-        except TopicNotification.DoesNotExist:
-            notification = TopicNotification.objects.create(
-                user=one_user,
-                topic=instance,
-                action='new_topic',
-            )
-
-        # Create the New Topic notification for appropriate users
-        notification.is_read = False
-        notification.save()
-
-        # Increase the unread count for this user in 1
-        unread_notification_increment(one_user)
 
 
 @receiver(post_save, sender=Comment)

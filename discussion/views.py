@@ -8,11 +8,11 @@ from permissions import IsTopicAuthor, IsCommentAuthor
 
 from django.db.models import Q
 
-from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer, TopicSerializer, CommentSerializer,
+from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer, TopicSerializer, CommentSerializer, ContentFileSerializer,
                                     TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
-                               CommentLike, TopicFile, CommentFile, TopicRead)
+                               CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
 from paralapraca.models import AnswerNotification
 
 
@@ -250,6 +250,12 @@ class TopicFileViewSet(viewsets.ModelViewSet):
 class CommentFileViewSet(viewsets.ModelViewSet):
     queryset = CommentFile.objects.all()
     serializer_class = CommentFileSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class ContentFileViewSet(viewsets.ModelViewSet):
+    queryset = ContentFile.objects.all()
+    serializer_class = ContentFileSerializer
     permission_classes = [IsAuthenticated]
 
 

@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
 from discussion.views import (CategoryViewSet, ForumViewSet, ForumSearchViewSet, TopicTypeaheadViewSet, TopicViewSet, CommentViewSet, TagViewSet, TopicPageViewSet,
-                              TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet, TopicReadViewSet)
+                              TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet, ContentFileViewSet, TopicReadViewSet)
 
 from rest_framework import routers
 
@@ -20,6 +20,7 @@ router.register(r'comment_like', CommentLikeViewSet)
 router.register(r'comment-file', CommentFileViewSet)
 router.register(r'topic_like', TopicLikeViewSet)
 router.register(r'topic-file', TopicFileViewSet)
+router.register(r'content-file', ContentFileViewSet)
 router.register(r'topic-read', TopicReadViewSet)
 router.register(r'search', ForumSearchViewSet)
 router.register(r'typeahead', TopicTypeaheadViewSet)

@@ -73,6 +73,8 @@ def get_upload_path(instance, filename):
         return u'forum/{}/{}_{}'.format(instance.topic.slug, hash_name, instance.name)
     elif isinstance(instance, CommentFile) and hasattr(instance, 'topic') and instance.topic:
         return u'forum/{}/{}/{}_{}'.format(instance.comment.topic.slug, instance.comment.slug, hash_name, instance.name)
+    elif isinstance(instance, ContentFile):
+        return u'forum/content/{}_{}'.format(hash_name, instance.name)
     else:
         return u'forum/{}_{}'.format(hash_name, instance.name)
 
@@ -89,6 +91,14 @@ class TopicFile(models.Model):
 class CommentFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
     comment = models.ForeignKey('Comment', related_name='files', null=True, blank=True)
+    file = models.FileField(upload_to=get_upload_path)
+
+    def __unicode__(self):
+        return self.name
+
+
+class ContentFile(models.Model):
+    name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
     file = models.FileField(upload_to=get_upload_path)
 
     def __unicode__(self):

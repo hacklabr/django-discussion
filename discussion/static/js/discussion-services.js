@@ -96,6 +96,37 @@
         return comment_file
     }]);
 
+    app.factory('ContentFile', ['$resource', 'Upload', function($resource, Upload){
+      var content_file = $resource('/discussion/api/content-file/:id',
+          {'id' : '@id'},
+          {
+              'update': {'method': 'PUT'},
+              'patch': {'method': 'PATCH'}
+          });
+
+        content_file.upload = function (blobInfo, success, failure) {
+            if(blobInfo === undefined) return;
+
+            Upload.upload(
+                {
+                    url: '/discussion/api/content-file',
+                    data: {
+                        name: blobInfo.filename(),
+                        file: blobInfo.blob()
+                    },
+                    arrayKey: '',
+                }
+            ).then(function (response) {
+                success(response.data.file);
+            }, function (response) {
+                if (response.status > 0) {
+                    success('');  // disable the temporary image in the editor to let the user know about the error
+                }
+            });
+        };
+        return content_file;
+    }]);
+
     app.factory('Category', ['$resource', function($resource){
         return $resource('/discussion/api/category/:id',
             {'id' : '@id'},

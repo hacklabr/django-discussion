@@ -168,12 +168,15 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile', 'Category', 'Tag',
-        function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag) {
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile', 'uiTinymceConfig',
+        function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag, ContentFile,  uiTinymceConfig) {
             $scope.forums = Forum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
+
+            uiTinymceConfig.images_upload_handler = ContentFile.upload;
+
             $scope.save_topic = function() {
                 $scope.sending = true;
                 // $scope.new_topic.forum = 1;
@@ -221,8 +224,8 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser',
-        function ($scope, $routeParams, $sce, $location, $anchorScroll, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser) {
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile',
+        function ($scope, $routeParams, $sce, $location, $anchorScroll, uiTinymceConfig, Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
 
             $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
                 // Mark topic as read
@@ -234,6 +237,8 @@
             $scope.user = CurrentUser;
 
             uiTinymceConfig.automatic_uploads = true;
+
+            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
             // Prepare for topic editing
             $scope.forums = Forum.query();

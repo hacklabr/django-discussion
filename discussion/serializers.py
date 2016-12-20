@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from discussion.models import (Category, Forum, Topic, Comment, Tag,
                                TopicNotification, TopicLike, TopicRead,
-                               CommentLike, TopicFile, CommentFile)
+                               CommentLike, TopicFile, CommentFile, ContentFile)
 from accounts.serializers import TimtecUserSerializer
 
 
@@ -143,6 +143,12 @@ class TopicFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TopicFile
+
+
+class ContentFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ContentFile
 
 
 class TopicSerializer(serializers.ModelSerializer):

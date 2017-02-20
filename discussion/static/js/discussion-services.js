@@ -49,7 +49,7 @@
     }]);
 
     app.factory('AnswerNotification', ['$resource', function($resource){
-        return $resource('/paralapraca/api/answer-notification/:id',
+        return $resource('/timtec_theme_hacklab/api/answer-notification/:id',
             {'id' : '@topic'},
             {'update': {'method': 'PUT', 'ignoreLoadingBar': true} });
     }]);

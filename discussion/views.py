@@ -13,7 +13,7 @@ from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSe
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
-from paralapraca.models import AnswerNotification
+from timtec_theme_hacklab.models import AnswerNotification
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

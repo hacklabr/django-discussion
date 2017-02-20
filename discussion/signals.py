@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from discussion.models import Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
-from paralapraca.models import UnreadNotification
+from timtec_theme_hacklab.models import UnreadNotification
 
 
 @receiver(post_save, sender=Comment)

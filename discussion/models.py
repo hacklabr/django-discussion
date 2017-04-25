@@ -163,7 +163,7 @@ class TopicRead(models.Model):
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.topic.title + " " + self.user.username + " " + self.is_read
+        return self.topic.title + " " + self.user.username + " " + str(self.is_read)
 
     class Meta:
         unique_together = ('user', 'topic')

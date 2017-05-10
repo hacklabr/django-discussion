@@ -29,6 +29,7 @@ class TagSerializer(serializers.ModelSerializer):
 class BaseTopicSerializer(serializers.ModelSerializer):
 
     read = serializers.SerializerMethodField()
+    author = BaseUserSerializer(read_only=True)
 
     class Meta:
         model = Topic

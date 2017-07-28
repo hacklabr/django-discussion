@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
 from discussion.views import (CategoryViewSet, ForumViewSet, ForumSearchViewSet, TopicTypeaheadViewSet, TopicViewSet, CommentViewSet, TagViewSet, TopicPageViewSet,
-                              TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet, ContentFileViewSet, TopicReadViewSet)
+                              TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet, ContentFileViewSet, TopicReadViewSet, ForumView)
 
 from rest_framework import routers
 
@@ -28,7 +28,7 @@ router.register(r'typeahead', TopicTypeaheadViewSet)
 urlpatterns = [
 
     url(r'^api/', include(router.urls)),
-    url(r'^$', TemplateView.as_view(template_name="forum.html"), name='forum'),
+    url(r'^$', ForumView.as_view(), name='forum'),
     url(r'^topic/(?:#(?P<topic_id>[-a-zA-Z0-9_]+))?$', TemplateView.as_view(template_name="forum-topic.html")),
     url(r'^topic/new/', TemplateView.as_view(template_name="forum-new-topic.html")),
     url(r'^home/$', RedirectView.as_view(url='/discussion/', permanent=False), name='forum-home'),

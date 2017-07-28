@@ -5,6 +5,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.utils import timezone
 from permissions import IsTopicAuthor, IsCommentAuthor
+from django.views.generic.base import TemplateView
 
 from django.db.models import Q
 
@@ -14,6 +15,15 @@ from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSe
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
 from paralapraca.models import AnswerNotification
+from core.utils import AcceptedTermsRequiredMixin
+
+
+class ForumView(AcceptedTermsRequiredMixin, TemplateView):
+    template_name = 'forum.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ForumView, self).get_context_data(**kwargs)
+        return context
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

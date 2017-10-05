@@ -202,6 +202,14 @@
                  return item;
             };
 
+            $scope.new_topic.tags = [];
+            $scope.tagExists = function (newTag) {
+                for (var tag of $scope.tags)
+                    if (tag.name == newTag)
+                        return true;
+                return false;
+            }
+
             $scope.uploadTopicFiles = function (file, topic) {
 
                 if (file) {
@@ -293,6 +301,13 @@
                  };
                  return item;
             };
+
+            $scope.tagExists = function (newTag) {
+                for (var tag of $scope.topic.tags)
+                    if (tag.name == newTag)
+                        return true;
+                return false;
+            }
 
             // Bootstrap functions for new comments and replies
             $scope.new_comment = function(){

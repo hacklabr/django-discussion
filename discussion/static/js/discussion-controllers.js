@@ -2,12 +2,43 @@
     'use strict';
     var app = angular.module('discussion.controllers', ['ngSanitize']);
 
-    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', 'Forum', 'Topic', 'TopicPage',
-        function ($scope, $routeParams, $http, Forum, Topic, TopicPage) {
+    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Forum', 'Tag', 'Topic', 'TopicPage',
+        function ($scope, $routeParams, $http, $location, Category, Forum, Tag, Topic, TopicPage) {
             function normalInit() {
-                $scope.filters = undefined;
-                $scope.forum_search = false;
+                $scope.filters = {};
                 $scope.forum_single = false;
+                if($routeParams['categories'] || $routeParams['tags']) {
+                    if($routeParams['categories']) {
+                        if(typeof $routeParams['categories'] === 'string' || typeof $routeParams['categories'] === 'number')
+                            $scope.filters.categories = [$routeParams['categories']];
+                        else
+                            $scope.filters.categories = $routeParams['categories'];
+                        $scope.filters.categories = $scope.filters.categories.map(function(cat) {
+                            return angular.fromJson(cat);
+                        });
+                    }
+                    else {
+                        $scope.filters.categories = [];
+                    }
+                    if($routeParams['tags']) {
+                        if(typeof $routeParams['tags'] === 'string' || typeof $routeParams['tags'] === 'number')
+                            $scope.filters.tags = [$routeParams['tags']];
+                        else
+                            $scope.filters.tags = $routeParams['tags'];
+                        $scope.filters.tags = $scope.filters.tags.map(function(tag) {
+                            return angular.fromJson(tag);
+                        });
+                    }
+                    else {
+                        $scope.filters.tags = [];
+                    }
+                    $scope.forum_search = true;
+                }
+                else {
+                    $scope.filters.categories = [];
+                    $scope.filters.tags = [];
+                    $scope.forum_search = false;
+                }
                 $scope.forums = Forum.query({});
                 $scope.latest_topics = Topic.query({
                     limit: 6,
@@ -66,8 +97,6 @@
                 });
             }
 
-
-
             var forum_id = $routeParams.forumId;
 
             if(forum_id) {
@@ -103,64 +132,81 @@
                     });
             }
 
+            function clear_filters() {
+                $scope.filters = {};
+                $scope.filters.categories = [];
+                $scope.filters.tags = [];
+            }
+
+            function set_route() {
+                var new_url = '#!/';
+                if (forum_id)
+                    new_url += forum_id;
+                var plain_url = true;
+                for(var cat of $scope.filters.categories) {
+                    if (plain_url)
+                        new_url += '?categories=' + angular.toJson(cat);
+                    else
+                        new_url += '&categories=' + angular.toJson(cat);
+                    plain_url = false;
+                }
+                for(var tag of $scope.filters.tags) {
+                    if (plain_url)
+                        new_url += '?tags=' + angular.toJson(tag);
+                    else
+                        new_url += '&tags=' + angular.toJson(tag);
+                    plain_url = false;
+                }
+                window.location.hash = new_url;
+            }
+
             $scope.forumFilter = function(operation,type,filter_obj) {
                 if(!$scope.filters) {
                     $scope.filters = {};
                     $scope.filters.categories = []
                     $scope.filters.tags = []
-                    $scope.filters_query = {};
-                    $scope.filters_query.categories = []
-                    $scope.filters_query.tags = []
                 }
 
                 if(operation == 'clear') {
-                    if(forum_id) {
-                        singleInit();
-                    } else {
-                        normalInit();
-                    }
-                    return;
+                    clear_filters();
                 }
 
                 if(type == 'cat') {
                     if(operation == 'add') {
-                        if($scope.filters_query.categories.indexOf(filter_obj.id) > -1) {
+                        if($scope.filters.categories.indexOf(filter_obj) > -1) {
                             return;
                         }
                         $scope.filters.categories.push(filter_obj);
-                        $scope.filters_query.categories.push(filter_obj.id);
                     }
                     else {
                         $scope.filters.categories.splice( $scope.filters.categories.indexOf(filter_obj), 1 );
-                        $scope.filters_query.categories.splice( $scope.filters_query.categories.indexOf(filter_obj.id), 1 );
                     }
                 }
                 else {
                     if(operation == 'add') {
-                        if($scope.filters_query.tags.indexOf(filter_obj.id) > -1) {
+                        if($scope.filters.tags.indexOf(filter_obj) > -1) {
                             return;
                         }
                         $scope.filters.tags.push(filter_obj);
-                        $scope.filters_query.tags.push(filter_obj.id);
                     }
                     else {
                         $scope.filters.tags.splice( $scope.filters.tags.indexOf(filter_obj), 1 );
-                        $scope.filters_query.tags.splice( $scope.filters_query.tags.indexOf(filter_obj.id), 1 );
                     }
                 }
 
                 if($scope.filters.categories.length + $scope.filters.tags.length === 0) {
-                    if(forum_id) {
-                        singleInit();
-                    } else {
-                        normalInit();
-                    }
-                    return;
+                    clear_filters();
                 }
 
+                set_route();
+
                 $scope.forums = Forum.query({ // TODO: when single forum, filter only within it
-                    categories : $scope.filters_query.categories, //array with cat id's
-                    tags : $scope.filters_query.tags //array with tag id's
+                    categories : $scope.filters.categories.map(function(el) {
+                        return el.id;
+                    }), //array with cat id's
+                    tags : $scope.filters.tags.map(function(el) {
+                        return el.id;
+                    }) //array with tag id's
                 }, function(r) {
                     $scope.forum_search = true;
                 });

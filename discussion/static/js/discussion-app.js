@@ -34,11 +34,13 @@
                 }).
                 when('/forum/:forumId', {
                     templateUrl: 'forum.html',
-                    controller: 'ForumCtrl'
+                    controller: 'ForumCtrl',
+                    reloadOnSearch: false
                 }).
                 when('/', {
                     templateUrl: 'forum.html',
-                    controller: 'ForumCtrl'
+                    controller: 'ForumCtrl',
+                    reloadOnSearch: false
                 }).
                 otherwise('/');
         }

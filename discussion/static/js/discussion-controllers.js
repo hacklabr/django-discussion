@@ -226,6 +226,7 @@
             $scope.save_topic = function() {
                 $scope.sending = true;
                 // $scope.new_topic.forum = 1;
+                $scope.new_topic.categories = [$scope.category];
                 var topic_files = $scope.new_topic.files;
                 $scope.new_topic.$save(function(topic){
                     angular.forEach(topic_files, function(topic_file) {
@@ -275,6 +276,7 @@
 
             $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
                 // Mark topic as read
+                $scope.category_id = $scope.topic.categories[0].id;
                 var topic_read = new TopicRead();
                 topic_read.topic = topic.id;
                 topic_read.is_read = true;
@@ -292,6 +294,9 @@
             $scope.tags = Tag.query();
             // angular.copy($scope.topic, $scope.current_topic);
             $scope.update_topic = function() {
+                $scope.topic.categories = $scope.categories.filter(function(cat) {
+                    return cat.id == $scope.category_id;
+                });
                 var topic_files = $scope.topic.files;
                 $scope.topic.$update(function(topic){
                     angular.forEach(topic_files, function(topic_file) {

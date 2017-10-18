@@ -241,6 +241,18 @@
                 });
             }
 
+            $scope.show_errors = false;
+            $scope.validate = function(valid) {
+                $scope.show_errors = true;
+                if(!valid) {
+                    setTimeout(function() {
+                        $('html, body').animate({
+                          scrollTop: $('#errors-list').position().top
+                        }, 500);
+                    }, 100);
+                }
+            }
+
             // Turn new tags into serializable objects
             $scope.tagTransform = function (newTag) {
                 var item = {

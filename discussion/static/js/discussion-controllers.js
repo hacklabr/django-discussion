@@ -143,18 +143,18 @@
                 if (forum_id)
                     new_url += forum_id;
                 var plain_url = true;
-                for(var cat of $scope.filters.categories) {
+                for(var i = 0; i < $scope.filters.categories.length; i++) {
                     if (plain_url)
-                        new_url += '?categories=' + angular.toJson(cat);
+                        new_url += '?categories=' + angular.toJson($scope.filters.categories[i]);
                     else
-                        new_url += '&categories=' + angular.toJson(cat);
+                        new_url += '&categories=' + angular.toJson($scope.filters.categories[i]);
                     plain_url = false;
                 }
-                for(var tag of $scope.filters.tags) {
+                for(var i = 0; i < $scope.filters.tags.length; i++) {
                     if (plain_url)
-                        new_url += '?tags=' + angular.toJson(tag);
+                        new_url += '?tags=' + angular.toJson($scope.filters.tags[i]);
                     else
-                        new_url += '&tags=' + angular.toJson(tag);
+                        new_url += '&tags=' + angular.toJson($scope.filters.tags[i]);
                     plain_url = false;
                 }
                 window.location.hash = new_url;

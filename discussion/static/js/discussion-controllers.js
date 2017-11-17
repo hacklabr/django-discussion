@@ -2,8 +2,8 @@
     'use strict';
     var app = angular.module('discussion.controllers', ['ngSanitize']);
 
-    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Forum', 'Tag', 'Topic', 'TopicPage',
-        function ($scope, $routeParams, $http, $location, Category, Forum, Tag, Topic, TopicPage) {
+    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Contracts', 'Forum', 'Tag', 'Topic', 'TopicPage',
+        function ($scope, $routeParams, $http, $location, Category, Contracts, Forum, Tag, Topic, TopicPage) {
             function normalInit() {
                 $scope.filters = {};
                 $scope.forum_single = false;
@@ -68,6 +68,8 @@
                   }
               );
             };
+
+            $scope.contracts = Contracts.query();
 
             function singleInit() {
                 Forum.get({id: forum_id},function(forum){

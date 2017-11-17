@@ -54,6 +54,11 @@
             {'update': {'method': 'PUT', 'ignoreLoadingBar': true} });
     }]);
 
+    app.factory('Contracts', ['$resource', function($resource){
+        return $resource('/paralapraca/api/contract/:id',
+            {'id': '@id'});
+    }]);
+
     app.factory('TopicFile', ['$resource', 'Upload', function($resource, Upload){
          var topic_file = $resource('/discussion/api/topic-file/:id',
             {'id' : '@id'},

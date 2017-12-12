@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
-
 import hashlib
 
 
@@ -41,7 +40,7 @@ class Forum(models.Model):
     slug = AutoSlugField(_('Slug'), populate_from='title', max_length=255, editable=False, unique=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False)
 
-    forum_type = models.CharField(choices=TYPE_CHOICES, default='discussion', max_length=64)
+    forum_type = models.CharField(_('Forum Type'), choices=TYPE_CHOICES, default='discussion', max_length=64)
 
     is_public = models.BooleanField(_("public"), default=False)
 
@@ -49,8 +48,8 @@ class Forum(models.Model):
         Group,
         verbose_name=_('groups'),
         blank=True,
-        help_text=_('The Groups that can have access to this forum. If empty, there are no group restrictions.'),
-        related_name="groups",
+        help_text=_('The Groups that can access this forum. If empty, there are no group restrictions.'),
+        related_name="foruns",
     )
 
     def __str__(self):

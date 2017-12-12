@@ -4,7 +4,8 @@ from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
 from discussion.views import (CategoryViewSet, ForumViewSet, ForumSearchViewSet, TopicTypeaheadViewSet, TopicViewSet, CommentViewSet, TagViewSet, TopicPageViewSet,
-                              TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet, ContentFileViewSet, TopicReadViewSet, ForumView)
+                              TopicNotificationViewSet, TopicLikeViewSet, CommentLikeViewSet, TopicFileViewSet, CommentFileViewSet, ContentFileViewSet, TopicReadViewSet, ForumView,
+                              ForumCreateView, ForumListView, ForumUpdateView, ForumDeleteView)
 
 from rest_framework import routers
 
@@ -29,6 +30,10 @@ urlpatterns = [
 
     url(r'^api/', include(router.urls)),
     url(r'^$', ForumView.as_view(), name='forum'),
+    url(r'^forum-create$', ForumCreateView.as_view(), name='forum-create'),
+    url(r'^forum-list$', ForumListView.as_view(), name='forum-list'),
+    url(r'^forum-update/(?P<pk>[-a-zA-Z0-9_]+)$', ForumUpdateView.as_view(), name='forum-update'),
+    url(r'^forum-delete/(?P<pk>[-a-zA-Z0-9_]+)$', ForumDeleteView.as_view(), name='forum-delete'),
     url(r'^topic/(?:#(?P<topic_id>[-a-zA-Z0-9_]+))?$', TemplateView.as_view(template_name="forum-topic.html")),
     url(r'^topic/new/', TemplateView.as_view(template_name="forum-new-topic.html")),
     url(r'^home/$', RedirectView.as_view(url='/discussion/', permanent=False), name='forum-home'),

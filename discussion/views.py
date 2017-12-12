@@ -16,6 +16,10 @@ from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotifi
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
 from paralapraca.models import AnswerNotification
 from core.utils import AcceptedTermsRequiredMixin
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import ListView
+from .forms import ForumForm
+from django.core.urlresolvers import reverse_lazy
 
 
 class ForumView(AcceptedTermsRequiredMixin, TemplateView):
@@ -24,6 +28,34 @@ class ForumView(AcceptedTermsRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ForumView, self).get_context_data(**kwargs)
         return context
+
+
+class ForumCreateView(CreateView):
+    template_name = 'forum_create_form.html'
+    success_url = reverse_lazy('discussion:forum-list')
+    form_class = ForumForm
+
+    def form_valid(self, form):
+        form.author = self.request.user
+        return super(ForumCreateView, self).form_valid(form)
+
+
+class ForumListView(ListView):
+    model = Forum
+    template_name = 'forum-list.html'
+
+
+class ForumUpdateView(UpdateView):
+    model = Forum
+    fields = ['title', 'category', 'text', 'forum_type', 'is_public', 'groups']
+    template_name = 'forum_update_form.html'
+    success_url = reverse_lazy('discussion:forum-list')
+
+
+class ForumDeleteView(DeleteView):
+    model = Forum
+    template_name = 'forum_delete_form.html'
+    success_url = reverse_lazy('discussion:forum-list')
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -45,6 +77,7 @@ class ForumViewSet(viewsets.ModelViewSet):
     queryset = Forum.objects.all()
     serializer_class = ForumSerializer
     permission_classes = [IsAuthenticated]
+    filter_fields = ('forum_type',)
 
     def get_queryset(self):
         queryset = super(ForumViewSet, self).get_queryset()

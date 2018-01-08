@@ -7,7 +7,7 @@ class TopicAdmin(admin.ModelAdmin):
 
 
 class ForumAdmin(admin.ModelAdmin):
-    list_filter = ['groups__contracts']
+    list_filter = ['groups__contract']
 
 admin.site.register(Category)
 admin.site.register(Forum, ForumAdmin)

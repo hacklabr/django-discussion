@@ -26,12 +26,59 @@
 {% block content %}
   <div class="page container-fluid">
     <header class="page-header">
-      <h2>Atualizar Fórum</h2>
+      <h2>Atualizar fórum</h2>
     </header>
-    <form action="" method="post">
+    <form action="" method="post" class="forum-admin">
       {% csrf_token %}
-      {{ form.as_p }}
-      <input type="submit" value="Update Forum"/>
+      <div class="row">
+        <div class="col-xs-12 col-md-3">
+          <label>Título</label>
+        </div>
+        <div class="col-xs-12 col-md-9">
+          {{ form.title }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-md-3">
+          <label>Texto</label>
+        </div>
+        <div class="col-xs-12 col-md-9">
+          {{ form.text }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-md-3">
+          <label>Tipo de fórum</label>
+        </div>
+        <div class="col-xs-12 col-md-9">
+          {{ form.forum_type }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-md-3">
+          <label>Categoria</label>
+        </div>
+        <div class="col-xs-12 col-md-9">
+          {{ form.category }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-md-3">
+          <label>Grupos de usuário</label>
+        </div>
+        <div class="col-xs-12 col-md-9">
+          {{ form.groups }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-md-3">
+          <label>Tornar público</label>
+        </div>
+        <div class="col-xs-12 col-md-9">
+          {{ form.is_public }}
+        </div>
+      </div>
+      <input type="submit" class="btn btn-primary" value="Atualizar fórum"/>
     </form>
   </div>
 {% endblock %}

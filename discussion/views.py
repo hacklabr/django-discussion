@@ -47,7 +47,8 @@ class ForumListView(ListView):
 
 class ForumUpdateView(UpdateView):
     model = Forum
-    fields = ['title', 'category', 'text', 'forum_type', 'is_public', 'groups']
+    form_class = ForumForm
+
     template_name = 'forum_update_form.html'
     success_url = reverse_lazy('discussion:forum-list')
 

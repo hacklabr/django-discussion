@@ -24,20 +24,24 @@
 
 
 {% block content %}
-  <div class="page container-fluid">
+  <div class="page container-fluid forum-admin forum-list">
     <header class="page-header">
+      <div class="pull-right"><a class="btn btn-primary add" href="/discussion/admin/forum-create">novo fórum</a></div>
       <h2>Lista de Fóruns</h2>
     </header>
-  <ul>
     {% for forum in object_list %}
-      <li>{{ forum.title }} -
-        <a href="{% url 'discussion:forum-update' forum.id %}">Editar</a> -
-        <a href="{% url 'discussion:forum-delete' forum.id %}">Remover</a>
-      </li>
+      <div class="row">
+        <div class="col-xs-12 col-sm-7">
+          <span><a href="/discussion/#!/forum/{{ forum.id }}">{{ forum.title }}</a></span>
+        </div>
+        <div class="col-xs-12 col-sm-5 actions">
+          <a class="btn btn-primary edit" href="{% url 'discussion:forum-update' forum.id %}">Editar</a>
+          <a class="btn btn-danger delete" href="{% url 'discussion:forum-delete' forum.id %}">Remover</a>
+        </div>
+      </div>
     {% empty %}
-      <li>Ainda não há fóruns</li>
+      <p>Ainda não há fóruns</p>
     {% endfor %}
-  </ul>
   </div>
 {% endblock %}
 

@@ -26,11 +26,11 @@
 {% block content %}
   <div class="page container-fluid">
     <header class="page-header">
-      <h2>Remover Fórum</h2>
+      <h2>Remover fórum</h2>
     </header>
 <form action="" method="post">{% csrf_token %}
     <p>Você tem certeza de que quer remover "{{ object }}"?</p>
-    <input type="submit" value="Confirmar" />
+    <input class="btn btn-primary" type="submit" value="Confirmar" />
 </form>
   </div>
 {% endblock %}

@@ -24,6 +24,22 @@
 
 
 {% block content %}
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+       $("select[multiple]").mousedown(function(e){
+            e.preventDefault();
+
+            var select = this;
+            var scroll = select.scrollTop;
+
+            e.target.selected = !e.target.selected;
+
+            setTimeout(function(){select.scrollTop = scroll;}, 0);
+
+            $(select).focus();
+        }).mousemove(function(e){e.preventDefault()});
+    });
+  </script>
   <div class="page container-fluid">
     <header class="page-header">
       <h2>Atualizar fórum</h2>
@@ -37,6 +53,7 @@
         <div class="col-xs-12 col-md-9">
           {{ form.title }}
         </div>
+        {{ form.title.errors }}
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-3">
@@ -61,6 +78,7 @@
         <div class="col-xs-12 col-md-9">
           {{ form.category }}
         </div>
+        {{ form.category.errors }}
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-3">
@@ -69,6 +87,7 @@
         <div class="col-xs-12 col-md-9">
           {{ form.groups }}
         </div>
+        {{ form.groups.errors }}
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-3">

@@ -47,11 +47,12 @@ class ForumListView(ListView):
 
     def get_queryset(self):
         queryset = super(ForumListView, self).get_queryset()
+        queryset = queryset.filter(forum_type='discussion')
         contract = self.request.GET.get('contract', None)
         if contract:
             contract = Contract.objects.get(id=int(contract))
             groups = contract.groups.all()
-            queryset = queryset.filter(Q(is_public=True) | Q(groups__in=groups))
+            queryset = queryset.filter(Q(groups__in=groups))
 
         return queryset.distinct()
 

@@ -72,7 +72,10 @@
             $scope.contracts = Contracts.query({simple: true});
 
             $scope.contractChange = function(){
-                $scope.forums = Forum.query({'contract' : $scope.filters.contract.id});
+                if ($scope.filters.contract)
+                    $scope.forums = Forum.query({'contract' : $scope.filters.contract.id});
+                else
+                    $scope.forums = Forum.query();
                 $scope.latest_topics = Topic.query({
                     limit: 6,
                     ordering: '-last_activity_at',

@@ -69,7 +69,19 @@
               );
             };
 
-            $scope.contracts = Contracts.query();
+            $scope.contracts = Contracts.query({simple: true});
+
+            $scope.contractChange = function(){
+                $scope.forums = Forum.query({'contract' : $scope.filters.contract.id});
+                $scope.latest_topics = Topic.query({
+                    limit: 6,
+                    ordering: '-last_activity_at',
+                    contract: $scope.filters.contract
+                    }, function(){
+                        $scope.topics_loaded = true;
+                    },
+                );
+            }
 
             function singleInit() {
                 Forum.get({id: forum_id},function(forum){

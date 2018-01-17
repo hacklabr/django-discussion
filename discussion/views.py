@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.utils import timezone
+
 from permissions import IsTopicAuthor, IsCommentAuthor
 from django.views.generic.base import TemplateView
 
@@ -14,7 +15,7 @@ from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSe
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
-from paralapraca.models import AnswerNotification
+from paralapraca.models import AnswerNotification, Contract
 from core.utils import AcceptedTermsRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
@@ -43,6 +44,25 @@ class ForumCreateView(CreateView):
 class ForumListView(ListView):
     model = Forum
     template_name = 'forum-list.html'
+
+    def get_queryset(self):
+        queryset = super(ForumListView, self).get_queryset()
+        contract = self.request.GET.get('contract', None)
+        if contract:
+            contract = Contract.objects.get(id=int(contract))
+            groups = contract.groups.all()
+            queryset = queryset.filter(Q(is_public=True) | Q(groups__in=groups))
+
+        return queryset.distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super(ForumListView, self).get_context_data(**kwargs)
+        context['contracts'] = Contract.objects.all()
+        contract = self.request.GET.get('contract', None)
+        if contract:
+            context['curr_contract'] = int(contract)
+
+        return context
 
 
 class ForumUpdateView(UpdateView):
@@ -82,7 +102,13 @@ class ForumViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super(ForumViewSet, self).get_queryset()
+        contract = self.request.GET.get('contract', None)
+
         queryset = queryset.order_by('id')
+        if contract:
+            contract = Contract.objects.get(id=int(contract))
+            groups = contract.groups.all()
+            queryset = queryset.filter(Q(is_public=True) | Q(groups__in=groups))
         queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
 
         return queryset.distinct()
@@ -104,6 +130,8 @@ class ForumSearchViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('title', 'text',)
     # search_fields = ('title', 'text', 'topics__title', 'topics__content', 'topics__comment__text', )
+
+
 
 
 class TopicTypeaheadViewSet(viewsets.ModelViewSet):

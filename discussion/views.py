@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from rest_framework import viewsets, status
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
@@ -177,7 +178,20 @@ class TopicViewSet(viewsets.ModelViewSet):
         try:
             topic = Topic.objects.get(id=kwargs['pk'])
         except Topic.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': u'Tópico não encontrado'},
+                            status=status.HTTP_404_NOT_FOUND)
+        except ValueError:
+            return Response({
+                'message': u'Identificador inválido "%s"' % kwargs['pk']
+            }, status.HTTP_400_BAD_REQUEST)
+
+        user_groups = set(list(self.request.user.groups.all()))
+        forum_groups = set(list(topic.forum.groups.all()))
+        if len(user_groups.intersection(forum_groups)) == 0:
+            return Response({'message': u"Você não tem acesso a esse Tópico"},
+                            status=status.HTTP_403_FORBIDDEN)
+
+
         topicSer = self.get_serializer(topic)
 
         # Mark the last notification relative to the current topic-user pair as read

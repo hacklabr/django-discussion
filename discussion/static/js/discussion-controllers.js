@@ -310,6 +310,9 @@
                 topic_read.topic = topic.id;
                 topic_read.is_read = true;
                 topic_read.$save();
+            }, function(error) {
+                $scope.fatal_error = true;
+                $scope.error_message = error.data.message;
             });
             $scope.user = CurrentUser;
 

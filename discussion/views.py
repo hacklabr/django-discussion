@@ -111,7 +111,8 @@ class ForumViewSet(viewsets.ModelViewSet):
             contract = Contract.objects.get(id=int(contract))
             groups = contract.groups.all()
             queryset = queryset.filter(Q(is_public=True) | Q(groups__in=groups))
-        queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
 
         return queryset.distinct()
 
@@ -185,12 +186,12 @@ class TopicViewSet(viewsets.ModelViewSet):
                 'message': u'Identificador inválido "%s"' % kwargs['pk']
             }, status.HTTP_400_BAD_REQUEST)
 
-        user_groups = set(list(self.request.user.groups.all()))
-        forum_groups = set(list(topic.forum.groups.all()))
-        if len(user_groups.intersection(forum_groups)) == 0:
-            return Response({'message': u"Você não tem acesso a esse Tópico"},
-                            status=status.HTTP_403_FORBIDDEN)
-
+        if not self.request.user.is_superuser:
+            user_groups = set(list(self.request.user.groups.all()))
+            forum_groups = set(list(topic.forum.groups.all()))
+            if len(user_groups.intersection(forum_groups)) == 0:
+                return Response({'message': u"Você não tem acesso a esse Tópico"},
+                                status=status.HTTP_403_FORBIDDEN)
 
         topicSer = self.get_serializer(topic)
 
@@ -226,10 +227,12 @@ class TopicViewSet(viewsets.ModelViewSet):
                 queryset = queryset.exclude(author=self.request.user)
         else:
             queryset = queryset.filter(forum__forum_type='discussion')
-            queryset = queryset.filter(
-                Q(forum__is_public=True) |
-                Q(forum__groups__in=self.request.user.groups.all())
-            )
+            if not self.request.user.is_superuser:
+                queryset = queryset.filter(
+                    Q(forum__is_public=True) |
+                    Q(forum__groups__in=self.request.user.groups.all())
+                )
+
             # If there are search fields in the request, do the search
             search = self.request.query_params.get('search', None)
             if search:

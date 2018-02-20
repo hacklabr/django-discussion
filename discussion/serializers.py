@@ -213,7 +213,10 @@ class TopicSerializer(serializers.ModelSerializer):
             for tag in tags:
                 # Check if it's a new tag
                 if 'isTag' in tag.keys():
-                    tag = Tag.objects.create(name=tag['name'])
+                    if not Tag.objects.filter(name=tag['name'].lower()).exists():
+                        tag = Tag.objects.create(name=tag['name'].lower())
+                    else:
+                        tag = Tag.objects.get(name=tag['name'].lower())
                 else:
                     tag = Tag.objects.get(id=tag['id'])
                 instance.tags.add(tag)

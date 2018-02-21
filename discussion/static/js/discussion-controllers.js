@@ -273,7 +273,7 @@
             // Turn new tags into serializable objects
             $scope.tagTransform = function (newTag) {
                 var item = {
-                    name: newTag
+                    name: newTag.toLowerCase()
                  };
                  return item;
             };
@@ -281,7 +281,7 @@
             $scope.new_topic.tags = [];
             $scope.tagExists = function (newTag) {
                 for (var tag of $scope.tags)
-                    if (tag.name == newTag)
+                    if (tag.name.toLowerCase() == newTag)
                         return true;
                 return false;
             }
@@ -380,14 +380,14 @@
             // Turn new tags into serializable objects
             $scope.tagTransform = function (newTag) {
                 var item = {
-                    name: newTag
+                    name: newTag.toLowerCase()
                  };
                  return item;
             };
 
             $scope.tagExists = function (newTag) {
                 for (var tag of $scope.topic.tags)
-                    if (tag.name == newTag)
+                    if (tag.name.toLowerCase() == newTag)
                         return true;
                 return false;
             }

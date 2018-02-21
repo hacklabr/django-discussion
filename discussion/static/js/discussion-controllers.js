@@ -386,7 +386,7 @@
             };
 
             $scope.tagExists = function (newTag) {
-                for (var tag of $scope.topic.tags)
+                for (var tag of $scope.tags)
                     if (tag.name.toLowerCase() == newTag)
                         return true;
                 return false;

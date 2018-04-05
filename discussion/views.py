@@ -22,6 +22,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from .forms import ForumForm
 from django.core.urlresolvers import reverse_lazy
+from braces import views
 
 
 class ForumView(AcceptedTermsRequiredMixin, TemplateView):
@@ -32,7 +33,9 @@ class ForumView(AcceptedTermsRequiredMixin, TemplateView):
         return context
 
 
-class ForumCreateView(CreateView):
+class ForumCreateView(views.LoginRequiredMixin,
+                      views.StaffuserRequiredMixin,
+                      CreateView):
     template_name = 'forum_create_form.html'
     success_url = reverse_lazy('discussion:forum-list')
     form_class = ForumForm
@@ -42,9 +45,12 @@ class ForumCreateView(CreateView):
         return super(ForumCreateView, self).form_valid(form)
 
 
-class ForumListView(ListView):
+class ForumListView(views.LoginRequiredMixin,
+                    views.StaffuserRequiredMixin,
+                    ListView):
     model = Forum
     template_name = 'forum-list.html'
+
 
     def get_queryset(self):
         queryset = super(ForumListView, self).get_queryset()
@@ -67,7 +73,9 @@ class ForumListView(ListView):
         return context
 
 
-class ForumUpdateView(UpdateView):
+class ForumUpdateView(views.LoginRequiredMixin,
+                      views.StaffuserRequiredMixin,
+                      UpdateView):
     model = Forum
     form_class = ForumForm
 
@@ -75,7 +83,9 @@ class ForumUpdateView(UpdateView):
     success_url = reverse_lazy('discussion:forum-list')
 
 
-class ForumDeleteView(DeleteView):
+class ForumDeleteView(views.LoginRequiredMixin,
+                      views.StaffuserRequiredMixin,
+                      DeleteView):
     model = Forum
     template_name = 'forum_delete_form.html'
     success_url = reverse_lazy('discussion:forum-list')

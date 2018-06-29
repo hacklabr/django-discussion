@@ -6,8 +6,9 @@ class TopicAdmin(admin.ModelAdmin):
     search_fields = ['title', 'content']
 
 
+
 class ForumAdmin(admin.ModelAdmin):
-    list_filter = ['groups__contract']
+    pass
 
 admin.site.register(Category)
 admin.site.register(Forum, ForumAdmin)

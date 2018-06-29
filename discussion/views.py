@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
@@ -6,7 +7,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.utils import timezone
 
-from permissions import IsTopicAuthor, IsCommentAuthor
+from .permissions import IsTopicAuthor, IsCommentAuthor
 from django.views.generic.base import TemplateView
 
 from django.db.models import Q
@@ -16,8 +17,6 @@ from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSe
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
-from paralapraca.models import AnswerNotification, Contract
-from core.utils import AcceptedTermsRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from .forms import ForumForm
@@ -25,7 +24,7 @@ from django.core.urlresolvers import reverse_lazy
 from braces import views
 
 
-class ForumView(AcceptedTermsRequiredMixin, TemplateView):
+class ForumView(TemplateView):
     template_name = 'forum.html'
 
     def get_context_data(self, **kwargs):
@@ -55,20 +54,11 @@ class ForumListView(views.LoginRequiredMixin,
     def get_queryset(self):
         queryset = super(ForumListView, self).get_queryset()
         queryset = queryset.filter(forum_type='discussion')
-        contract = self.request.GET.get('contract', None)
-        if contract:
-            contract = Contract.objects.get(id=int(contract))
-            groups = contract.groups.all()
-            queryset = queryset.filter(Q(groups__in=groups))
 
         return queryset.distinct()
 
     def get_context_data(self, **kwargs):
         context = super(ForumListView, self).get_context_data(**kwargs)
-        context['contracts'] = Contract.objects.all()
-        contract = self.request.GET.get('contract', None)
-        if contract:
-            context['curr_contract'] = int(contract)
 
         return context
 
@@ -114,13 +104,8 @@ class ForumViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super(ForumViewSet, self).get_queryset()
-        contract = self.request.GET.get('contract', None)
 
         queryset = queryset.order_by('id')
-        if contract:
-            contract = Contract.objects.get(id=int(contract))
-            groups = contract.groups.all()
-            queryset = queryset.filter(Q(is_public=True) | Q(groups__in=groups))
         if not self.request.user.is_superuser:
             queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
 
@@ -170,10 +155,11 @@ class TopicViewSet(viewsets.ModelViewSet):
 
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
-    filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend, )
+    filter_backends = (filters.OrderingFilter, DjangoFilterBackend, )
     ordering_fields = ('last_activity_at', )
     filter_fields = ('forum', )
     permission_classes = (IsAuthenticated, IsTopicAuthor, )
+    pagination_class = None
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, updated_at=timezone.now())
@@ -196,7 +182,7 @@ class TopicViewSet(viewsets.ModelViewSet):
                 'message': u'Identificador inválido "%s"' % kwargs['pk']
             }, status.HTTP_400_BAD_REQUEST)
 
-        if not self.request.user.is_superuser:
+        if not self.request.user.is_superuser and self.request.user != topic.author:
             user_groups = set(list(self.request.user.groups.all()))
             forum_groups = set(list(topic.forum.groups.all()))
             if len(user_groups.intersection(forum_groups)) == 0:
@@ -213,14 +199,6 @@ class TopicViewSet(viewsets.ModelViewSet):
             notification.save(skip_date=True)
         except TopicNotification.DoesNotExist:
             # There isn't a topic notification associated to the current topic-user pair
-            pass
-
-        # Maybe is there an answer notification to mark as read?
-        try:
-            notification = AnswerNotification.objects.get(topic=topic, user=request.user)
-            notification.is_read = True
-            notification.save(skip_date=True)
-        except AnswerNotification.DoesNotExist:
             pass
 
         return Response(topicSer.data)

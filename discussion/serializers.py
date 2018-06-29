@@ -1,15 +1,14 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from discussion.models import (Category, Forum, Topic, Comment, Tag,
                                TopicNotification, TopicLike, TopicRead,
                                CommentLike, TopicFile, CommentFile, ContentFile)
-from accounts.serializers import TimtecUserSerializer
 
 
-class BaseUserSerializer(TimtecUserSerializer):
-    pass
-    # class Meta:
-    #     model = get_user_model()
-    #     exclude = ('password',)
+class BaseUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        exclude = ('password',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -17,6 +16,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         depth = 1
+        fields = '__all__'
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -24,6 +24,7 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         depth = 1
+        fields = '__all__'
 
 
 class BaseTopicSerializer(serializers.ModelSerializer):
@@ -95,6 +96,7 @@ class BaseCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        fields = '__all__'
 
     def get_user_like(self, obj):
         request = self.context.get("request")
@@ -109,6 +111,7 @@ class CommentFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommentFile
+        fields = '__all__'
 
 
 class CommentReplySerializer(BaseCommentSerializer):
@@ -144,12 +147,14 @@ class TopicFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TopicFile
+        fields = '__all__'
 
 
 class ContentFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContentFile
+        fields = '__all__'
 
 
 class TopicSerializer(serializers.ModelSerializer):
@@ -258,6 +263,7 @@ class TopicLikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TopicLike
+        fields = '__all__'
 
 
 class CommentLikeSerializer(serializers.ModelSerializer):
@@ -266,6 +272,7 @@ class CommentLikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommentLike
+        fields = '__all__'
 
 
 class TopicNotificationSerializer(serializers.ModelSerializer):
@@ -278,6 +285,7 @@ class TopicNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TopicNotification
         depth = 1
+        fields = '__all__'
 
 
 class ForumSearchSerializer(serializers.ModelSerializer):

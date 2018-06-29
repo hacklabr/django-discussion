@@ -5,22 +5,26 @@
         'discussion.controllers',
         'discussion.services',
         'discussion.directives',
+        'discussion.filters',
         'ngRoute',
-        'ui.tinymce',
+//        'ui.tinymce',
         'ui.bootstrap',
         'ngFileUpload',
         'ui.select',
         'ngSanitize',
         'ngAnimate',
         'duScroll',
+        'LocalStorageModule',
     ]);
 
     // Set new default values for 'duScroll'
     app.value('duScrollDuration', 1000);
     app.value('duScrollOffset', 100);
 
-    app.config(['$locationProvider', '$routeProvider',
-        function config($locationProvider, $routeProvider) {
+    app.config(['$locationProvider', '$routeProvider', 'localStorageServiceProvider',
+        function config($locationProvider, $routeProvider,
+            localStorageServiceProvider) {
+            localStorageServiceProvider.setPrefix('');
             $locationProvider.hashPrefix('!');
 
             $routeProvider.
@@ -45,5 +49,14 @@
                 otherwise('/');
         }
     ]);
+
+    app.run(function($http, localStorageService) {
+        $http.defaults.headers.common.Authorization = 'Token ' + localStorageService.get('ujs-ocupa|token');
+    });
+
+    app.service('CurrentUser', ['localStorageService', function (localStorageService) {
+        console.log(localStorageService.get('ujs-ocupa|currentProfile'));
+        return localStorageService.get('ujs-ocupa|currentProfile');
+    }]);
 
 })(angular);

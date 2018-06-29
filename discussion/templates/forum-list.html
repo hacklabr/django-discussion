@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-{% load is_enrolled %}
 
 {% block js %} {{ block.super }}
   <script type="text/javascript" src="{% static 'js/my-courses/app.js' %}"></script>
@@ -29,26 +28,6 @@
       <div class="pull-right"><a class="btn btn-primary add" href="/discussion/admin/forum-create">novo fórum</a></div>
       <h2>Lista de Fóruns</h2>
     </header>
-    <div class="filters">
-     <div class="form-inline">
-        <div class="row">
-          <div class="col-xs-12 col-sm-6">
-            <form action="/discussion/admin" method="get">
-              <select class="form-control" name="contract" onchange="this.form.submit()">
-                <option  value="" selected="selected">-- Selecione Contrato --</option>
-                {% for c in contracts %}
-                {{ c.id }}
-                <option value="{{ c.id }}"
-                        {% if c.id == curr_contract %}selected="selected"{% endif %}>
-                  {{ c }}
-                </option>
-                {% endfor %}
-              </select>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
     {% for forum in object_list %}
       <div class="row">
         <div class="col-xs-12 col-sm-7">

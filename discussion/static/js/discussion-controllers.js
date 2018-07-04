@@ -39,7 +39,14 @@
                     $scope.filters.tags = [];
                     $scope.forum_search = false;
                 }
-                $scope.forums = Forum.query({});
+                $scope.forums = Forum.query({
+                    categories : $scope.filters.categories.map(function(el) {
+                        return el.id;
+                    }),
+                    tags : $scope.filters.tags.map(function(el) {
+                        return el.id;
+                    })
+                });
                 $scope.latest_topics = Topic.query({
                     limit: 6,
                     ordering: '-last_activity_at',
@@ -141,7 +148,7 @@
             function set_route() {
                 var new_url = '#!/';
                 if (forum_id)
-                    new_url += forum_id;
+                    new_url += 'forum/' + forum_id;
                 var plain_url = true;
                 for(var i = 0; i < $scope.filters.categories.length; i++) {
                     if (plain_url)
@@ -196,6 +203,10 @@
 
                 if($scope.filters.categories.length + $scope.filters.tags.length === 0) {
                     clear_filters();
+                    $scope.forum_search = false;
+                }
+                else {
+                    $scope.forum_search = true;
                 }
 
                 set_route();
@@ -207,8 +218,6 @@
                     tags : $scope.filters.tags.map(function(el) {
                         return el.id;
                     }) //array with tag id's
-                }, function(r) {
-                    $scope.forum_search = true;
                 });
             }
         }
@@ -373,6 +382,10 @@
                     name: newTag.toLowerCase()
                  };
                  return item;
+            };
+
+            $scope.encodeUrl = function (obj) {
+                return encodeURIComponent(angular.toJson(obj));
             };
 
             $scope.tagExists = function (newTag) {

@@ -55,7 +55,6 @@
     });
 
     app.service('CurrentUser', ['localStorageService', function (localStorageService) {
-        console.log(localStorageService.get('ujs-ocupa|currentProfile'));
         return localStorageService.get('ujs-ocupa|currentProfile');
     }]);
 

@@ -6,7 +6,7 @@
     // If you want to cutomize uiTinymceConfig for your theme, please copy this file to you theme in the
     // same path (static/js/). This are the default setting for timtec
     app.value('uiTinymceConfig', {
-        base_url: '/static/tinymce-dist/',
+        base_url: 'https://unpkg.com/tinymce@4.5.1',
         related_url: true,
         inline: false,
         menubar: false,

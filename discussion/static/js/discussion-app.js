@@ -7,7 +7,7 @@
         'discussion.directives',
         'discussion.filters',
         'ngRoute',
-//        'ui.tinymce',
+        'ui.tinymce',
         'ui.bootstrap',
         'ngFileUpload',
         'ui.select',

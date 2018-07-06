@@ -223,17 +223,14 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile',
-//    'uiTinymceConfig',
-        function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag, ContentFile,
-//        uiTinymceConfig
-        ) {
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile', 'uiTinymceConfig',
+        function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag, ContentFile, uiTinymceConfig) {
             $scope.forums = Forum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
 
-//            uiTinymceConfig.images_upload_handler = ContentFile.upload;
+            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
             $scope.save_topic = function() {
                 $scope.sending = true;
@@ -303,11 +300,9 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll',
-//    'uiTinymceConfig',
-    'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile',
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll', 'uiTinymceConfig', 'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile',
         function ($scope, $routeParams, $sce, $location, $anchorScroll,
-//        uiTinymceConfig,
+        uiTinymceConfig,
         Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
 
             $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
@@ -323,9 +318,9 @@
             });
             $scope.user = CurrentUser;
 
-//            uiTinymceConfig.automatic_uploads = true;
+            uiTinymceConfig.automatic_uploads = true;
 
-//            uiTinymceConfig.images_upload_handler = ContentFile.upload;
+            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
             // Prepare for topic editing
 //            $scope.forums = Forum.query();
@@ -482,16 +477,16 @@
                 }
             };
 
-            // uiTinymceConfig.file_browser_callback = function(field_name, url, type, win) {
-            //     if(type=='image') {
-            //         $('#select-file').click();
-            //         console.log('file_browser_callback called!');
-            //     }
-            // };
-            //
-            // uiTinymceConfig.images_upload_handler = function (blobInfo, success, failure) {
-            //     console.log('images_upload_handler called!');
-            // };
+             uiTinymceConfig.file_browser_callback = function(field_name, url, type, win) {
+                 if(type=='image') {
+                     $('#select-file').click();
+                     console.log('file_browser_callback called!');
+                 }
+             };
+
+             uiTinymceConfig.images_upload_handler = function (blobInfo, success, failure) {
+                 console.log('images_upload_handler called!');
+             };
 
             // ng-file-upload
             $scope.uploadCommentFiles = function (file, comment) {

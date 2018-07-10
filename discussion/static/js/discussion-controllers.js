@@ -220,6 +220,11 @@
                     }) //array with tag id's
                 });
             }
+
+            var observer = new MutationObserver(function() {
+                window.parent.postMessage('FrameResize', '*');
+            });
+            observer.observe(window.document.body, { attributes: true, characterData: true, childList: true, subtree: true });
         }
     ]);
 
@@ -297,6 +302,11 @@
                     });
                 }
             };
+
+            var observer = new MutationObserver(function() {
+                window.parent.postMessage('FrameResize', '*');
+            });
+            observer.observe(window.document.body, { attributes: true, characterData: true, childList: true, subtree: true });
         }
     ]);
 
@@ -512,6 +522,11 @@
             $scope.get_as_safe_html = function(html_content) {
                 return $sce.trustAsHtml(html_content);
             }
+
+            var observer = new MutationObserver(function() {
+                window.parent.postMessage('FrameResize', '*');
+            });
+            observer.observe(window.document.body, { attributes: true, characterData: true, childList: true, subtree: true });
         }
     ]);
 

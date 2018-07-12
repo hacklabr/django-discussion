@@ -5,6 +5,7 @@
     app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Forum', 'Tag', 'Topic', 'TopicPage',
         function ($scope, $routeParams, $http, $location, Category, Forum, Tag, Topic, TopicPage) {
             function normalInit() {
+                $scope.search = '';
                 $scope.filters = {};
                 $scope.forum_single = false;
                 if($routeParams['categories'] || $routeParams['tags']) {
@@ -110,6 +111,12 @@
                 singleInit();
             } else {
                 normalInit();
+            }
+
+            $scope.resetIfBlank = function(txt) {
+                if (txt.length === 0) {
+                    $scope.forumFilter('clear');
+                }
             }
 
             $scope.getResults = function(txt) {

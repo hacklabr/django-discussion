@@ -113,6 +113,10 @@
             }
 
             $scope.getResults = function(txt) {
+                if (txt.length < $scope.current_search.length && txt.length <= 1) {
+                    $scope.forumFilter('clear');
+                    return;
+                }
                 $scope.current_search = txt;
                 TopicPage.get({
                     search: txt,

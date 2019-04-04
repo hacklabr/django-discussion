@@ -9,6 +9,9 @@ from discussion.views import (CategoryViewSet, ForumViewSet, ForumSearchViewSet,
 
 from rest_framework import routers
 
+
+app_name = 'discussion'
+
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'category', CategoryViewSet)
 router.register(r'forum', ForumViewSet)

@@ -1,17 +1,14 @@
-# -*- coding: utf-8 -*-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from autoslug import AutoSlugField
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 import hashlib
 
 
-@python_2_unicode_compatible
 class Category(models.Model):
-    parent = models.ForeignKey('self', verbose_name=_("category parent"), null=True, blank=True)
+    parent = models.ForeignKey('self', models.CASCADE, verbose_name=_("category parent"), null=True, blank=True)
     # author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
 
     name = models.CharField(_("title"), max_length=124)
@@ -24,7 +21,6 @@ class Category(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Forum(models.Model):
 
     TYPE_CHOICES = (
@@ -32,7 +28,7 @@ class Forum(models.Model):
         ('activity', _('Activity')),
     )
 
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), blank=True, null=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, verbose_name=_('User'), blank=True, null=True)
     category = models.ManyToManyField(Category, verbose_name=_('category'), blank=True)
 
     title = models.CharField(_('Title'), max_length=255)
@@ -56,7 +52,6 @@ class Forum(models.Model):
         return self.title
 
 
-@python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(_('name'), max_length=255)
 
@@ -80,7 +75,7 @@ def get_upload_path(instance, filename):
 
 class TopicFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
-    topic = models.ForeignKey('Topic', related_name='files', null=True, blank=True)
+    topic = models.ForeignKey('Topic', models.CASCADE, related_name='files', null=True, blank=True)
     file = models.FileField(upload_to=get_upload_path)
 
     def __unicode__(self):
@@ -89,7 +84,7 @@ class TopicFile(models.Model):
 
 class CommentFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
-    comment = models.ForeignKey('Comment', related_name='files', null=True, blank=True)
+    comment = models.ForeignKey('Comment', models.CASCADE, related_name='files', null=True, blank=True)
     file = models.FileField(upload_to=get_upload_path)
 
     def __unicode__(self):
@@ -105,7 +100,7 @@ class ContentFile(models.Model):
 
 
 class BasePost(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('author'), related_name=_('%(class)s_author'))
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, verbose_name=_('author'), related_name=_('%(class)s_author'))
     tags = models.ManyToManyField(Tag, verbose_name=_('tags'), blank=True)
 
     created_at = models.DateTimeField(default=timezone.now)
@@ -113,6 +108,7 @@ class BasePost(models.Model):
     is_hidden = models.BooleanField(verbose_name=_('hidden'), default=False)
     hidden_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        models.CASCADE,
         verbose_name=_('hidden_by'),
         null=True, blank=True)
     # FIXME hidden_notice?
@@ -125,10 +121,9 @@ class BasePost(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class Topic(BasePost):
 
-    forum = models.ForeignKey(Forum, verbose_name=_('forum'), related_name='topics')
+    forum = models.ForeignKey(Forum, models.CASCADE, verbose_name=_('forum'), related_name='topics')
     categories = models.ManyToManyField(Category, verbose_name=_('categories'), related_name='topics', blank=True)
 
     last_activity_at = models.DateTimeField(auto_now=True)
@@ -155,10 +150,9 @@ class Topic(BasePost):
         return self.comments.count()
 
 
-@python_2_unicode_compatible
 class TopicRead(models.Model):
-    topic = models.ForeignKey(Topic, related_name='read')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), related_name=_('%(class)s'))
+    topic = models.ForeignKey(Topic, models.CASCADE, related_name='read')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, verbose_name=_('user'), related_name=_('%(class)s'))
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
@@ -168,13 +162,13 @@ class TopicRead(models.Model):
         unique_together = ('user', 'topic')
 
 
-@python_2_unicode_compatible
 class Comment(BasePost):
     parent = models.ForeignKey('self',
+                               models.CASCADE,
                                verbose_name=_("comment parent"),
                                related_name='comment_replies',
                                null=True, blank=True)
-    topic = models.ForeignKey(Topic, related_name='comments')
+    topic = models.ForeignKey(Topic, models.CASCADE, related_name='comments')
 
     slug = AutoSlugField(_('Slug'), populate_from='text', max_length=64, editable=False, unique=True)
     text = models.TextField(_('text'))
@@ -188,7 +182,7 @@ class Comment(BasePost):
 
 
 class Reaction(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, verbose_name=_('User'))
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -196,21 +190,21 @@ class Reaction(models.Model):
 
 
 class TopicUse(Reaction):
-    topic = models.ForeignKey(Topic, related_name='uses')
+    topic = models.ForeignKey(Topic, models.CASCADE, related_name='uses')
 
     class Meta:
         unique_together = ('user', 'topic')
 
 
 class TopicLike(Reaction):
-    topic = models.ForeignKey(Topic, related_name='likes')
+    topic = models.ForeignKey(Topic, models.CASCADE, related_name='likes')
 
     class Meta:
         unique_together = ('user', 'topic')
 
 
 class CommentLike(Reaction):
-    comment = models.ForeignKey(Comment, related_name='likes')
+    comment = models.ForeignKey(Comment, models.CASCADE, related_name='likes')
 
     class Meta:
         unique_together = ('user', 'comment')
@@ -228,11 +222,11 @@ class TopicNotification(models.Model):
         ('new_activity', _("New activity")),
     )
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='topic_notifications')
-    topic = models.ForeignKey('Topic')
-    comment = models.ForeignKey('Comment', null=True, blank=True)
-    comment_like = models.ForeignKey('CommentLike', null=True, blank=True)
-    topic_like = models.ForeignKey('TopicLike', null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name='topic_notifications')
+    topic = models.ForeignKey('Topic', models.CASCADE,)
+    comment = models.ForeignKey('Comment', models.CASCADE, null=True, blank=True)
+    comment_like = models.ForeignKey('CommentLike', models.CASCADE, null=True, blank=True)
+    topic_like = models.ForeignKey('TopicLike', models.CASCADE, null=True, blank=True)
 
     date = models.DateTimeField()
     action = models.CharField(choices=ACTION_CHOICES, default='undefined', max_length=64)
@@ -295,13 +289,13 @@ class BaseHistory(BasePost):
 
 
 class TopicHistory(BaseHistory):
-    topic = models.ForeignKey('topic', verbose_name=_("original topic"))
+    topic = models.ForeignKey('topic', models.CASCADE, verbose_name=_("original topic"))
     title = models.CharField(_('title'), max_length=255)
     text = models.TextField(_('text'))
 
 
 class CommentHistory(BaseHistory):
-    comment = models.ForeignKey('Comment', verbose_name=_("original comment"))
+    comment = models.ForeignKey('Comment', models.CASCADE, verbose_name=_("original comment"))
     text = models.TextField(_('text'))
 
     def create_or_update_revision(self, instance):

@@ -1,27 +1,26 @@
-# -*- coding: utf-8 -*-
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.utils import timezone
-
-from .permissions import IsTopicAuthor, IsCommentAuthor
 from django.views.generic.base import TemplateView
-
 from django.db.models import Q
-
-from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer, TopicSerializer, CommentSerializer, ContentFileSerializer,
-                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
-                                    CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
-from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
-                               CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
-from .forms import ForumForm
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
+from django_filters.rest_framework import DjangoFilterBackend
 from braces import views
+
+
+from .serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer,
+                                    TopicSerializer, CommentSerializer, ContentFileSerializer,
+                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
+                                    CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
+from .models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
+                               CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
+from .forms import ForumForm
+from .permissions import IsTopicAuthor, IsCommentAuthor
 
 
 class ForumView(TemplateView):
@@ -57,11 +56,6 @@ class ForumListView(views.LoginRequiredMixin,
 
         return queryset.distinct()
 
-    def get_context_data(self, **kwargs):
-        context = super(ForumListView, self).get_context_data(**kwargs)
-
-        return context
-
 
 class ForumUpdateView(views.LoginRequiredMixin,
                       views.StaffuserRequiredMixin,
@@ -84,7 +78,6 @@ class ForumDeleteView(views.LoginRequiredMixin,
 class CategoryViewSet(viewsets.ModelViewSet):
     """
     """
-
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
@@ -128,8 +121,6 @@ class ForumSearchViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('title', 'text',)
     # search_fields = ('title', 'text', 'topics__title', 'topics__content', 'topics__comment__text', )
-
-
 
 
 class TopicTypeaheadViewSet(viewsets.ModelViewSet):

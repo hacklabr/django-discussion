@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from discussion.models import Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike, UnreadNotification
+from discussion.models import Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
 
 
 @receiver(post_save, sender=Comment)
@@ -191,17 +191,17 @@ def comment_reaction_created_or_updated(instance, **kwargs):
         notification.save()
 
         # Increase the unread count for this user in 1
-        unread_notification_increment(one_user)
+        # unread_notification_increment(one_user)
 
 
-def unread_notification_increment(user):
-    # Only increment the counter if the user already has a UnreadNotification instance
-    try:
-        unread = UnreadNotification.objects.get(user=user)
-        unread.counter += 1
-        unread.save()
-    except UnreadNotification.DoesNotExist:
-        pass
+# def unread_notification_increment(user):
+#     # Only increment the counter if the user already has a UnreadNotification instance
+#     try:
+#         unread = UnreadNotification.objects.get(user=user)
+#         unread.counter += 1
+#         unread.save()
+#     except UnreadNotification.DoesNotExist:
+#         pass
 
 
 

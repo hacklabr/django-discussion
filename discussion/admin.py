@@ -6,12 +6,8 @@ class TopicAdmin(admin.ModelAdmin):
     search_fields = ['title', 'content']
 
 
-
-class ForumAdmin(admin.ModelAdmin):
-    pass
-
 admin.site.register(Category)
-admin.site.register(Forum, ForumAdmin)
+admin.site.register(Forum)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Comment)
 admin.site.register(Tag)

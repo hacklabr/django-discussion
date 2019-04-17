@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='comment',
             name='parent',
-            field=models.ForeignKey(related_name='comment_replies', verbose_name='comment parent', blank=True, to='discussion.Comment', null=True),
+            field=models.ForeignKey(related_name='comment_replies', on_delete=models.CASCADE, verbose_name='comment parent', blank=True, to='discussion.Comment', null=True),
         ),
         migrations.AlterField(
             model_name='comment',

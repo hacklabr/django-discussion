@@ -1,6 +1,6 @@
-django<1.9
+django==2.1
 
-django-autoslug==1.9.3
+django-autoslug==1.9.4
 
-djangorestframework==3.3.3
-django-filter==0.13.0
+djangorestframework==3.9.1
+django-filter==2.0.0

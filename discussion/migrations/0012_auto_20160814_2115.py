@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='commentfile',
             name='comment',
-            field=models.ForeignKey(related_name='files', blank=True, to='discussion.Comment', null=True),
+            field=models.ForeignKey(related_name='files', on_delete=models.CASCADE, blank=True, to='discussion.Comment', null=True),
         ),
         migrations.AlterField(
             model_name='topicfile',
             name='topic',
-            field=models.ForeignKey(related_name='files', blank=True, to='discussion.Topic', null=True),
+            field=models.ForeignKey(related_name='files', on_delete=models.CASCADE, blank=True, to='discussion.Topic', null=True),
         ),
     ]

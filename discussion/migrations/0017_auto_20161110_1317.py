@@ -18,8 +18,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('is_read', models.BooleanField(default=False)),
-                ('topic', models.ForeignKey(related_name='read', to='discussion.Topic')),
-                ('user', models.ForeignKey(related_name='topicread', verbose_name='user', to=settings.AUTH_USER_MODEL)),
+                ('topic', models.ForeignKey(related_name='read', on_delete=models.CASCADE, to='discussion.Topic')),
+                ('user', models.ForeignKey(related_name='topicread', on_delete=models.CASCADE, verbose_name='user', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AlterUniqueTogether(

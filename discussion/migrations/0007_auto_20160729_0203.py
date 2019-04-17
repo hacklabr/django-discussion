@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='topicnotification',
             name='comment_like',
-            field=models.ForeignKey(blank=True, to='discussion.CommentLike', null=True),
+            field=models.ForeignKey(blank=True, on_delete=models.CASCADE, to='discussion.CommentLike', null=True),
         ),
         migrations.AddField(
             model_name='topicnotification',
             name='topic_like',
-            field=models.ForeignKey(blank=True, to='discussion.TopicLike', null=True),
+            field=models.ForeignKey(blank=True, on_delete=models.CASCADE, to='discussion.TopicLike', null=True),
         ),
     ]

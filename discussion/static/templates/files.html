@@ -1,0 +1,30 @@
+<div class="form-group">
+    <div ng-show="(files.length > 1) && !editable && !show_files">
+        <button class="btn btn-xs attached" ng-click="show_files=true">
+        <u>{{files.length}} arquivos anexos</u> + ...
+        </button>
+    </div>
+    <div class="post-attachments"
+       ng-show="(((files.length>0 && editable) || progress) || show_files) || files.length == 1">
+        <div class="attachments">
+            <span translate
+                  translate-n="files.length"
+                  translate-plural="{{$count}} arquivos anexos:">1 arquivo anexo:</span>
+            <ul>
+                <li ng-repeat="(i, file) in files">
+                    <a ng-href="{{file.file}}" target="_blank">{{file.name}}</a>
+                    <span class="delete" ng-show="editable" ng-click="deleteFile(i)">
+                      <span class="sr-only">deletar o arquivo</span>
+                    </span>
+                </li>
+            </ul>
+            <div class="loading" ng-show="progress >= 0 && progress != 100">
+              Carregando novo arquivo...
+              {{progress + '%'}}
+              <div class="loading-bar">
+                <div style="width:{{progress}}%"></div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>

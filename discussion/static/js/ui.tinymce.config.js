@@ -6,7 +6,7 @@
     // If you want to cutomize uiTinymceConfig for your theme, please copy this file to you theme in the
     // same path (static/js/). This are the default setting for timtec
     app.value('uiTinymceConfig', {
-        base_url: 'https://unpkg.com/tinymce@4.5.1',
+        base_url: 'https://unpkg.com/tinymce@4.5.10',
         related_url: true,
         inline: false,
         menubar: false,
@@ -17,7 +17,7 @@
         skin: 'lightgray',
         theme : 'modern',
         language: 'pt_BR',
-        language_url : '/static/vendor/tinymce/langs/pt_BR.js',
+        language_url : 'https://unpkg.com/tinymce-i18n@19.4.15/langs/pt_BR.js',
         resize: true,
         elementpath: false,
 

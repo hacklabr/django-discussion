@@ -39,5 +39,6 @@ urlpatterns = [
     url(r'^admin/forum-delete/(?P<pk>[-a-zA-Z0-9_]+)$', ForumDeleteView.as_view(), name='forum-delete'),
     url(r'^topic/(?:#(?P<topic_id>[-a-zA-Z0-9_]+))?$', TemplateView.as_view(template_name="forum-topic.html")),
     url(r'^topic/new/', TemplateView.as_view(template_name="forum-new-topic.html")),
+    url(r'^forum/embed/$', TemplateView.as_view(template_name="forum-embed.html")),
     url(r'^home/$', RedirectView.as_view(url='/discussion/', permanent=False), name='forum-home'),
 ]

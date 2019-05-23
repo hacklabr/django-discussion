@@ -507,4 +507,10 @@
         }
     ]);
 
+    app.controller('ForumEmbedCtrl', ['$scope', 'Topic'],
+        function($scope, Topic) {
+            $scope.latest_topics = Topic.query({limit: 8, ordering: '-last_activity_at'})
+        }
+    );
+
 })(window.angular);

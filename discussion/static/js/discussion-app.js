@@ -36,6 +36,11 @@
                     templateUrl: 'topic-detail.html',
                     controller: 'TopicCtrl'
                 }).
+                when('/forum/embed/', {
+                    templateUrl: 'forum-embed.html',
+                    controller: 'ForumEmbedCtrl',
+                    reloadOnSearch: false
+                }).
                 when('/forum/:forumId', {
                     templateUrl: 'forum.html',
                     controller: 'ForumCtrl',

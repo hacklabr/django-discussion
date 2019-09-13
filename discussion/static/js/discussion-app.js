@@ -15,6 +15,7 @@
         'ngAnimate',
         'duScroll',
         'LocalStorageModule',
+        'shared'
     ]);
 
     // Set new default values for 'duScroll'

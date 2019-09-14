@@ -1,0 +1,22 @@
+<ul class="notifications-list">
+    <li class="notifications-item" ng-show="!notifications_ready">
+        <span class="info">Carregando notificações&hellip;</span>
+    </li>
+    <li class="notifications-item" ng-show="parsed_notifications.length === 0 && notifications_ready">
+        <span class="info">Sem notificações</span>
+    </li>
+    <notification-item ng-repeat="notification in parsed_notifications | orderBy : 'date' : true">
+        <li class="notifications-item" ng-class="{'not-read': notification.is_read===false }">
+          <discussion ng-if="notification.action !== 'new_activity'">
+              <span class="icon"><img ng-src="{{notification.user.picture || '/static/img/avatar-default.png'}}"></span>
+              <span class="info"><b><a ng-href="/profile/{{ notification.user.username}}">{{notification.user.first_name || notification.topic.author.username}}</a></b> {{notification.action | actionFilter }} tópico <a ng-href="/discussion/topic/#!/topic/{{notification.topic.id}}/">{{notification.topic.title}}</a> no fórum <a href="/discussion/#!/forum/{{notification.forum.id}}">{{notification.forum.title}}</a></span>
+              <span class="date"> {{notification.date | dateFilter }}</span>
+          </discussion>
+          <answer ng-if="notification.action === 'new_activity'">
+              <span class="icon"><img ng-src="{{notification.topic.author.picture || '/static/img/avatar-default.png'}}"></span>
+              <span class="info"><b><a ng-href="/profile/{{ notification.topic.author.username}}">{{notification.topic.author.first_name || notification.topic.author.username}}</a></b> respondeu a <a ng-href="{{notification.activity_url}}">uma atividade</a> no <a href="/course/{{notification.course_slug}}/intro/">{{notification.course_name}}</a></span>
+              <span class="date"> {{notification.date | dateFilter }}</span>
+          </answer>
+        </li>
+    </notification-item>
+</ul>

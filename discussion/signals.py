@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from discussion.models import Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
+from discussion.models import Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike, UnreadNotification
 
 
 @receiver(post_save, sender=Comment)
@@ -194,27 +194,27 @@ def comment_reaction_created_or_updated(instance, **kwargs):
         # unread_notification_increment(one_user)
 
 
-# def unread_notification_increment(user):
-#     # Only increment the counter if the user already has a UnreadNotification instance
-#     try:
-#         unread = UnreadNotification.objects.get(user=user)
-#         unread.counter += 1
-#         unread.save()
-#     except UnreadNotification.DoesNotExist:
-#         pass
+def unread_notification_increment(user):
+    # Only increment the counter if the user already has a UnreadNotification instance
+    try:
+        unread = UnreadNotification.objects.get(user=user)
+        unread.counter += 1
+        unread.save()
+    except UnreadNotification.DoesNotExist:
+        pass
 
 
 
-# def topic_viewed(request, topic):
-#     # Todo test detail views
-#     user = request.user
-#     comment_number = CommentBookmark.page_to_comment_number(request.GET.get('page', 1))
-#
-#     CommentBookmark.update_or_create(
-#         user=user,
-#         topic=topic,
-#         comment_number=comment_number
-#     )
-#     TopicNotification.mark_as_read(user=user, topic=topic)
-#     TopicUnread.create_or_mark_as_read(user=user, topic=topic)
-#     topic.increase_view_count()
+def topic_viewed(request, topic):
+    # Todo test detail views
+    user = request.user
+    comment_number = CommentBookmark.page_to_comment_number(request.GET.get('page', 1))
+
+    CommentBookmark.update_or_create(
+        user=user,
+        topic=topic,
+        comment_number=comment_number
+    )
+    TopicNotification.mark_as_read(user=user, topic=topic)
+    TopicUnread.create_or_mark_as_read(user=user, topic=topic)
+    topic.increase_view_count()

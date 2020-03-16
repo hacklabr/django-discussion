@@ -7,6 +7,8 @@ from paralapraca.models import UnreadNotification
 @receiver(post_save, sender=Comment)
 def comment_created_or_updated(instance, **kwargs):
 
+    if instance.comment.topic.forum.forum_type != 'discussion':
+        return
     # if this comment was just updated, no notifications must be sent
     if kwargs['created'] is False:
         return
@@ -91,6 +93,9 @@ def comment_created_or_updated(instance, **kwargs):
 @receiver(post_save, sender=TopicUse)
 def topic_reaction_created_or_updated(instance, **kwargs):
 
+    if instance.comment.topic.forum.forum_type != 'discussion':
+        return
+
     # Users that must be notified
     users = []
 
@@ -135,6 +140,8 @@ def topic_reaction_created_or_updated(instance, **kwargs):
 @receiver(post_save, sender=CommentLike)
 def comment_reaction_created_or_updated(instance, **kwargs):
 
+    if instance.comment.topic.forum.forum_type != 'discussion':
+        return
     # Users that must be notified
     users = []
 

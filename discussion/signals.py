@@ -7,7 +7,7 @@ from courses_notifications.models import unread_notification_increment
 @receiver(post_save, sender=Comment)
 def comment_created_or_updated(instance, **kwargs):
 
-    if instance.comment.topic.forum.forum_type != 'discussion':
+    if instance.topic.forum.forum_type != 'discussion':
         return
     # if this comment was just updated, no notifications must be sent
     if kwargs['created'] is False:

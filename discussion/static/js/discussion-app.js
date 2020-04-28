@@ -15,7 +15,8 @@
         'ngAnimate',
         'duScroll',
         'LocalStorageModule',
-        'shared'
+        'shared',
+        'djangular'
     ]);
 
     // Set new default values for 'duScroll'
@@ -55,14 +56,4 @@
                 otherwise('/');
         }
     ]);
-
-    app.run(function($http, localStorageService) {
-        $http.defaults.headers.common.Authorization = 'Token ' + localStorageService.get('ujs-ocupa|token');
-    });
-
-    app.service('CurrentUser', ['localStorageService', function (localStorageService) {
-        console.log(localStorageService.get('ujs-ocupa|currentProfile'));
-        return localStorageService.get('ujs-ocupa|currentProfile');
-    }]);
-
 })(angular);

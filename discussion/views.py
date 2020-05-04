@@ -102,7 +102,9 @@ class ForumViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_superuser:
             queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
 
-        return queryset.distinct()
+        queryset = queryset.distinct()
+        queryset = queryset.select_related('author')
+        return queryset.prefetch_related('topics', 'category')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -111,7 +113,7 @@ class ForumViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class ForumSearchViewSet(viewsets.ModelViewSet):
+class ForumSearchViewSet(viewsets.ReadOnlyModelViewSet):
     """
     """
 
@@ -123,7 +125,7 @@ class ForumSearchViewSet(viewsets.ModelViewSet):
     # search_fields = ('title', 'text', 'topics__title', 'topics__content', 'topics__comment__text', )
 
 
-class TopicTypeaheadViewSet(viewsets.ModelViewSet):
+class TopicTypeaheadViewSet(viewsets.ReadOnlyModelViewSet):
     """
     """
 

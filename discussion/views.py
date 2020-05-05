@@ -20,7 +20,7 @@ from .serializers import (CategorySerializer, ForumSerializer, ForumSearchSerial
 from .models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
 from .forms import ForumForm
-from .permissions import IsTopicAuthor, IsCommentAuthor
+from .permissions import IsTopicAuthor, IsCommentAuthor, IsForumAuthor
 
 
 class ForumView(TemplateView):
@@ -119,7 +119,7 @@ class ForumSearchViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Forum.objects.all()
     serializer_class = ForumSearchSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsForumAuthor]
     filter_backends = (filters.SearchFilter,)
     search_fields = ('title', 'text',)
     # search_fields = ('title', 'text', 'topics__title', 'topics__content', 'topics__comment__text', )

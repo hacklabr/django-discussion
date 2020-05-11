@@ -272,6 +272,16 @@
                 return false;
             }
 
+            $scope.filter_categories = function(){
+                $scope.forums.filter(function(t) {
+                if (t.id == $scope.new_topic.forum)
+                    $scope.forum_category = t.category
+                }
+                );
+                $scope.list_categories =  $scope.forum_category;
+                $scope.category_id =  $scope.forum_category[0].id;
+            }
+
             $scope.uploadTopicFiles = function (file, topic) {
 
                 if (file) {

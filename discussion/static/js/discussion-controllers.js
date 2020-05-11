@@ -318,6 +318,13 @@
                 topic_read.topic = topic.id;
                 topic_read.is_read = true;
                 topic_read.$save();
+
+                //Filter the topics from Forum
+                Forum.get({id:$scope.topic.forum}, function(t) {
+                    $scope.forum_categories = t.category;
+                }
+                );
+
             }, function(error) {
                 $scope.fatal_error = true;
                 $scope.error_message = error.data.message;

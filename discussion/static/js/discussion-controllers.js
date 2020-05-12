@@ -272,6 +272,17 @@
                 return false;
             }
 
+            $scope.filter_categories = function(){                
+                $scope.forums.filter(function(t) {
+                if (t.id == $scope.new_topic.forum) 
+                    $scope.forum_category = t.category
+                }
+                );
+                $scope.list_categories = $scope.forum_category;
+                if ($scope.forum_category.length > 0)
+                    $scope.category_id = $scope.forum_category[0].id;
+            }
+
             $scope.uploadTopicFiles = function (file, topic) {
 
                 if (file) {
@@ -308,6 +319,13 @@
                 topic_read.topic = topic.id;
                 topic_read.is_read = true;
                 topic_read.$save();
+
+                //Filter the topics from Forum
+                Forum.get({id:$scope.topic.forum}, function(t) {
+                    $scope.forum_categories = t.category;
+                }
+                );
+
             }, function(error) {
                 $scope.fatal_error = true;
                 $scope.error_message = error.data.message;

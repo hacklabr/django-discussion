@@ -230,7 +230,8 @@ class TopicSerializer(serializers.ModelSerializer):
         if 'categories' in self.initial_data.keys():
             categories = self.initial_data.pop('categories')
             for cat in categories:
-                topic.categories.add(Category.objects.get(id=cat['id']))
+                if cat != None:
+                    topic.categories.add(Category.objects.get(id=cat['id']))
 
         # If tags were specified
         if 'tags' in self.initial_data.keys():
@@ -258,7 +259,8 @@ class TopicSerializer(serializers.ModelSerializer):
         if 'categories' in self.initial_data.keys():
             categories = self.initial_data.pop('categories')
             for cat in categories:
-                instance.categories.add(Category.objects.get(id=cat['id']))
+                if cat != None:
+                    instance.categories.add(Category.objects.get(id=cat['id']))
 
         # Clean current tags
         instance.tags.clear()

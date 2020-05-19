@@ -314,7 +314,9 @@
 
             $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
                 // Mark topic as read
-                $scope.category_id = $scope.topic.categories[0].id;
+                if (topic.categories.length > 0)
+                    $scope.category_id = $scope.topic.categories[0].id;    
+                
                 var topic_read = new TopicRead();
                 topic_read.topic = topic.id;
                 topic_read.is_read = true;

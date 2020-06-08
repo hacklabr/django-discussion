@@ -12,10 +12,10 @@ from django.views.generic.base import TemplateView
 from django.db.models import Q
 
 from discussion.serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer, TopicSerializer, CommentSerializer, ContentFileSerializer,
-                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
+                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer, ForumFileSerializer,
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from discussion.models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
-                               CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
+                               CommentLike, ForumFile, TopicFile, CommentFile, ContentFile, TopicRead)
 from paralapraca.models import AnswerNotification, Contract
 from core.utils import AcceptedTermsRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -340,6 +340,12 @@ class TopicLikeViewSet(BaseUserReactionViewSet):
     serializer_class = TopicLikeSerializer
     permission_classes = [IsAuthenticated]
 
+
+class ForumFileViewSet(viewsets.ModelViewSet):
+    queryset = ForumFile.objects.all()
+    serializer_class = ForumFileSerializer
+    permission_classes = [IsAuthenticated]
+    filter_fields = ('forum', )
 
 class TopicFileViewSet(viewsets.ModelViewSet):
     queryset = TopicFile.objects.all()

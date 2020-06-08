@@ -59,6 +59,29 @@
             {'id': '@id'});
     }]);
 
+    app.factory('ForumFile', ['$resource', 'Upload', function($resource, Upload){
+        var forum_file = $resource('/discussion/api/forum-file/:id',
+            {'id' : '@id'},
+            {
+                'update': { method: 'PUT' },
+                'patch': { method: 'PATCH' },
+                'get_files': { method: 'GET', params: 'forum', isArray: true }
+            });
+
+        forum_file.upload = function(file, forum_id) {
+            return Upload.upload({
+                url: '/discussion/api/forum-file',
+                data: {
+                    name: file.name,
+                    file: file,
+                    forum: forum_id
+                },
+                arrayKey: '',
+            });
+        };
+        return forum_file
+    }]);
+
     app.factory('TopicFile', ['$resource', 'Upload', function($resource, Upload){
          var topic_file = $resource('/discussion/api/topic-file/:id',
             {'id' : '@id'},

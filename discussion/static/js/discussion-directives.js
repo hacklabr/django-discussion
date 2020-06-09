@@ -12,6 +12,7 @@
                     progress: '=',
                     editable: '=',
                     isTopic: '=',
+                    isForum: '='
                 },
                 controller: ['$scope', 'ForumFile', 'TopicFile', 'CommentFile', function($scope, ForumFile, TopicFile, CommentFile){
                     $scope.deleteFile = function(i){

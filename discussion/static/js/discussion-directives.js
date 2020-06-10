@@ -29,4 +29,23 @@
         }
     );
 
+    app.directive('hasGroupPermission',
+        function() {
+            return {
+                restrict: "A",
+                scope: {
+                    hasGroupPermission: '='
+                },
+                link: function(scope, element, attrs) {
+                    element.hide();
+                    if (['professors', 'Avante'].some(function (g){
+                        return scope.hasGroupPermission.indexOf(g) >= 0
+                    })) {
+                        element.show();
+                    }
+                }
+            }
+        }
+    );
+
 })(window.angular);

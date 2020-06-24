@@ -15,10 +15,10 @@ from braces import views
 
 from .serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer,
                                     TopicSerializer, CommentSerializer, ContentFileSerializer,
-                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer, ForumFileSerializer
+                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer, ForumFileSerializer,
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from .models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
-                               CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
+                               CommentLike, TopicFile, CommentFile, ContentFile, TopicRead, ForumFile)
 
 
 from .forms import ForumForm

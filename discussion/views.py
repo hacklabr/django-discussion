@@ -15,10 +15,12 @@ from braces import views
 
 from .serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer,
                                     TopicSerializer, CommentSerializer, ContentFileSerializer,
-                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer,
+                                    TagSerializer, TopicNotificationSerializer, TopicLikeSerializer, ForumFileSerializer
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from .models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead)
+
+
 from .forms import ForumForm
 from .permissions import IsTopicAuthor, IsCommentAuthor, IsForumAuthor
 
@@ -311,6 +313,12 @@ class TopicLikeViewSet(BaseUserReactionViewSet):
     serializer_class = TopicLikeSerializer
     permission_classes = [IsAuthenticated]
 
+
+class ForumFileViewSet(viewsets.ModelViewSet):
+    queryset = ForumFile.objects.all()
+    serializer_class = ForumFileSerializer
+    permission_classes = [IsAuthenticated]
+    filter_fields = ('forum', )
 
 class TopicFileViewSet(viewsets.ModelViewSet):
     queryset = TopicFile.objects.all()

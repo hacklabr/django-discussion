@@ -2,8 +2,8 @@
     'use strict';
     var app = angular.module('discussion.controllers', ['ngSanitize']);
 
-    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Forum', 'Tag', 'Topic', 'TopicPage',
-        function ($scope, $routeParams, $http, $location, Category, Forum, Tag, Topic, TopicPage) {
+    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Forum', 'Tag', 'Topic', 'TopicPage', 'CurrentUser',
+        function ($scope, $routeParams, $http, $location, Category, Forum, Tag, Topic, TopicPage, CurrentUser) {
             function normalInit() {
                 $scope.filters = {};
                 $scope.forum_single = false;
@@ -48,7 +48,7 @@
                     }
                 );
             }
-
+            $scope.user = CurrentUser;
             // Pagination controls
             $scope.forum_pages_max_number = 10;
             $scope.forum_topics_page = 20;

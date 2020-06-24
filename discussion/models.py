@@ -73,6 +73,15 @@ def get_upload_path(instance, filename):
         return u'forum/{}_{}'.format(hash_name, instance.name)
 
 
+class ForumFile(models.Model):
+    name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
+    forum = models.ForeignKey('Forum', models.CASCADE, related_name='files', null=True, blank=True)
+    file = models.FileField(upload_to=get_upload_path)
+
+    def __unicode__(self):
+        return self.name
+
+
 class TopicFile(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
     topic = models.ForeignKey('Topic', models.CASCADE, related_name='files', null=True, blank=True)

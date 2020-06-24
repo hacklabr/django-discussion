@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from discussion.models import (Category, Forum, Topic, Comment, Tag,
+from discussion.models import (Category, Forum, Topic, Comment, Tag, ForumFile,
                                TopicNotification, TopicLike, TopicRead,
                                CommentLike, TopicFile, CommentFile, ContentFile)
 
@@ -63,15 +63,22 @@ class BaseForumSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category', )
 
 
+class ForumFileSerializer(serializers.ModelSerializer):
+    """ Serializer to Forum file attachments """
+    class Meta:
+        model = ForumFile
+
+
 class ForumSerializer(serializers.ModelSerializer):
 
     author = BaseUserSerializer(read_only=True)
     latest_topics = serializers.SerializerMethodField()
     topics = serializers.SerializerMethodField()
+    files = ForumFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', 'forum_type', 'topics', )
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', 'forum_type', 'topics', 'files')
         depth = 1
 
     def get_latest_topics(self, obj):

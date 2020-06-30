@@ -16,7 +16,6 @@
             $scope.forum_topics_page = 20;
             $scope.forum.page_size = 10;
             $scope.forum.current_page = 1
-            $scope.search_txt = ""
 
             if(forum_id) {
                 singleInit();
@@ -26,7 +25,6 @@
 
             function singleInit() {
                 Forum.get({id: forum_id}, (forum) => {
-                    // console.log("singleInit")
                     $scope.filters = undefined;
                     $scope.forum_search = false;
                     $scope.forum_single = true;
@@ -54,14 +52,10 @@
             }
 
             function normalInit() {
-                console.log("normalInit")
                 $scope.filters = {};
                 $scope.forum_single = false;
                 const categoriesParams = $routeParams['categories'];
                 const tagParams = $routeParams['tags']
-                
-                // console.log(categoriesParams)
-                // console.log(tagParams)
 
                 if(categoriesParams || tagParams) {
                     if(categoriesParams) {
@@ -126,11 +120,7 @@
                   page_size: $scope.forum_topics_page,
                   forum: forum_id,
                   ordering: '-last_activity_at'},
-                  function(page){
-                    //   console.log(page)
-                    //   console.log($scope.forum_topics_total)
-                    //   console.log($scope.topics.current_page)
-                    //   console.log($scope.forum_topics_page)
+                  function(page){              
                       $scope.forum.topics = page.results;
                       $scope.topics_loaded = true;
                   },
@@ -153,7 +143,6 @@
               };
 
             $scope.getResults = function(txt) {
-                console.log($scope.search.txt)
                 $scope.current_search = txt;
                 TopicPage.get({
                     search: txt,
@@ -254,7 +243,7 @@
                 }
 
                 set_route();
-
+                
                 $scope.forums = Forum.query({ // TODO: when single forum, filter only within it
                     categories : $scope.filters.categories.map(function(el) {
                         return el.id;
@@ -263,14 +252,6 @@
                         return el.id;
                     }) //array with tag id's
                 }, function(r) {
-                    // r.forEach(forum => {
-                    //     $scope.forum.forum_topics_total = forum.topics.length;
-                    // })
-                    // $scope.forum_topics_total = r.topics.length
-                    // console.log(r)
-                    // console.log($scope.forum_topics_total)
-                    // console.log($scope.topics.current_page)
-                    // console.log($scope.forum_topics_page)
                     $scope.forum_search = true;
                 });
             }
@@ -291,7 +272,6 @@
 
             $scope.save_topic = function() {
                 $scope.sending = true;
-                // $scope.new_topic.forum = 1;
                 $scope.new_topic.categories = [$scope.category];
                 var topic_files = $scope.new_topic.files;
                 $scope.new_topic.$save(function(topic){
@@ -376,7 +356,6 @@
         Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
 
             $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
-                // console.log(topic)
                 // Mark topic as read
                 if (topic.categories.length > 0)
                     $scope.category_id = $scope.topic.categories[0].id;    
@@ -388,7 +367,6 @@
 
                 //Filter the topics from Forum
                 Forum.get({id:$scope.topic.forum}, function(t) {
-                    // console.log(t)
                     $scope.forum_categories = t.category;
                 }
                 );

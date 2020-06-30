@@ -114,6 +114,14 @@ class ForumViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
 
+class ForumPagination(PageNumberPagination):
+    page_size = 2
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+class ForumPageViewSet(ForumViewSet):
+    pagination_class = ForumPagination
+
 
 class ForumSearchViewSet(viewsets.ReadOnlyModelViewSet):
     """

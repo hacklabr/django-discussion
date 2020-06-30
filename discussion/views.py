@@ -115,7 +115,7 @@ class ForumViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 class ForumPagination(PageNumberPagination):
-    page_size = 2
+    page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 50
 

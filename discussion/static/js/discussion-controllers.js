@@ -12,9 +12,9 @@
             $scope.topics = {}
             $scope.search = {txt:""}
             // Pagination Params
-            $scope.forum_pages_max_number = 10;
+            $scope.forum_pages_max_number = 20;
             $scope.forum_topics_page = 20;
-            $scope.forum.page_size = 10;
+            $scope.forum.page_size = 20;
             $scope.forum.current_page = 1
 
             if(forum_id) {

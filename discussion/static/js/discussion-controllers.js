@@ -476,7 +476,9 @@
                             comment.files.push(comment_file_complete);
                         });
                     });
-                });
+                    //clear variable to prepare for new comment
+                    comment = $scope.new_comment();
+                }, (err) => console.error(err));
             };
 
             $scope.update_comment = function(changed_comment) {

@@ -7,6 +7,10 @@ class ForumAdmin(admin.ModelAdmin):
         'groups',
         'category',
     ]
+    search_fields = [
+        'title',
+        'text',
+    ]
 
 class TopicAdmin(admin.ModelAdmin):
     search_fields = ['title', 'content']

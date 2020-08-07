@@ -1,0 +1,94 @@
+{% verbatim %}
+<section class="forums forums-page forums-widget thread widget container-fluid">
+    <div class="widget-topbar breadcrumb">
+        <div class="line">
+            <div class="pull-left">
+                <h2 class="title" ng-cloak><a class="forum-header-link" href="/discussion/#!/">Fóruns</a> > Novo Tópico</h2>
+            </div>
+            <div class="pull-right">
+                <a href="/discussion/" class="btn btn-link goback"><span>voltar</span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="line one-column">
+        <div class="column">
+            <form class="new-thread" name="newthread" novalidate ng-submit="newthread.$valid && save_topic()">
+                <div ng-show="show_errors" id="errors-list">
+                    <div class="alert alert-danger" role="danger" ng-repeat="(error, detail) in newthread.forum.$error">Fórum é campo obrigatório</div>
+                    <!-- <div class="alert alert-danger" role="danger" ng-repeat="(error, detail) in newthread.category.$error">Categoria é campo obrigatório</div> -->
+                    <div class="alert alert-danger" role="danger" ng-repeat="(error, detail) in newthread.title.$error">Título do tópico é campo obrigatório</div>
+                    <div class="alert alert-danger" role="danger" ng-repeat="(error, detail) in newthread.content.$error">Tópico não pode ser vazio</div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="thread-forum">Em qual fórum ele deve estar? <span class="help-text">(campo obrigatório)</span></label>
+                            <select class="form-control" ng-model="new_topic.forum" name="forum" id="thread-forum" ng-change="filter_categories()" ng-options="forum.id as forum.title for forum in forums" required >
+                                <option>Escolha o fórum</option>
+                            </select>
+                        </div>
+                        <!-- <div class="col-sm-6">
+                            <div class="help-text">fórum escolhido</div>
+                            <div class="selected-forum">Avante e Entremeios</div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="thread-forum">Qual a categoria do seu tópico?</label>
+                            <select class="form-control" ng-model="category" name="category" id="category" ng-options="category as category.name for category in list_categories track by category.name">
+                                <option>Escolha a categoria</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="thread-name">Como se chamará o novo tópico? <span class="help-text">(campo obrigatório)</span></label>
+                    <input class="form-control" ng-model="new_topic.title" name="title" type="text" id="thread-name" placeholder="Escreva o título aqui" required>
+                </div>
+                <div class="form-group">
+                    <label for="thread-text">Texto do tópico <span class="help-text">(campo obrigatório)</span></label>
+                    <textarea ui-tinymce
+                              ng-model="new_topic.content"
+                              placeholder="Escreva aqui o seu comentário" name="content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <button id="select-file-topic"
+                            class="btn btn-xs btn-primary attach"
+                            ngf-select="uploadTopicFiles($file, new_topic)"
+                            ngf-multiple="false">anexar arquivo</button>
+                </div>
+                <files files="new_topic.files" progress="new_topic.progress" editable="true" is_topic="true"></files>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <label for="thread-tags">Para terminar, escolha algumas tags</label>
+
+                            <ui-select multiple tagging="tagTransform" ng-model="new_topic.tags" theme="bootstrap" title="Escolha algumas tags...">
+                              <ui-select-match placeholder="Selecione uma tag...">#{{$item.name}}</ui-select-match>
+                              <ui-select-choices repeat="tag in tags | filter: {name: $select.search}" group-by="">
+                                    <div ng-if="tag.isTag">
+                                        <div ng-if="tagExists($select.search.toLowerCase())" ng-bind-html="tag.name | highlight: $select.search"></div>
+                                        <div ng-if="!tagExists($select.search.toLowerCase())" ng-bind-html="(tag.name | highlight: $select.search) +' (nova tag)'"></div>
+                                    </div>
+                                    <div ng-if="!tag.isTag" ng-bind-html="tag.name + tag.isTag | highlight: $select.search" ng-class="{'active': $select.search == tag.name}" ng-hide="$select.search.toLowerCase() == tag.name.toLowerCase()"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                        </div>
+                        <!-- <div class="col-sm-6">
+                            <div class="help-text">tags escolhidas</div>
+                            <div class="selected-tags tags">
+                                <a href="#" class="tag" ng-repeat="tag in new_topic.tags">#{{tag}}</a>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+                <button type="submit" ng-click="validate(newthread.$valid)" class="btn btn-success new-topic" ng-disabled="!new_topic.content">postar novo tópico</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endverbatim %}

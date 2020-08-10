@@ -4,10 +4,10 @@
 
     app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Forum', 'ForumPage', 'Tag', 'Topic', 'TopicPage', 'CurrentUser',
         function ($scope, $routeParams, $http, $location, Category, Forum, ForumPage, Tag, Topic, TopicPage, CurrentUser) {
-            
+
             const forum_id = $routeParams.forumId;
             $scope.user = CurrentUser;
-            
+
             $scope.forum = {}
             $scope.topics = {}
             $scope.search = {txt:""}
@@ -90,7 +90,7 @@
                     $scope.filters.tags = [];
                     $scope.forum_search = false;
                 }
-                
+
                 $scope.forums = ForumPage.get({
                     search: $scope.current_search,  // if there is a search in progress, keep it
                     page: $scope.forum.current_page,
@@ -120,7 +120,7 @@
                   page_size: $scope.forum_topics_page,
                   forum: forum_id,
                   ordering: '-last_activity_at'},
-                  function(page){              
+                  function(page){
                       $scope.forum.topics = page.results;
                       $scope.topics_loaded = true;
                   },
@@ -150,7 +150,7 @@
                     page_size: $scope.forum_topics_page,
                     ordering: '-last_activity_at',
                     ignoreLoadingBar: true},
-                    function(page){  
+                    function(page){
                         $scope.forums = [];
                         $scope.forum.title = "Resultados de busca";
                         $scope.topics.current_page = 1;
@@ -219,7 +219,7 @@
 
                 if(type === 'cat') {
                     if(operation === 'add') {
-                        $scope.filters.categories.some(obj => obj.name === filter_obj.name) ? 
+                        $scope.filters.categories.some(obj => obj.name === filter_obj.name) ?
                             console.log('already filtering by this category') :
                             $scope.filters.categories.push(filter_obj);
                     }
@@ -229,8 +229,8 @@
                 }
                 else {
                     if(operation === 'add') {
-                        $scope.filters.tags.some(obj => obj.name === filter_obj.name) ? 
-                            console.log('already filtering by this tag') : 
+                        $scope.filters.tags.some(obj => obj.name === filter_obj.name) ?
+                            console.log('already filtering by this tag') :
                             $scope.filters.tags.push(filter_obj);
                     }
                     else {
@@ -243,7 +243,7 @@
                 }
 
                 set_route();
-                
+
                 $scope.forums = Forum.query({ // TODO: when single forum, filter only within it
                     categories : $scope.filters.categories.map(function(el) {
                         return el.id;
@@ -315,9 +315,9 @@
                 return false;
             }
 
-            $scope.filter_categories = function(){                
+            $scope.filter_categories = function(){
                 $scope.forums.filter(function(t) {
-                if (t.id == $scope.new_topic.forum) 
+                if (t.id == $scope.new_topic.forum)
                     $scope.forum_category = t.category
                 }
                 );
@@ -358,8 +358,8 @@
             $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
                 // Mark topic as read
                 if (topic.categories.length > 0)
-                    $scope.category_id = $scope.topic.categories[0].id;    
-                
+                    $scope.category_id = $scope.topic.categories[0].id;
+
                 var topic_read = new TopicRead();
                 topic_read.topic = topic.id;
                 topic_read.is_read = true;

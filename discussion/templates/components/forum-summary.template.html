@@ -1,0 +1,201 @@
+{% verbatim %}
+<section class="forums forums-page forums-widget widget container-fluid" ng-cloak>
+    <!-- <div class="widget-topbar line one-column">
+        <div class="column">
+            <button class="btn btn-link clean">limpar filtro</button>
+            <button class="btn btn-link filter">filtrar por tags e categorias</button>
+        </div>
+    </div> -->
+    <div class="widget-topbar line one-column filters" ng-show="filters.categories.length + filters.tags.length > 0">
+        <div class="filters-header">
+            <span class="col-sm-2">
+                categorias
+            </span>
+            <span class="col-sm-8">
+                tags
+            </span>
+            <span class="col-sm-2">
+                opções
+            </span>
+        </div>
+        <div class="filters-options">
+            <div class="col-sm-2">
+                <a ng-click="forumFilter('rem','cat',category)"
+                    class="category"
+                    ng-repeat="category in filters.categories track by $index"><span>{{category.name}} <b>&times;</b></span></a>
+            </div>
+            <div class="col-sm-8">
+                <a ng-click="forumFilter('rem','tag',tag)"
+                    class="tag"
+                    ng-repeat="tag in filters.tags track by $index"><span>#{{tag.name}} <b>&times;</b></span></a>
+            </div>
+            <div class="col-sm-2" ng-show="forum_search">
+                <button class="btn btn-link clean" ng-click="forumFilter('clear')">limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <header ng-if="forum_single" class="widget-topbar breadcrumb">
+        <div class="line">
+            <div class="pull-left">
+                <h2 class="title" ng-cloak><a class="forum-header-link" href="/discussion/#!/">Fóruns</a> > {{forum.title}}</h2>
+            </div>
+            <div class="pull-right hidden-xs">
+                <a class="btn btn-sm btn-success new-topic"
+                href="/discussion/topic/new/#!/topic/new/">criar novo tópico</a>
+                <a ng-href="/discussion/#!/forum/" class="btn btn-link goback"><span>voltar para o fórum</span></a>
+            </div>
+            <div class="pull-right dropdown visible-xs">
+                <button class="btn btn-default list-all dropdown-toggle" type="button" id="dropdownOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    opções
+                </button>
+                <ul class="dropdown-menu dropdown-options" aria-labelledby="dropdownOptions">
+                    <li><a href="/discussion/topic/new/#!/topic/new/">criar novo tópico</a></li>
+                    <li><a ng-href="/discussion/#!/forum/">voltar para o fórum</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <header ng-if="!forum_single || forum_search" class="widget-header line one-column">
+        <div class="column">
+            <h2 class="widget-title">Fóruns</h2>
+            <a class="btn btn-success new-topic"
+                href="/discussion/topic/new/#!/topic/new/">criar novo tópico</a>
+
+            <form id="searchForm" class="widget-filter form-inline pull-right">
+                <input class="form-control" type="text" placeholder="Busca nos fóruns..." ng-model="search.txt" uib-typeahead="result for results in getResults($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" typeahead-min-length="2" typeahead-wait-ms="500">
+            </form>
+            <button class="btn btn-xs btn-danger pull-right" ng-show="forum_search" ng-click="clear_search();">Limpar Busca</button>
+        </div>
+    </header>
+
+    <div class="line one-column" ng-if="!forum_single && !forum_search">
+        <div class="column">
+            <h3 class="section-title">Últimas Postagens</h3>
+        </div>
+    </div>
+
+    <div class="line two-column fifty-fifty" ng-if="!forum_single && !forum_search">
+        <div class="user-update column" ng-repeat="topic in latest_topics">
+            <div class="user-icon">
+                <img ng-src="{{topic.author.image || '/static/img/avatar-default.png'}}" alt="{{topic.author.first_name || topic.author.username  }}">
+            </div>
+            <div class="info">
+                <a ng-href="/profile/{{ topic.author.username }}">
+                  <b>{{ topic.author.first_name || topic.author.username }}</b>
+                </a> comentou no tópico <a href="/discussion/topic/#!/topic/{{ topic.id }}" class="thread-name">{{ topic.title |charLimiter:50}}</a> no fórum <a ng-href="/discussion/#!/forum/{{ topic.forum }}">{{ topic.forum_info.title }}</a>
+            </div>
+            <div class="actions">
+                <span class="action last-update">Última atividade <b>{{ topic.last_activity_at | dateFilter }}</b></span>
+                <span class="action liked"
+                      ng-class="{ 'active': topic.count_likes }"
+                      translate
+                      translate-n="topic.count_likes"
+                      translate-plural="{{$count}} gostaram">1 gostou</span>
+                <span class="action replies"
+                      ng-class="{ 'active': topic.count_replies }"
+                      translate
+                      translate-n="topic.count_replies"
+                      translate-plural="{{$count}} comentários">1 comentário</span>
+            </div>
+        </div>
+    </div>
+
+    <div ng-repeat="forum in forums">
+        <div ng-hide="(filters.categories.length + filters.tags.length === 0) && forum.topics.length===0">
+            <div class="line one-column" ng-if="!forum_single">
+                <div class="column">
+                    <h3 class="section-title">
+                        <a ng-href="/discussion/#!/forum/{{ forum.id }}">{{ forum.title }}</a>
+                        <button class="btn btn-link btn-sm"
+                            ng-if="forum.topics.length>0"
+                            ng-init="forum.show_forum=true"
+                            ng-class="forum.show_forum ? 'hide-all': 'show-all'"
+                            ng-click="forum.show_forum=!forum.show_forum">
+                            <span ng-show="!forum.show_forum">ver</span>
+                            <span ng-show="forum.show_forum">ocultar</span>
+                        </button>
+                    </h3>
+                </div>
+            </div>
+            <!-- <div class="column" ng-show="( forum_single && !topics_loaded ) || !forums.$resolved">
+                <h3 class="section-title"><span>Carregando tópicos...</span></h3>
+            </div> -->
+            <div class="column" ng-show="forum.topics.length===0 && forum_page_loaded && !forum_search">
+                <p class="empty-forum">Este fórum ainda não possui nenhum tópico.</p>
+            </div>
+            <div class="column" ng-show="forum.topics.length===0 && forum_search">
+                <p class="empty-forum">Nenhum resultado encontrado.</p>
+            </div>
+
+            <!-- List topics in a specific forum -->
+            <div class="forum-list" ng-show="forum.show_forum || forum_single" ng-if="forum.topics.length>0">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>tópico</th>
+                            <th>reações</th>
+                            <th>categorias</th>
+                            <th>tags</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="topic in forum.topics" ng-class="{'new': topic.read !== true}">
+                            <td>
+                                <a ng-href="/discussion/topic/#!/topic/{{ topic.id }}"><span class="thread-name">{{ topic.title }}</span></a>
+                                <span class="last-update">Por <a ng-href="/profile/{{ topic.author.username }}">{{topic.author.first_name + " " + topic.author.last_name}}</a> | Última atividade <b>{{ topic.last_activity_at | dateFilter }}</b></span>
+                            </td>
+                            <td>
+                                <span class="action replies small">{{ topic.count_replies }}</span>
+                                <span class="action liked small">{{ topic.count_likes }}</span>
+                            </td>
+                            <td>
+                                <a ng-repeat="category in topic.categories"
+                                      ng-click="forumFilter('add','cat',category)"
+                                      class="category">{{ category.name }}</a>
+                            </td>
+                            <td>
+                                <div class="tags">
+                                <a ng-repeat="tag in topic.tags.slice(0,2)"
+                                      ng-click="forumFilter('add','tag',tag)"
+                                      class="tag">#{{ tag.name }}</a>
+                                <a ng-href="/discussion/topic/#!/topic/{{ topic.id }}"
+                                    ng-show="topic.tags.length > 2"
+                                    class="tag">
+                                    +{{ topic.tags.length - 2 }}</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div ng-show="(forum_single || forum_search) && (forum_topics_total > forum_topics_page)" class="pagination-wrapper">
+
+                    <!-- Small screens -->
+                    <ul uib-pagination boundary-links="true" total-items="forum_topics_total" ng-model="topics.current_page" rotate="true" max-size="1" items-per-page="forum_topics_page" ng-change="topicPageChanged()" class="pagination pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+
+                    <!-- Medium screens -->
+                    <ul uib-pagination boundary-links="true" total-items="forum_topics_total" ng-model="topics.current_page" rotate="true" force-ellipses="false" max-size="5" items-per-page="forum_topics_page" ng-change="topicPageChanged()" class="pagination pagination-md" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="primeira" last-text="última"></ul>
+
+                    <!-- Large screens -->
+                    <ul uib-pagination boundary-links="true" total-items="forum_topics_total" ng-model="topics.current_page" rotate="true" force-ellipses="false" max-size="forum_pages_max_number" items-per-page="forum_topics_page" ng-change="topicPageChanged()" class="pagination pagination-lg" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="primeira" last-text="última"></ul>
+                </div>
+
+                <div ng-show="!forum_single && !forum_search" class="see-all-topics">
+                    <a class="btn btn-sm btn-primary" ng-href="/discussion/#!/forum/{{ forum.id }}">Ver todos os tópicos deste fórum</a>
+                </div>
+            </div>
+            <!-- /List topics in a specific forum -->
+        </div>
+    </div>
+    <div ng-show="forum_page_loaded && forum.has_next_page && !(forum_single || forum_search)" class="pagination-wrapper">
+        <!-- Small screens -->
+        <ul uib-pagination boundary-links="true" total-items="forum.total_forum_items" ng-model="forum.current_page" rotate="true" force-ellipses="true" max-size="5" items-per-page="forum.page_size" ng-change="forumPageChanged()" class="pagination pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></ul>
+        <!-- Medium screens -->
+        <ul uib-pagination boundary-links="true" total-items="forum.total_forum_items" ng-model="forum.current_page" rotate="true" force-ellipses="true" max-size="10" items-per-page="forum.page_size" ng-change="forumPageChanged()" class="pagination pagination-md" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="primeira" last-text="última"></ul>
+        <!-- Large screens -->
+        <ul uib-pagination boundary-links="true" total-items="forum.total_forum_items" ng-model="forum.current_page" rotate="true" force-ellipses="true" max-size="10" items-per-page="forum.page_size" ng-change="forumPageChanged()" class="pagination pagination-lg" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="primeira" last-text="última"></ul>
+    </div>
+</section>
+{% endverbatim %}

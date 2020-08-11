@@ -47,4 +47,9 @@ urlpatterns = [
     url(r'^topic/new/', TemplateView.as_view(template_name="forum-new-topic.html")),
     url(r'^forum/embed/$', TemplateView.as_view(template_name="forum-embed.html")),
     url(r'^home/$', RedirectView.as_view(url='/discussion/', permanent=False), name='forum-home'),
+
+    # Templates for Angular components
+    url(r'^forum-summary.template.html', TemplateView.as_view(template_name="components/forum-summary.template.html")),
+    url(r'^topic-create.template.html', TemplateView.as_view(template_name="components/topic-create.template.html")),
+    url(r'^topic-detail.template.html', TemplateView.as_view(template_name="components/topic-detail.template.html")),
 ]

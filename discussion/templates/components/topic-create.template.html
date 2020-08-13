@@ -24,7 +24,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <label for="thread-forum">Em qual fórum ele deve estar? <span class="help-text">(campo obrigatório)</span></label>
-                            <select class="form-control" ng-model="new_topic.forum" name="forum" id="thread-forum" ng-change="filter_categories()" ng-options="forum.id as forum.title for forum in forums" required >
+                            <select class="form-control" ng-model="new_topic.forum" ng-disabled="disable_forum_selection" name="forum" id="thread-forum" ng-change="filter_categories()" ng-options="forum.id as forum.title for forum in forums" required >
                                 <option>Escolha o fórum</option>
                             </select>
                         </div>

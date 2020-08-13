@@ -5,13 +5,14 @@
         component('topicCreate', {
             templateUrl: '/discussion/topic-create.template.html',
             controller: NewTopicCtrl,
-            bindings: {},
+            bindings: {
+                forum: '<',
+            },
         });
 
     NewTopicCtrl.$inject = [
         '$scope',
-        '$window',
-        '$stateParams',
+        '$state',
         'Forum',
         'Topic',
         'TopicFile',
@@ -20,23 +21,25 @@
         'ContentFile',
     ];
 
-    function NewTopicCtrl ($scope,  $window, $stateParams, Forum, Topic, TopicFile, Category, Tag, ContentFile) {
-        // $scope.forums = Forum.query();
+    function NewTopicCtrl ($scope, $state, Forum, Topic, TopicFile, Category, Tag, ContentFile) {
         $scope.categories = Category.query();
         $scope.tags = Tag.query();
         $scope.new_topic = new Topic();
 
-        // If there is a "forumid", change how "forums" is initialized
-        if ($stateParams.forumId) {
-            $scope.forums = Forum.get({id: $stateParams.forumId});
-            $scope.forums.$promise.then(forum => {
-                $scope.forums = [forum]
-                $scope.new_topic.forum = forum.id;
+        var ctrl = this;
+
+        this.$onInit = function() {
+            // If there is a "crtl.forum", change how "forums" is initialized
+            if (ctrl.forum) {
+                $scope.forums = [ctrl.forum]
+                $scope.new_topic.forum = ctrl.forum.id;
 
                 $scope.filter_categories();
-            });
-        } else {
-            $scope.forums = Forum.query();
+                $scope.disable_forum_selection = true;
+            } else {
+                // Otherwise, initialize forums normally
+                $scope.forums = Forum.query();
+            }
         }
 
         // uiTinymceConfig.images_upload_handler = ContentFile.upload;
@@ -52,9 +55,8 @@
                     topic_file.$patch().then(function(comment_file_complete) {
                         topic.files.push(comment_file_complete);
                     });
-                })
-                var url = '/discussion/topic/#!/topic/'+topic.id;
-                $window.location.href = url;
+                });
+                $state.go('classroom.topicDetail', {topicId: topic.id});
             });
         }
 

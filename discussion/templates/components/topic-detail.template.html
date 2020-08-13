@@ -5,16 +5,16 @@
             <div class="pull-left">
                 <h2 class="title" ng-cloak><a class="forum-header-link" href="/discussion/#!/">Fóruns</a> > <a class="forum-header-link" ng-href="/discussion/#!/forum/{{ topic.forum }}">{{ topic.forum_info.title }}</h2>
             </div>
-            <div ng-show="!fatal_error" class="pull-right hidden-xs">
+            <!-- <div ng-show="!fatal_error" class="pull-right hidden-xs">
                 <a ng-href="/discussion/#!/forum/{{ topic.forum }}" class="btn btn-link goback"><span>voltar</span></a>
-            </div>
+            </div> -->
             <div ng-show="!fatal_error" class="pull-right dropdown visible-xs">
                 <button class="btn btn-default list-all dropdown-toggle" type="button" id="dropdownOptions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     opções
                 </button>
                 <ul class="dropdown-menu dropdown-options" aria-labelledby="dropdownOptions">
                     <li><a href="/discussion/topic/new/#!/topic/new/">criar novo tópico</a></li>
-                    <li><a ng-href="/discussion/#!/forum/{{ topic.forum }}">voltar para os tópicos</a></li>
+                    <!-- <li><a ng-href="/discussion/#!/forum/{{ topic.forum }}">voltar para os tópicos</a></li> -->
                 </ul>
             </div>
         </div>

@@ -165,7 +165,7 @@ class CommentSerializer(BaseCommentSerializer):
     files = CommentFileSerializer(many=True, read_only=True)
 
     def get_comment_replies(self, obj):
-        queryset = obj.comment_replies.order_by('updated_at')
+        queryset = obj.comment_replies.order_by('created_at')
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
     class Meta:
@@ -265,7 +265,7 @@ class TopicSerializer(serializers.ModelSerializer):
         return instance
 
     def get_comments(self, obj):
-        queryset = obj.comments.filter(parent=None).order_by('updated_at')
+        queryset = obj.comments.filter(parent=None).order_by('created_at')
         return CommentSerializer(instance=queryset, many=True, **{'context': self.context}).data
 
     def get_categories(self, obj):

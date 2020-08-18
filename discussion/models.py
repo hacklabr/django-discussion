@@ -112,8 +112,8 @@ class BasePost(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, verbose_name=_('author'), related_name=_('%(class)s_author'))
     tags = models.ManyToManyField(Tag, verbose_name=_('tags'), blank=True)
 
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_hidden = models.BooleanField(verbose_name=_('hidden'), default=False)
     hidden_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

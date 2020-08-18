@@ -218,7 +218,7 @@
                                     class="action liked"><span>gostei</span></a>
                                 <a ng-click="comment.show_comment_input = true;" class="action replies" du-smooth-scroll="new-answer-{{comment.id}}"><span>responder</span></a>
                                 <a class="action edit" ng-click="comment.$ctrl.updating=true" ng-show="(comment.author.id == user.id || user.is_staff || user.is_superuser) && !comment.$ctrl.updating">editar</a>
-                                <span class="last-update">{{ comment.updated_at | date : "d 'de' MMMM 'de' yyyy 'às' HH'h'mm" }}</span>
+                                <span class="last-update">{{ comment.created_at | date : "d 'de' MMMM 'de' yyyy 'às' HH'h'mm" }}</span>
                             </div>
                             <div class="pull-right">
                                 <span class="action liked"
@@ -278,7 +278,7 @@
                                         class="action liked"><span>gostei</span></a>
                                     <a ng-click="comment.show_comment_input = true;" du-smooth-scroll="new-answer-{{comment.id}}" class="action replies"><span>responder</span></a>
                                     <a class="action edit" ng-click="reply.$ctrl.updating=true" ng-show="(reply.author.id == user.id || user.is_staff || user.is_superuser) && !reply.$ctrl.updating">editar</a>
-                                    <span class="last-update">{{ reply.updated_at | date : "d 'de' MMMM 'de' yyyy 'às' HH'h'mm" }}</span>
+                                    <span class="last-update">{{ reply.created_at | date : "d 'de' MMMM 'de' yyyy 'às' HH'h'mm" }}</span>
                                 </div>
                                 <div class="pull-right">
                                     <span class="action liked"

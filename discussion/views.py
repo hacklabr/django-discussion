@@ -3,7 +3,7 @@ from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from django.utils import timezone
+
 from django.views.generic.base import TemplateView
 from django.db.models import Q
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -165,10 +165,10 @@ class TopicViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, updated_at=timezone.now())
+        serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
-        topic = serializer.save(author=self.request.user, updated_at=timezone.now())
+        topic = serializer.save()
 
         # Since the topic is being updated, it must be marked as unread for all relevant users
         TopicRead.objects.filter(topic=topic).update(is_read=False)
@@ -268,13 +268,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, IsCommentAuthor, )
 
     def perform_create(self, serializer):
-        comment = serializer.save(author=self.request.user, updated_at=timezone.now())
+        comment = serializer.save(author=self.request.user)
 
         # Since there is a new comment, this topic must be marked as unread for all the relevant users
         TopicRead.objects.filter(topic=comment.topic).update(is_read=False)
-
-    def perform_update(self, serializer):
-        serializer.save(author=self.request.user, updated_at=timezone.now())
 
 
 class TagViewSet(viewsets.ModelViewSet):

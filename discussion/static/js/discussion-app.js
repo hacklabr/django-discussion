@@ -6,6 +6,7 @@
         'discussion.services',
         'discussion.directives',
         'discussion.filters',
+        'core.services',
         'ngRoute',
         'ui.tinymce',
         'ui.bootstrap',

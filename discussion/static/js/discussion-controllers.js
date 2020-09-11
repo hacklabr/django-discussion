@@ -2,8 +2,8 @@
     'use strict';
     var app = angular.module('discussion.controllers', ['ngSanitize']);
 
-    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Forum', 'ForumPage', 'Tag', 'Topic', 'TopicPage', 'CurrentUser',
-        function ($scope, $routeParams, $http, $location, Category, Forum, ForumPage, Tag, Topic, TopicPage, CurrentUser) {
+    app.controller('ForumCtrl', ['$scope', '$routeParams', '$http', '$location', 'Category', 'Forum', 'ForumPage', 'Tag', 'Topic', 'TopicPage', 'CurrentUser', 'UserAccess',
+        function ($scope, $routeParams, $http, $location, Category, Forum, ForumPage, Tag, Topic, TopicPage, CurrentUser, UserAccess) {
 
             const forum_id = $routeParams.forumId;
             $scope.user = CurrentUser;
@@ -52,6 +52,9 @@
             }
 
             function normalInit() {
+                // Log this access
+                (new UserAccess({ area: 'forums' })).$save();
+
                 $scope.filters = {};
                 $scope.forum_single = false;
                 const categoriesParams = $routeParams['categories'];

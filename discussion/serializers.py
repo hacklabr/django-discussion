@@ -234,7 +234,6 @@ class TopicSerializer(serializers.ModelSerializer):
         instance.title = self.initial_data['title']
         instance.content = self.initial_data['content']
         instance.forum = Forum.objects.get(id=self.initial_data['forum'])
-        instance.updated_at = validated_data['updated_at']
 
         # Clean current categories
         instance.categories.clear()

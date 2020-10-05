@@ -7,6 +7,14 @@
             {'id' : '@id'},
             {'update': {'method': 'PUT'} });
     }]);
+
+
+    app.factory('BasicForum', ['$resource', function($resource){
+        return $resource('/discussion/api/basic_forum/:id',
+            {'id' : '@id'},
+            {'update': {'method': 'PUT'} });
+    }]);
+    
     
     app.factory('ForumPage', ['$resource', function($resource){
         return $resource('/discussion/api/forum_page/:id',

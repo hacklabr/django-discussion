@@ -261,12 +261,13 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile',
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'BasicForum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile',
 //    'uiTinymceConfig',
-        function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag, ContentFile,
+        function ($scope,  $window, $location, Forum, BasicForum, Topic, TopicFile, Category, Tag, ContentFile,
 //        uiTinymceConfig
         ) {
-            $scope.forums = Forum.query();
+            $scope.selected_forum = '';
+            $scope.forums = BasicForum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
@@ -275,7 +276,9 @@
 
             $scope.save_topic = function() {
                 $scope.sending = true;
+                $scope.new_topic.forum = $scope.selected_forum.id;
                 $scope.new_topic.categories = [$scope.category];
+                console.log('\n\nTOPIC IS PINNED\n\n\n', new_topic.is_pinned);
                 var topic_files = $scope.new_topic.files;
                 $scope.new_topic.$save(function(topic){
                     angular.forEach(topic_files, function(topic_file) {
@@ -319,14 +322,16 @@
             }
 
             $scope.filter_categories = function(){
-                $scope.forums.filter(function(t) {
-                if (t.id == $scope.new_topic.forum)
-                    $scope.forum_category = t.category
-                }
-                );
-                $scope.list_categories = $scope.forum_category;
-                if ($scope.forum_category.length > 0)
-                    $scope.category_id = $scope.forum_category[0].id;
+            //     $scope.forums.filter(function(t) {
+            //     if (t.id == $scope.new_topic.forum)
+            //         $scope.forum_category = t.category
+            //     }
+            //     );
+            //     $scope.list_categories = $scope.forum_category;
+            //     if ($scope.forum_category.length > 0)
+            //         $scope.category_id = $scope.forum_category[0].id;
+            // }function(t)
+                $scope.list_categories = $scope.selected_forum.category;
             }
 
             $scope.uploadTopicFiles = function (file, topic) {
@@ -351,10 +356,10 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll',
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll', 'BasicForum',
 //    'uiTinymceConfig',
     'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile',
-        function ($scope, $routeParams, $sce, $location, $anchorScroll,
+        function ($scope, $routeParams, $sce, $location, $anchorScroll, BasicForum, 
 //        uiTinymceConfig,
         Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
 
@@ -385,10 +390,10 @@
 //            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
             // Prepare for topic editing
-//            $scope.forums = Forum.query();
+            $scope.forums = BasicForum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
-            // angular.copy($scope.topic, $scope.current_topic);
+            angular.copy($scope.topic, $scope.current_topic);
             $scope.update_topic = function() {
                 $scope.topic.categories = $scope.categories.filter(function(cat) {
                     return cat.id == $scope.category_id;

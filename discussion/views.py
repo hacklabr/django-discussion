@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from braces import views
 
 
-from .serializers import (CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer,
+from .serializers import (BasicForumSerializer, CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer,
                                     TopicSerializer, CommentSerializer, ContentFileSerializer,
                                     TagSerializer, TopicNotificationSerializer, TopicLikeSerializer, ForumFileSerializer,
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
@@ -113,6 +113,13 @@ class ForumViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
+
+class BasicForumViewSet(ForumViewSet):
+    """
+    """
+    queryset = Forum.objects.all()
+    serializer_class = BasicForumSerializer
+    permission_classes = [IsAuthenticated, IsTopicAuthor]
 
 class ForumPagination(PageNumberPagination):
     page_size = 10

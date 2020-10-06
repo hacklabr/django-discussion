@@ -31,6 +31,7 @@ class TagSerializer(serializers.ModelSerializer):
         depth = 1
         fields = '__all__'
 
+
 class BaseTopicSerializer(serializers.ModelSerializer):
 
     read = serializers.SerializerMethodField()
@@ -53,16 +54,19 @@ class BaseTopicSerializer(serializers.ModelSerializer):
             # If there is no instance, the topic is not read yet
             return False
 
+
 class BaseForumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Forum
         fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category')
         
+
 class ForumFileSerializer(serializers.ModelSerializer):
     """ Serializer to Forum file attachments """
     class Meta:
         model = ForumFile
+
 
 class ForumSerializer(serializers.ModelSerializer):
 
@@ -102,6 +106,7 @@ class ForumSerializer(serializers.ModelSerializer):
             else:
                 return BaseTopicSerializer(queryset.order_by('-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
+
 class BasicForumSerializer(ForumSerializer):
 
     category = CategorySerializer(many=True, read_only=True)
@@ -109,7 +114,7 @@ class BasicForumSerializer(ForumSerializer):
     class Meta:
         model = Forum
         fields = ('id', 'category', 'is_public', 'title', 'slug', 'timestamp')
-
+~
 class ForumSumarySerializer(serializers.ModelSerializer):
 
     author = BaseUserSerializer(read_only=True)

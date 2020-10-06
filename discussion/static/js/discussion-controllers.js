@@ -346,10 +346,10 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll', 'BasicForum',
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll',
 //    'uiTinymceConfig',
     'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile',
-        function ($scope, $routeParams, $sce, $location, $anchorScroll, BasicForum, 
+        function ($scope, $routeParams, $sce, $location, $anchorScroll, 
 //        uiTinymceConfig,
         Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
 
@@ -380,7 +380,7 @@
 //            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
             // Prepare for topic editing
-            $scope.forums = BasicForum.query();
+            $scope.forums = Forum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             angular.copy($scope.topic, $scope.current_topic);

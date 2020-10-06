@@ -278,7 +278,6 @@
                 $scope.sending = true;
                 $scope.new_topic.forum = $scope.selected_forum.id;
                 $scope.new_topic.categories = [$scope.category];
-                console.log('\n\nTOPIC IS PINNED\n\n\n', new_topic.is_pinned);
                 var topic_files = $scope.new_topic.files;
                 $scope.new_topic.$save(function(topic){
                     angular.forEach(topic_files, function(topic_file) {
@@ -322,15 +321,6 @@
             }
 
             $scope.filter_categories = function(){
-            //     $scope.forums.filter(function(t) {
-            //     if (t.id == $scope.new_topic.forum)
-            //         $scope.forum_category = t.category
-            //     }
-            //     );
-            //     $scope.list_categories = $scope.forum_category;
-            //     if ($scope.forum_category.length > 0)
-            //         $scope.category_id = $scope.forum_category[0].id;
-            // }function(t)
                 $scope.list_categories = $scope.selected_forum.category;
             }
 

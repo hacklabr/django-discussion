@@ -380,7 +380,7 @@ class ForumSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'is_pinned', 'category', 'topics', )
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category', 'topics', )
         depth = 1
 
 

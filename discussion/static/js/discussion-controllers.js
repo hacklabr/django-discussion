@@ -261,12 +261,13 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile',
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'BasicForum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile',
 //    'uiTinymceConfig',
-        function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag, ContentFile,
+        function ($scope,  $window, $location, Forum, BasicForum, Topic, TopicFile, Category, Tag, ContentFile,
 //        uiTinymceConfig
         ) {
-            $scope.forums = Forum.query();
+            $scope.selected_forum = '';
+            $scope.forums = BasicForum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
@@ -275,6 +276,7 @@
 
             $scope.save_topic = function() {
                 $scope.sending = true;
+                $scope.new_topic.forum = $scope.selected_forum.id;
                 $scope.new_topic.categories = [$scope.category];
                 var topic_files = $scope.new_topic.files;
                 $scope.new_topic.$save(function(topic){
@@ -319,14 +321,7 @@
             }
 
             $scope.filter_categories = function(){
-                $scope.forums.filter(function(t) {
-                if (t.id == $scope.new_topic.forum)
-                    $scope.forum_category = t.category
-                }
-                );
-                $scope.list_categories = $scope.forum_category;
-                if ($scope.forum_category.length > 0)
-                    $scope.category_id = $scope.forum_category[0].id;
+                $scope.list_categories = $scope.selected_forum.category;
             }
 
             $scope.uploadTopicFiles = function (file, topic) {
@@ -354,7 +349,7 @@
     app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll',
 //    'uiTinymceConfig',
     'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile',
-        function ($scope, $routeParams, $sce, $location, $anchorScroll,
+        function ($scope, $routeParams, $sce, $location, $anchorScroll, 
 //        uiTinymceConfig,
         Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
 
@@ -385,7 +380,7 @@
 //            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
             // Prepare for topic editing
-//            $scope.forums = Forum.query();
+            // $scope.forums = Forum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             // angular.copy($scope.topic, $scope.current_topic);

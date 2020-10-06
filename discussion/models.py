@@ -142,6 +142,7 @@ class Topic(BasePost):
     content = models.TextField(_('content'), null=True, blank=True)
 
     is_public = models.BooleanField(_("public"), default=False)
+    is_pinned = models.BooleanField(_("pinned"), default=False)
 
     def __str__(self):
         return self.title

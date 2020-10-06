@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
 from discussion.views import (
-    CategoryViewSet, CommentFileViewSet, CommentLikeViewSet, CommentViewSet,
+    BasicForumViewSet, CategoryViewSet, CommentFileViewSet, CommentLikeViewSet, CommentViewSet,
     ContentFileViewSet, ForumCreateView, ForumDeleteView, ForumFileViewSet,
     ForumListView, ForumSearchViewSet, ForumUpdateView, ForumView, ForumViewSet,
     TagViewSet, TopicFileViewSet, TopicLikeViewSet, TopicNotificationViewSet,
@@ -18,7 +18,8 @@ app_name = 'discussion'
 
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'category', CategoryViewSet)
-router.register(r'forum', ForumViewSet)
+router.register(r'forum', ForumViewSet) 
+router.register(r'basic_forum', BasicForumViewSet)
 router.register(r'forum_page', ForumPageViewSet)
 router.register(r'topic', TopicViewSet)
 router.register(r'topic_page', TopicPageViewSet)

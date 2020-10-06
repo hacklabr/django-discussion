@@ -114,17 +114,20 @@ class ForumViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
 
+
 class BasicForumViewSet(ForumViewSet):
     """
     """
     queryset = Forum.objects.all()
     serializer_class = BasicForumSerializer
-    permission_classes = [IsAuthenticated, IsTopicAuthor]
+    permission_classes = [IsAuthenticated]
+
 
 class ForumPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 50
+
 
 class ForumPageViewSet(ForumViewSet):
     pagination_class = ForumPagination

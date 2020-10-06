@@ -114,7 +114,8 @@ class BasicForumSerializer(ForumSerializer):
     class Meta:
         model = Forum
         fields = ('id', 'category', 'is_public', 'title', 'slug', 'timestamp')
-~
+
+
 class ForumSumarySerializer(serializers.ModelSerializer):
 
     author = BaseUserSerializer(read_only=True)

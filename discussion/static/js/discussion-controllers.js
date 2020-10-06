@@ -380,10 +380,10 @@
 //            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
             // Prepare for topic editing
-            $scope.forums = Forum.query();
+            // $scope.forums = Forum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
-            angular.copy($scope.topic, $scope.current_topic);
+            // angular.copy($scope.topic, $scope.current_topic);
             $scope.update_topic = function() {
                 $scope.topic.categories = $scope.categories.filter(function(cat) {
                     return cat.id == $scope.category_id;

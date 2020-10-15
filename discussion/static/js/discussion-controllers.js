@@ -493,6 +493,7 @@
                               comment_file.comment = comment.id;
                               delete comment_file.file;
                               comment_file.$patch().then(function(comment_file_complete) {
+                                  changed_comment.files = changed_comment.files || [];
                                   changed_comment.files.push(comment_file_complete);
                               });
                           }
@@ -550,9 +551,7 @@
                 if (file) {
                     CommentFile.upload(file).then(function (response) {
                         var comment_file = new CommentFile(response.data);
-
-                        if (comment.files === undefined)
-                            comment.files = [];
+                        comment.files = comment.files || [];
                         comment.files.push(comment_file);
                         return {location: comment_file.file};
                     }, function (response) {

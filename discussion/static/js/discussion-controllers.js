@@ -349,7 +349,7 @@
     app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll',
 //    'uiTinymceConfig',
     'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile',
-        function ($scope, $routeParams, $sce, $location, $anchorScroll, 
+        function ($scope, $routeParams, $sce, $location, $anchorScroll,
 //        uiTinymceConfig,
         Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
 
@@ -471,6 +471,7 @@
                         comment_file.comment = comment.id;
                         delete comment_file.file;
                         comment_file.$patch().then(function(comment_file_complete) {
+                            comment.files = comment.files || [];
                             comment.files.push(comment_file_complete);
                         });
                     });

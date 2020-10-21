@@ -261,7 +261,6 @@
                                             ngf-select="uploadCommentFiles($file, changed_reply)"
                                             ngf-multiple="false">anexar arquivo</button>
 
-                                    <span tabindex="0" data-toggle="tooltip" data-placement="bottom" title="Disabled tooltip" delay="0" container="#comment_btn">teste</span>
                                     <button class="btn btn-xs btn-success reply pull-right" type="submit" ng-disabled="!changed_reply.text"
                                         data-toggle="tooltip" data-placement="bottom" title="Campo de texto é obrigatório"
                                         ng-click="update_comment(changed_reply); reply.$ctrl.updating = false">comentar</button>

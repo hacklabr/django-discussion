@@ -32,12 +32,35 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class BaseTopicSerializer(serializers.ModelSerializer):
+
+    read = serializers.SerializerMethodField()
+    author = BaseUserSerializer(read_only=True)
+
+    class Meta:
+        model = Topic
+        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'is_pinned', 'author',
+                  'hidden_by', 'tags', 'categories', 'comments', 'count_likes', 'count_uses', 'count_replies', 'last_activity_at',
+                  'forum', 'read')
+        depth = 1
+
+    def get_read(self, obj):
+        request = self.context.get("request")
+        # If there is a TopicRead instance, return the content of "is_read" field
+        try:
+            topic_read = TopicRead.objects.get(topic=obj, user=request.user)
+            return topic_read.is_read
+        except TopicRead.DoesNotExist:
+            # If there is no instance, the topic is not read yet
+            return False
+
+
 class BaseForumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category', )
-
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'category')
+        
 
 class ForumFileSerializer(serializers.ModelSerializer):
     """ Serializer to Forum file attachments """
@@ -82,6 +105,15 @@ class ForumSerializer(serializers.ModelSerializer):
                 return BaseTopicSerializer(queryset.order_by('-last_activity_at'), many=True, **{'context': self.context}).data
             else:
                 return BaseTopicSerializer(queryset.order_by('-last_activity_at')[:5], many=True, **{'context': self.context}).data
+
+
+class BasicForumSerializer(ForumSerializer):
+
+    category = CategorySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Forum
+        fields = ('id', 'category', 'is_public', 'title', 'slug', 'timestamp')
 
 
 class ForumSumarySerializer(serializers.ModelSerializer):
@@ -203,7 +235,7 @@ class TopicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Topic
-        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
+        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'is_pinned', 'author',
                   'hidden_by', 'tags', 'categories', 'count_likes', 'count_uses', 'count_replies', 'forum', 'comments',
                   'user_like', 'last_activity_at', 'forum_info', 'files', 'read')
 
@@ -356,5 +388,5 @@ class TopicSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Topic
-        fields = ('id', 'title', 'content', 'slug', 'is_public', )
+        fields = ('id', 'title', 'content', 'slug', 'is_public', 'is_pinned')
         depth = 1

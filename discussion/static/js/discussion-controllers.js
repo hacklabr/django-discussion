@@ -261,12 +261,13 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile',
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'BasicForum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile',
 //    'uiTinymceConfig',
-        function ($scope,  $window, $location, Forum, Topic, TopicFile, Category, Tag, ContentFile,
+        function ($scope,  $window, $location, Forum, BasicForum, Topic, TopicFile, Category, Tag, ContentFile,
 //        uiTinymceConfig
         ) {
-            $scope.forums = Forum.query();
+            $scope.selected_forum = '';
+            $scope.forums = BasicForum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
@@ -275,6 +276,7 @@
 
             $scope.save_topic = function() {
                 $scope.sending = true;
+                $scope.new_topic.forum = $scope.selected_forum.id;
                 $scope.new_topic.categories = [$scope.category];
                 var topic_files = $scope.new_topic.files;
                 $scope.new_topic.$save(function(topic){
@@ -319,14 +321,7 @@
             }
 
             $scope.filter_categories = function(){
-                $scope.forums.filter(function(t) {
-                if (t.id == $scope.new_topic.forum)
-                    $scope.forum_category = t.category
-                }
-                );
-                $scope.list_categories = $scope.forum_category;
-                if ($scope.forum_category.length > 0)
-                    $scope.category_id = $scope.forum_category[0].id;
+                $scope.list_categories = $scope.selected_forum.category;
             }
 
             $scope.uploadTopicFiles = function (file, topic) {
@@ -385,7 +380,7 @@
 //            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
             // Prepare for topic editing
-//            $scope.forums = Forum.query();
+            // $scope.forums = Forum.query();
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             // angular.copy($scope.topic, $scope.current_topic);
@@ -476,6 +471,7 @@
                         comment_file.comment = comment.id;
                         delete comment_file.file;
                         comment_file.$patch().then(function(comment_file_complete) {
+                            comment.files = comment.files || [];
                             comment.files.push(comment_file_complete);
                         });
                     });
@@ -497,6 +493,7 @@
                               comment_file.comment = comment.id;
                               delete comment_file.file;
                               comment_file.$patch().then(function(comment_file_complete) {
+                                  changed_comment.files = changed_comment.files || [];
                                   changed_comment.files.push(comment_file_complete);
                               });
                           }
@@ -554,9 +551,7 @@
                 if (file) {
                     CommentFile.upload(file).then(function (response) {
                         var comment_file = new CommentFile(response.data);
-
-                        if (comment.files === undefined)
-                            comment.files = [];
+                        comment.files = comment.files || [];
                         comment.files.push(comment_file);
                         return {location: comment_file.file};
                     }, function (response) {

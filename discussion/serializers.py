@@ -128,7 +128,7 @@ class ForumSumarySerializer(serializers.ModelSerializer):
         depth = 1
 
     def get_latest_topics(self, obj):
-        queryset = Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5]
+        queryset = Topic.objects.filter(forum=obj).order_by('-is_pinned', '-last_activity_at')[:5]
         queryset = queryset.select_related('author')
         queryset = queryset.prefetch_related('categories', 'tags', 'forum')
         return BaseTopicSerializer(queryset , many=True, **{'context': self.context}).data
@@ -344,6 +344,7 @@ class BaseTopicSerializer(serializers.ModelSerializer):
         except TopicRead.DoesNotExist:
             # If there is no instance, the topic is not read yet
             return False
+
 
 class TopicLikeSerializer(serializers.ModelSerializer):
 

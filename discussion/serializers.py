@@ -149,9 +149,9 @@ class ForumSumarySerializer(serializers.ModelSerializer):
 
             # only exec the query if any filter is present
             if categories or tags:
-                return BaseTopicSerializer(queryset.order_by('-last_activity_at'), many=True, **{'context': self.context}).data
+                return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at'), many=True, **{'context': self.context}).data
             else:
-                return BaseTopicSerializer(queryset.order_by('-last_activity_at')[:5], many=True, **{'context': self.context}).data
+                return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
 
 class BaseCommentSerializer(serializers.ModelSerializer):
@@ -327,12 +327,13 @@ class BaseTopicSerializer(serializers.ModelSerializer):
     read = serializers.SerializerMethodField()
     author = BaseUserSerializer(read_only=True)
     files = TopicFileSerializer(many=True, read_only=True)
+    is_pinned = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
                   'files', 'hidden_by', 'tags', 'categories', 'comments', 'count_likes', 'count_uses', 'count_replies', 'last_activity_at',
-                  'forum', 'read')
+                  'forum', 'read', 'is_pinned')
         depth = 1
 
     def get_read(self, obj):

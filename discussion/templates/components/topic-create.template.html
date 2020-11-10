@@ -49,12 +49,8 @@
                     <input class="form-control" ng-model="new_topic.title" name="title" type="text" id="thread-name" placeholder="Escreva o título aqui" required>
                 </div>
                 <div class="form-group">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <label for="pinned-topic">Fixar tópico no topo do fórum? </label>
-                            <input ng-model="new_topic.is_pinned" name="pinned-topic" type="checkbox" id="pinned-topic"><br/>
-                        </div>
-                    </div>
+                    <input ng-model="new_topic.is_pinned" name="pinned-topic" type="checkbox" id="pinned-topic">
+                    <label for="pinned-topic">Fixar tópico no topo do fórum? </label>
                 </div>
                 <div class="form-group">
                     <label for="thread-text">Texto do tópico <span class="help-text">(campo obrigatório)</span></label>

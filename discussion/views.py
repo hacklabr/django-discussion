@@ -166,10 +166,10 @@ class TopicViewSet(viewsets.ModelViewSet):
     """
     """
 
-    queryset = Topic.objects.all()
+    queryset = Topic.objects.all().order_by('-is_pinned', '-last_activity_at')
     serializer_class = TopicSerializer
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend, )
-    ordering_fields = ('last_activity_at', )
+    ordering_fields = ('last_activity_at')
     filter_fields = ('forum', )
     permission_classes = (IsAuthenticated, IsTopicAuthor, )
     pagination_class = None
@@ -251,8 +251,8 @@ class TopicViewSet(viewsets.ModelViewSet):
         if limit_to:
             queryset = queryset[:int(limit_to)]
 
-        return queryset
-
+        return queryset       
+        
 
 class TopicPageViewSet(TopicViewSet):
     pagination_class = TopicPagination

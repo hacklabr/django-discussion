@@ -17,7 +17,7 @@ from rest_framework import routers
 app_name = 'discussion'
 
 router = routers.SimpleRouter(trailing_slash=False)
-router.register(r'category', CategoryViewSet)
+router.register(r'category', BasicForumViewSet)
 router.register(r'forum', ForumViewSet) 
 router.register(r'basic_forum', BasicForumViewSet)
 router.register(r'forum_page', ForumPageViewSet)

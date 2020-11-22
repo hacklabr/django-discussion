@@ -93,7 +93,7 @@ def comment_created_or_updated(instance, **kwargs):
 @receiver(post_save, sender=TopicUse)
 def topic_reaction_created_or_updated(instance, **kwargs):
 
-    if instance.comment.topic.forum.forum_type != 'discussion':
+    if instance.topic.forum.forum_type != 'discussion':
         return
 
     # Users that must be notified

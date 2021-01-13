@@ -29,6 +29,8 @@
     ];
 
     function TopicCtrl ($scope, $stateParams, $sce, $location, $anchorScroll, Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
+        $scope.topic_pinned = false;
+        $scope.user = CurrentUser;
 
         $scope.topic = Topic.get({id: $stateParams.topicId}, function(topic){
             // Mark topic as read
@@ -43,6 +45,13 @@
             //Filter the topics from Forum
             Forum.get({id:$scope.topic.forum}, function(t) {
                 $scope.forum_categories = t.category;
+
+                let filteredGroups = t.groups_ids.filter(value => $scope.user.groups_ids.includes(value));
+                if(filteredGroups.length > 0) {
+                    $scope.topic_pinned = true;
+                } else {
+                    $scope.topic_pinned = false;
+                } 
             }
             );
 
@@ -50,7 +59,7 @@
             $scope.fatal_error = true;
             $scope.error_message = error.data.message;
         });
-        $scope.user = CurrentUser;
+        
 
 //            uiTinymceConfig.automatic_uploads = true;
 

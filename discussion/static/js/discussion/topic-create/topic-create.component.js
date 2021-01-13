@@ -19,12 +19,16 @@
         'Category',
         'Tag',
         'ContentFile',
+        'CurrentUser',
     ];
 
-    function NewTopicCtrl ($scope, $state, Forum, Topic, TopicFile, Category, Tag, ContentFile) {
+    function NewTopicCtrl ($scope, $state, Forum, Topic, TopicFile, Category, Tag, ContentFile, CurrentUser) {
         $scope.categories = Category.query();
         $scope.tags = Tag.query();
         $scope.new_topic = new Topic();
+        $scope.pinned = false;
+
+        $scope.user = CurrentUser;
 
         var ctrl = this;
 
@@ -92,11 +96,20 @@
             $scope.forums.filter(function(t) {
                 if (t.id == $scope.new_topic.forum)
                     $scope.forum_category = t.category
+                    $scope.groups_ids = t.groups_ids
                 }
             );
             $scope.list_categories = $scope.forum_category;
             if ($scope.forum_category.length > 0)
                 $scope.category_id = $scope.forum_category[0].id;
+
+            let filteredGroups = $scope.groups_ids.filter(value =>  $scope.user.groups_ids.includes(value));
+
+            if(filteredGroups.length > 0) {
+                $scope.pinned = true;
+            } else {
+                $scope.pinned = false;
+            } 
         }
 
         $scope.uploadTopicFiles = function (file, topic) {

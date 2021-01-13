@@ -175,7 +175,7 @@ class TopicViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user, is_pinned=False)
 
     def perform_update(self, serializer):
         topic = serializer.save()

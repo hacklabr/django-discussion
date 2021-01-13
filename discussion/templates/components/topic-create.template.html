@@ -48,7 +48,7 @@
                     <label for="thread-name">Como se chamará o novo tópico? <span class="help-text">(campo obrigatório)</span></label>
                     <input class="form-control" ng-model="new_topic.title" name="title" type="text" id="thread-name" placeholder="Escreva o título aqui" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-if=pinned>
                     <input ng-model="new_topic.is_pinned" name="pinned-topic" type="checkbox" id="pinned-topic">
                     <label for="pinned-topic">Fixar tópico no topo do fórum? </label>
                 </div>

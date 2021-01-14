@@ -109,9 +109,9 @@ class ForumSerializer(serializers.ModelSerializer):
 
             # only exec the query if any filter is present
             if categories or tags:
-                return BaseTopicSerializer(queryset.order_by('-last_activity_at'), many=True, **{'context': self.context}).data
+                return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at'), many=True, **{'context': self.context}).data
             else:
-                return BaseTopicSerializer(queryset.order_by('-last_activity_at')[:5], many=True, **{'context': self.context}).data
+                return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
 
 class BasicForumSerializer(ForumSerializer):

@@ -295,9 +295,8 @@ class TopicSerializer(serializers.ModelSerializer):
         # If categories were specified
         if 'categories' in self.initial_data.keys():
             categories = self.initial_data.pop('categories')
-            for cat in categories:
-                if cat != None:
-                    instance.categories.add(Category.objects.get(id=cat['id']))
+            if categories:
+                instance.categories.add(Category.objects.get(id=categories))
 
         # Clean current tags
         instance.tags.clear()

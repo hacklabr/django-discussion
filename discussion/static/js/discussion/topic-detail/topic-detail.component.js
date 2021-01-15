@@ -67,13 +67,11 @@
 
         // Prepare for topic editing
 //            $scope.forums = Forum.query();
-        $scope.categories = Category.query();
+        // $scope.categories = Category.query();
         $scope.tags = Tag.query();
         // angular.copy($scope.topic, $scope.current_topic);
         $scope.update_topic = function() {
-            $scope.topic.categories = $scope.categories.filter(function(cat) {
-                return cat.id == $scope.category_id;
-            });
+            $scope.topic.categories = $scope.category_id;
             var topic_files = $scope.topic.files;
             $scope.topic.$update(function(topic){
                 angular.forEach(topic_files, function(topic_file) {

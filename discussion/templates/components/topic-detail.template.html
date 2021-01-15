@@ -26,10 +26,10 @@
       </div>
     </div>
     <!-- Edição do tópico -->
-    <div ng-if="!fatal_error" class="line one-column">
+    <div ng-show="!fatal_error" class="line one-column">
         <div class="column">
             <div class="forum-thread" ng-cloak>
-                <form class="new-thread" name="topic_form" novalidate ng-if="$ctrl.updating" ng-submit="topic_form.$valid && update_topic()">
+                <form class="new-thread" name="topic_form" novalidate ng-show="$ctrl.updating" ng-submit="topic_form.$valid && update_topic()">
                     <div class="form-group">
                         <div class="row">
                           <div class="col-sm-6">
@@ -40,9 +40,9 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-sm-6">
-                                <label for="thread-forum">Qual a categoria do seu tópico?</label>
+                                <label for="thread-forum">Qual a categoria do seu tópicooo?</label>
                                 <select ng-model="category_id" name="category" class="form-control" id="category" ng-options="category.id as category.name for category in forum_categories">
-                                    <option>Escolha a categoria</option>
+                                    <option value="">Escolha a categoria</option>
                                 </select>
                             </div>
                             <!-- <div class="col-sm-6">

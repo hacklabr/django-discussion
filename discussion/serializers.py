@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from django.contrib.auth.models import Group
+
 from discussion.models import (Category, Forum, Topic, Comment, Tag, ForumFile,
                                TopicNotification, TopicLike, TopicRead,
                                CommentLike, TopicFile, CommentFile, ContentFile)
@@ -74,11 +76,16 @@ class ForumSerializer(serializers.ModelSerializer):
     latest_topics = serializers.SerializerMethodField()
     topics = serializers.SerializerMethodField()
     files = ForumFileSerializer(many=True, read_only=True)
+    groups_ids = serializers.SerializerMethodField()
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', 'forum_type', 'topics', 'files')
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', 'forum_type', 'topics', 'files', 'groups_ids',)
         depth = 1
+    
+    def get_groups_ids(self, obj):
+        groups = obj.groups.all().values_list('id', flat=True)
+        return groups
 
     def get_latest_topics(self, obj):
         queryset = Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5]
@@ -102,9 +109,9 @@ class ForumSerializer(serializers.ModelSerializer):
 
             # only exec the query if any filter is present
             if categories or tags:
-                return BaseTopicSerializer(queryset.order_by('-last_activity_at'), many=True, **{'context': self.context}).data
+                return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at'), many=True, **{'context': self.context}).data
             else:
-                return BaseTopicSerializer(queryset.order_by('-last_activity_at')[:5], many=True, **{'context': self.context}).data
+                return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
 
 class BasicForumSerializer(ForumSerializer):
@@ -113,7 +120,7 @@ class BasicForumSerializer(ForumSerializer):
 
     class Meta:
         model = Forum
-        fields = ('id', 'category', 'is_public', 'title', 'slug', 'timestamp')
+        fields = ('id', 'category', 'is_public', 'title', 'slug', 'timestamp', 'groups')
 
 
 class ForumSumarySerializer(serializers.ModelSerializer):
@@ -121,12 +128,17 @@ class ForumSumarySerializer(serializers.ModelSerializer):
     author = BaseUserSerializer(read_only=True)
     latest_topics = serializers.SerializerMethodField()
     topics = serializers.SerializerMethodField()
+    groups_ids = serializers.SerializerMethodField()
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', 'forum_type', 'topics', )
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', 'forum_type', 'topics', 'groups_ids',)
         depth = 1
 
+    def get_groups_ids(self, obj):
+        groups = obj.groups.all().values_list('id', flat=True)
+        return groups
+        
     def get_latest_topics(self, obj):
         queryset = Topic.objects.filter(forum=obj).order_by('-is_pinned', '-last_activity_at')[:5]
         queryset = queryset.select_related('author')
@@ -240,6 +252,8 @@ class TopicSerializer(serializers.ModelSerializer):
                   'user_like', 'last_activity_at', 'forum_info', 'files', 'read')
 
     def create(self, validated_data):
+        request = self.context.get("request")
+
         topic = Topic.objects.create(**validated_data)
         # If categories were specified
         if 'categories' in self.initial_data.keys():
@@ -259,9 +273,18 @@ class TopicSerializer(serializers.ModelSerializer):
                     tag = Tag.objects.get(id=tag['id'])
                 topic.tags.add(tag)
 
+        # If is_pinned is specified and the user belongs to one of the forum groups
+        groups = Group.objects.filter(user__id=request.user.id, foruns__id=self.initial_data['forum'])
+
+        if 'is_pinned' in self.initial_data.keys() and groups.exists():
+            topic.is_pinned  = True
+            topic.save()
+       
         return topic
 
     def update(self, instance, validated_data):
+        request = self.context.get("request")
+
         # Update topic fields
         instance.title = self.initial_data['title']
         instance.content = self.initial_data['content']
@@ -272,9 +295,8 @@ class TopicSerializer(serializers.ModelSerializer):
         # If categories were specified
         if 'categories' in self.initial_data.keys():
             categories = self.initial_data.pop('categories')
-            for cat in categories:
-                if cat != None:
-                    instance.categories.add(Category.objects.get(id=cat['id']))
+            if categories:
+                instance.categories.add(Category.objects.get(id=categories))
 
         # Clean current tags
         instance.tags.clear()
@@ -291,6 +313,15 @@ class TopicSerializer(serializers.ModelSerializer):
                 else:
                     tag = Tag.objects.get(id=tag['id'])
                 instance.tags.add(tag)
+
+        # If is_pinned were specified and the user belongs to one of the forum groups
+        groups = Group.objects.filter(user__id=request.user.id, foruns__id=self.initial_data['forum'])
+        if 'is_pinned' in self.initial_data.keys() and groups.exists():
+            pin = self.initial_data.pop('is_pinned')
+            if pin:
+                instance.is_pinned = True
+            else:
+                instance.is_pinned = False
 
         instance.save()
         return instance

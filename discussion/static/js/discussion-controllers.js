@@ -261,9 +261,9 @@
         }
     ]);
 
-    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'BasicForum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile',
+    app.controller('NewTopicCtrl', ['$scope', '$window', '$location', 'Forum', 'BasicForum', 'Topic', 'TopicFile', 'Category', 'Tag', 'ContentFile', 'CurrentUser',
 //    'uiTinymceConfig',
-        function ($scope,  $window, $location, Forum, BasicForum, Topic, TopicFile, Category, Tag, ContentFile,
+        function ($scope,  $window, $location, Forum, BasicForum, Topic, TopicFile, Category, Tag, ContentFile, CurrentUser,
 //        uiTinymceConfig
         ) {
             $scope.selected_forum = '';
@@ -271,6 +271,9 @@
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
+            $scope.pinned = false;
+
+            $scope.user = CurrentUser;
 
 //            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
@@ -322,6 +325,13 @@
 
             $scope.filter_categories = function(){
                 $scope.list_categories = $scope.selected_forum.category;
+                let filteredGroups = $scope.selected_forum.groups.filter(value =>  $scope.user.groups_ids.includes(value));
+
+                if(filteredGroups.length > 0) {
+                    $scope.pinned = true;
+                } else {
+                    $scope.pinned = false;
+                } 
             }
 
             $scope.uploadTopicFiles = function (file, topic) {
@@ -353,6 +363,9 @@
 //        uiTinymceConfig,
         Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
 
+            $scope.topic_pinned = false;
+            $scope.user = CurrentUser;
+
             $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
                 // Mark topic as read
                 if (topic.categories.length > 0)
@@ -366,6 +379,13 @@
                 //Filter the topics from Forum
                 Forum.get({id:$scope.topic.forum}, function(t) {
                     $scope.forum_categories = t.category;
+                    
+                    let filteredGroups = t.groups_ids.filter(value => $scope.user.groups_ids.includes(value));
+                    if(filteredGroups.length > 0) {
+                        $scope.topic_pinned = true;
+                    } else {
+                        $scope.topic_pinned = false;
+                    } 
                 }
                 );
 
@@ -373,7 +393,6 @@
                 $scope.fatal_error = true;
                 $scope.error_message = error.data.message;
             });
-            $scope.user = CurrentUser;
 
 //            uiTinymceConfig.automatic_uploads = true;
 
@@ -381,13 +400,11 @@
 
             // Prepare for topic editing
             // $scope.forums = Forum.query();
-            $scope.categories = Category.query();
+            // $scope.categories = Category.query();
             $scope.tags = Tag.query();
             // angular.copy($scope.topic, $scope.current_topic);
             $scope.update_topic = function() {
-                $scope.topic.categories = $scope.categories.filter(function(cat) {
-                    return cat.id == $scope.category_id;
-                });
+                $scope.topic.categories = $scope.category_id;
                 var topic_files = $scope.topic.files;
                 $scope.topic.$update(function(topic){
                     angular.forEach(topic_files, function(topic_file) {

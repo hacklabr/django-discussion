@@ -195,7 +195,8 @@ class TopicViewSet(viewsets.ModelViewSet):
                 'message': u'Identificador inválido "%s"' % kwargs['pk']
             }, status.HTTP_400_BAD_REQUEST)
 
-        if not self.request.user.is_superuser and self.request.user != topic.author:
+        if not self.request.user.is_superuser and self.request.user != topic.author \
+           and not topic.forum.is_public:
             user_groups = set(list(self.request.user.groups.all()))
             forum_groups = set(list(topic.forum.groups.all()))
             if len(user_groups.intersection(forum_groups)) == 0:

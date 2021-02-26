@@ -238,7 +238,11 @@ class TopicViewSet(viewsets.ModelViewSet):
             # If there are search fields in the request, do the search
             search = self.request.query_params.get('search', None)
             if search:
-                queryset = queryset.filter(Q(title__icontains=search) | Q(content__icontains=search))
+                queryset = queryset.filter(
+                    Q(title__icontains=search) |
+                    Q(content__icontains=search) |
+                    Q(tags__name__icontains=search) |
+                    Q(categories__name__icontains=search))
 
         return queryset
 

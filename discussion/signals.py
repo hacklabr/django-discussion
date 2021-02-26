@@ -1,3 +1,4 @@
+from actstream import action
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from discussion.models import Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
@@ -6,6 +7,7 @@ from courses_notifications.models import unread_notification_increment
 
 @receiver(post_save, sender=Comment)
 def comment_created_or_updated(instance, **kwargs):
+    action.send(instance.author, verb='created comment', action_object=instance.topic, target=instance.topic.forum)
 
     if instance.topic.forum.forum_type != 'discussion':
         return
@@ -92,6 +94,7 @@ def comment_created_or_updated(instance, **kwargs):
 @receiver(post_save, sender=TopicLike)
 @receiver(post_save, sender=TopicUse)
 def topic_reaction_created_or_updated(instance, **kwargs):
+    action.send(instance.user, verb='reacted', action_object=instance.topic, target=instance.topic.forum)
 
     if instance.topic.forum.forum_type != 'discussion':
         return
@@ -136,9 +139,9 @@ def topic_reaction_created_or_updated(instance, **kwargs):
         # Increase the unread count for this user in 1
         unread_notification_increment(one_user)
 
-
 @receiver(post_save, sender=CommentLike)
 def comment_reaction_created_or_updated(instance, **kwargs):
+    action.send(instance.user, verb='reacted', action_object=instance.comment.topic, target=instance.comment.topic.forum)
 
     if instance.comment.topic.forum.forum_type != 'discussion':
         return
@@ -200,7 +203,6 @@ def comment_reaction_created_or_updated(instance, **kwargs):
 
         # Increase the unread count for this user in 1
         # unread_notification_increment(one_user)
-
 
 def topic_viewed(request, topic):
     # Todo test detail views

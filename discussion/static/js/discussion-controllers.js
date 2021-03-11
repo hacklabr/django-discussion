@@ -10,12 +10,15 @@
 
             $scope.forum = {}
             $scope.topics = {}
+            $scope.list_tags = []
             $scope.search = {txt:""}
+            $scope.search_topic = {txt:""}
             // Pagination Params
             $scope.forum_pages_max_number = 20;
             $scope.forum_topics_page = 20;
             $scope.forum.page_size = 20;
-            $scope.forum.current_page = 1
+            $scope.forum.current_page = 1;
+            $scope.load_page = 1;
 
             if(forum_id) {
                 singleInit();
@@ -31,6 +34,12 @@
                     $scope.forums = [];
                     $scope.forum = forum;
                     $scope.topics.current_page = 1;
+                    angular.forEach(forum.topics , function(topics) {
+                        angular.forEach(topics.tags , function(tags) {
+                            $scope.list_tags.push(tags);
+                        });
+                    });
+                  
                     $scope.forum.page = TopicPage.get({
                         page: 1,
                         page_size: $scope.forum_topics_page,
@@ -40,6 +49,7 @@
                             $scope.forum.topics = page.results;
                             $scope.forum_topics_total = page.count;
                             $scope.topics_loaded = true;
+                            $scope.has_next_page = page.next !== null;
                         },
                         function(err){
                             console.log("Erro ao carregar os tópicos");
@@ -114,6 +124,77 @@
                 );
             }
 
+            $scope.filtersChanged = function(type, value){
+                if (type === 'clean') {
+                    if (value === 'tag')
+                        $scope.tags = null;
+                    if (value === 'cat')
+                        $scope.category = null;
+                    if (!value) {
+                        $scope.tags = null;
+                        $scope.category = null;
+                    }
+                }
+
+                TopicPage.get({
+                    forum: forum_id,
+                    search: $scope.search_topic.txt,  
+                    tag: $scope.tags ? $scope.tags.id : null,
+                    category: $scope.category ? $scope.category.id : null,
+                    page: 1,
+                    page_size: $scope.forum_topics_page,
+                    ordering: '-last_activity_at'},
+                    function(page){
+                        $scope.forum.topics = page.results;
+                        $scope.forum_topics_total = page.count;
+                        $scope.topics_loaded = true;
+                        $scope.has_next_page = page.next !== null;
+                });  
+            };
+
+            $scope.loadMore = () => {
+                $scope.load_page += 1;
+
+                TopicPage.get({
+                    forum: forum_id,
+                    search: $scope.search_topic.txt,  
+                    tag: $scope.tags ? $scope.tags.id : null,
+                    category: $scope.category ? $scope.category.id : null,
+                    page: $scope.load_page,
+                    page_size: $scope.forum_topics_page,
+                    ordering: '-last_activity_at'},
+                    function(page){
+                        console.log("estou aqui")
+                        let results = $scope.forum.topics.concat(page.results)
+                        $scope.forum.topics = results;
+                        $scope.forum_topics_total = page.count;
+                        $scope.topics_loaded = true;
+                        $scope.has_next_page = page.next !== null;
+                });
+            };
+
+            $scope.getResultsTopic = function(txt) {
+                $scope.current_search = txt;
+
+                TopicPage.get({
+                    forum: forum_id,
+                    search: txt !== '' ? txt : null,  
+                    tag: $scope.tags ? $scope.tags.id : null,
+                    category: $scope.category ? $scope.category.id : null,
+                    page: 1,
+                    ordering: '-last_activity_at',
+                    page_size: $scope.forum_topics_page,
+                    ignoreLoadingBar: true},
+                    function(page){
+                        $scope.forums.topics = [];
+                        $scope.forum.topics = page.results;
+                        $scope.forum_topics_total = page.count;
+                        $scope.topics_loaded = true;
+                        // $scope.forum_search = true;
+                        $scope.forum_single = true;
+                        $scope.has_next_page = page.next !== null;
+                    });
+            };
 
             // Pagination controls
             $scope.topicPageChanged = function(){

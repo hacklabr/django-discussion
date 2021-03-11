@@ -262,6 +262,26 @@ class TopicViewSet(viewsets.ModelViewSet):
 class TopicPageViewSet(TopicViewSet):
     pagination_class = TopicPagination
 
+    def get_queryset(self):
+        queryset = super(TopicPageViewSet, self).get_queryset()
+
+        category = self.request.query_params.get('category', None)
+        tag = self.request.query_params.get('tag', None)
+        search = self.request.query_params.get('search', None)
+
+        if search:
+                queryset = queryset.filter(
+                    Q(title__icontains=search) |
+                    Q(content__icontains=search))
+                    
+        if category:
+            queryset = queryset.filter(Q(categories__id=category))
+
+        if tag:
+            queryset = queryset.filter(Q(tags__id=tag))
+
+        return queryset
+
 
 class TopicReadViewSet(viewsets.ModelViewSet):
     queryset = TopicRead.objects.all()

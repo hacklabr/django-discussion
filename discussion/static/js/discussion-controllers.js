@@ -26,8 +26,21 @@
                 normalInit();
             }
 
-            function singleInit() {
-                Forum.get({id: forum_id}, (forum) => {
+            $scope.ForumCourse = function(forum){
+                if (forum) {
+                    var forum_current = window.location.pathname.split('/')[4]
+                    singleInit(forum_current);
+                }
+            }
+
+            function singleInit(id) {
+                var forum_current = forum_id;
+                
+                if (id) {
+                    forum_current = id;
+                }
+
+                Forum.get({id: forum_current}, (forum) => {
                     $scope.filters = undefined;
                     $scope.forum_search = false;
                     $scope.forum_single = true;
@@ -43,7 +56,7 @@
                     $scope.forum.page = TopicPage.get({
                         page: 1,
                         page_size: $scope.forum_topics_page,
-                        forum: forum_id,
+                        forum: forum_current,
                         ordering: '-last_activity_at'},
                         function(page){
                             $scope.forum.topics = page.results;
@@ -358,7 +371,18 @@
 
 //            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
-            $scope.save_topic = function() {
+            $scope.NewForumCourse = function(forum){
+                if (forum) {
+                    var forum = window.location.pathname.split('/')[4] 
+                    Forum.get({id:forum}, function(t) {
+                        $scope.list_categories = t.category;
+                        $scope.selected_forum = t;
+                        $scope.new_topic.forum = t.id;
+                    });
+                }   
+            }
+
+            $scope.save_topic = function(type) {
                 $scope.sending = true;
                 $scope.new_topic.forum = $scope.selected_forum.id;
                 $scope.new_topic.categories = [$scope.category];
@@ -371,8 +395,13 @@
                             topic.files.push(comment_file_complete);
                         });
                     })
+                    if (type === 'course') {
+                        window.location.href = window.location.pathname.replace("new_topic", "topic/" + topic.id);
+                    } else
+                    {
                     var url = '/discussion/topic/#!/topic/'+topic.id;
                     $window.location.href = url;
+                    }
                 });
             }
 
@@ -447,10 +476,29 @@
             $scope.topic_pinned = false;
             $scope.user = CurrentUser;
 
-            $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
+            if ($routeParams.topicId) {
+                singleInit();
+            } 
+            
+            $scope.TopicCourse = function(topic_id){
+                var topic = window.location.pathname.split('/')[6];
+                singleInit(topic);
+            }
+
+            function singleInit(topic_id) {
+                var topic_current = $routeParams.topicId;
+                
+                if (topic_id) {
+                    topic_current = topic_id;
+                }
+
+                Topic.get({id: topic_current}, (topic) => {
                 // Mark topic as read
-                if (topic.categories.length > 0)
+                    $scope.topic = topic;
+
+                    if (topic.categories.length > 0) {
                     $scope.category_id = $scope.topic.categories[0].id;
+                    }
 
                 var topic_read = new TopicRead();
                 topic_read.topic = topic.id;
@@ -458,7 +506,7 @@
                 topic_read.$save();
 
                 //Filter the topics from Forum
-                Forum.get({id:$scope.topic.forum}, function(t) {
+                Forum.get({id: topic.forum}, function(t) {
                     $scope.forum_categories = t.category;
                     
                     let filteredGroups = t.groups_ids.filter(value => $scope.user.groups_ids.includes(value));
@@ -474,6 +522,7 @@
                 $scope.fatal_error = true;
                 $scope.error_message = error.data.message;
             });
+            };
 
 //            uiTinymceConfig.automatic_uploads = true;
 

@@ -19,7 +19,7 @@ from .serializers import (BasicForumSerializer, CategorySerializer, ForumSeriali
                                     CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
 from .models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead, ForumFile)
-
+from courses.models import Course, Forum
 
 from .forms import ForumForm
 from .permissions import IsTopicAuthor, IsCommentAuthor, IsForumAuthor
@@ -30,6 +30,34 @@ class ForumView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ForumView, self).get_context_data(**kwargs)
+        return context
+
+
+class ForumCourseView(views.LoginRequiredMixin, TemplateView):
+    template_name = 'forum-course.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ForumCourseView, self).get_context_data(**kwargs)
+        course = Course.objects.get(slug=context['slug'])
+        context['course'] = course
+        return context
+
+class ForumTopicView(views.LoginRequiredMixin, TemplateView):
+    template_name = 'forum-course-topic.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ForumTopicView, self).get_context_data(**kwargs)
+        course = Course.objects.get(slug=context['slug'])
+        context['course'] = course
+        return context
+
+class ForumNewTopicView(views.LoginRequiredMixin, TemplateView):
+    template_name = 'forum-course-new-topic.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ForumNewTopicView, self).get_context_data(**kwargs)
+        course = Course.objects.get(slug=context['slug'])
+        context['course'] = course
         return context
 
 

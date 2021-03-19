@@ -26,6 +26,7 @@ class Forum(models.Model):
     TYPE_CHOICES = (
         ('discussion', _('Discussion')),
         ('activity', _('Activity')),
+        ('course', _('Course')),
     )
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, verbose_name=_('User'), blank=True, null=True)

@@ -19,17 +19,26 @@
             $scope.forum.page_size = 20;
             $scope.forum.current_page = 1;
             $scope.load_page = 1;
+            $scope.has_forum = true;
+
+            $scope.ForumCourse = function(forum){
+                if (forum) {
+                    var forum_current = $location.absUrl().split('/')[6];
+
+                    if (forum_current === '#!') {
+                        $scope.has_forum = false;
+                    }
+                    else {
+                        singleInit(forum_current);
+                    }  
+                }
+            }
 
             if(forum_id) {
                 singleInit();
             } else {
-                normalInit();
-            }
-
-            $scope.ForumCourse = function(forum){
-                if (forum) {
-                    var forum_current = window.location.pathname.split('/')[4]
-                    singleInit(forum_current);
+                if ($location.absUrl().split('/')[3] !== "course") {
+                    normalInit();
                 }
             }
 
@@ -177,7 +186,6 @@
                     page_size: $scope.forum_topics_page,
                     ordering: '-last_activity_at'},
                     function(page){
-                        console.log("estou aqui")
                         let results = $scope.forum.topics.concat(page.results)
                         $scope.forum.topics = results;
                         $scope.forum_topics_total = page.count;
@@ -373,7 +381,7 @@
 
             $scope.NewForumCourse = function(forum){
                 if (forum) {
-                    var forum = window.location.pathname.split('/')[4] 
+                    var forum = $location.absUrl().split('/')[6]
                     Forum.get({id:forum}, function(t) {
                         $scope.list_categories = t.category;
                         $scope.selected_forum = t;
@@ -481,7 +489,7 @@
             } 
             
             $scope.TopicCourse = function(topic_id){
-                var topic = window.location.pathname.split('/')[6];
+                var topic = $location.absUrl().split('/')[8];
                 singleInit(topic);
             }
 

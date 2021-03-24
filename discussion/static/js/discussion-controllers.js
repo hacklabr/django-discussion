@@ -21,24 +21,24 @@
             $scope.load_page = 1;
             $scope.has_forum = true;
 
-            $scope.ForumCourse = function(forum){
-                if (forum) {
-                    var forum_current = $location.absUrl().split('/')[6];
-
-                    if (forum_current === '#!') {
-                        $scope.has_forum = false;
-                    }
-                    else {
-                        singleInit(forum_current);
-                    }  
-                }
-            }
-
             if(forum_id) {
                 singleInit();
             } else {
                 if ($location.absUrl().split('/')[3] !== "course") {
                     normalInit();
+                }
+            }
+            
+            $scope.ForumCourse = function(forum){
+                if (forum) {
+                    var forum_current = $location.absUrl().split('/')[6];
+
+                    if (forum_current === '#!' || !forum_current) {
+                        $scope.has_forum = false;
+                    }
+                    else {
+                        singleInit(forum_current);
+                    }  
                 }
             }
 

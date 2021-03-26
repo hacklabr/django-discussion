@@ -19,15 +19,37 @@
             $scope.forum.page_size = 20;
             $scope.forum.current_page = 1;
             $scope.load_page = 1;
+            $scope.has_forum = true;
 
             if(forum_id) {
                 singleInit();
             } else {
-                normalInit();
+                if ($location.absUrl().split('/')[3] !== "course") {
+                    normalInit();
+                }
+            }
+            
+            $scope.ForumCourse = function(forum){
+                if (forum) {
+                    var forum_current = $location.absUrl().split('/')[6];
+
+                    if (forum_current === '#!' || !forum_current) {
+                        $scope.has_forum = false;
+                    }
+                    else {
+                        singleInit(forum_current);
+                    }  
+                }
             }
 
-            function singleInit() {
-                Forum.get({id: forum_id}, (forum) => {
+            function singleInit(id) {
+                var forum_current = forum_id;
+                
+                if (id) {
+                    forum_current = id;
+                }
+
+                Forum.get({id: forum_current}, (forum) => {
                     $scope.filters = undefined;
                     $scope.forum_search = false;
                     $scope.forum_single = true;
@@ -43,7 +65,7 @@
                     $scope.forum.page = TopicPage.get({
                         page: 1,
                         page_size: $scope.forum_topics_page,
-                        forum: forum_id,
+                        forum: forum_current,
                         ordering: '-last_activity_at'},
                         function(page){
                             $scope.forum.topics = page.results;
@@ -164,7 +186,6 @@
                     page_size: $scope.forum_topics_page,
                     ordering: '-last_activity_at'},
                     function(page){
-                        console.log("estou aqui")
                         let results = $scope.forum.topics.concat(page.results)
                         $scope.forum.topics = results;
                         $scope.forum_topics_total = page.count;
@@ -358,7 +379,18 @@
 
 //            uiTinymceConfig.images_upload_handler = ContentFile.upload;
 
-            $scope.save_topic = function() {
+            $scope.NewForumCourse = function(forum){
+                if (forum) {
+                    var forum = $location.absUrl().split('/')[6]
+                    Forum.get({id:forum}, function(t) {
+                        $scope.list_categories = t.category;
+                        $scope.selected_forum = t;
+                        $scope.new_topic.forum = t.id;
+                    });
+                }   
+            }
+
+            $scope.save_topic = function(type) {
                 $scope.sending = true;
                 $scope.new_topic.forum = $scope.selected_forum.id;
                 $scope.new_topic.categories = [$scope.category];
@@ -371,8 +403,13 @@
                             topic.files.push(comment_file_complete);
                         });
                     })
+                    if (type === 'course') {
+                        window.location.href = window.location.pathname.replace("new_topic", "topic/" + topic.id);
+                    } else
+                    {
                     var url = '/discussion/topic/#!/topic/'+topic.id;
                     $window.location.href = url;
+                    }
                 });
             }
 
@@ -447,10 +484,29 @@
             $scope.topic_pinned = false;
             $scope.user = CurrentUser;
 
-            $scope.topic = Topic.get({id: $routeParams.topicId}, function(topic){
+            if ($routeParams.topicId) {
+                singleInit();
+            } 
+            
+            $scope.TopicCourse = function(topic_id){
+                var topic = $location.absUrl().split('/')[8];
+                singleInit(topic);
+            }
+
+            function singleInit(topic_id) {
+                var topic_current = $routeParams.topicId;
+                
+                if (topic_id) {
+                    topic_current = topic_id;
+                }
+
+                Topic.get({id: topic_current}, (topic) => {
                 // Mark topic as read
-                if (topic.categories.length > 0)
+                    $scope.topic = topic;
+
+                    if (topic.categories.length > 0) {
                     $scope.category_id = $scope.topic.categories[0].id;
+                    }
 
                 var topic_read = new TopicRead();
                 topic_read.topic = topic.id;
@@ -458,7 +514,7 @@
                 topic_read.$save();
 
                 //Filter the topics from Forum
-                Forum.get({id:$scope.topic.forum}, function(t) {
+                Forum.get({id: topic.forum}, function(t) {
                     $scope.forum_categories = t.category;
                     
                     let filteredGroups = t.groups_ids.filter(value => $scope.user.groups_ids.includes(value));
@@ -474,6 +530,7 @@
                 $scope.fatal_error = true;
                 $scope.error_message = error.data.message;
             });
+            };
 
 //            uiTinymceConfig.automatic_uploads = true;
 

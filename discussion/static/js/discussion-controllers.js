@@ -31,8 +31,7 @@
             
             $scope.ForumCourse = function(forum){
                 if (forum) {
-                    var forum_current = $location.absUrl().split('/')[7];
-
+                    var forum_current = $location.absUrl().split('/')[6];
                     if (forum_current === '#!' || !forum_current) {
                         $scope.has_forum = false;
                     }
@@ -381,7 +380,7 @@
 
             $scope.NewForumCourse = function(forum){
                 if (forum) {
-                    var forum = $location.absUrl().split('/')[7]
+                    var forum = $location.absUrl().split('/')[6]
                     Forum.get({id:forum}, function(t) {
                         $scope.list_categories = t.category;
                         $scope.selected_forum = t;
@@ -489,7 +488,7 @@
             } 
             
             $scope.TopicCourse = function(topic_id){
-                var topic = $location.absUrl().split('/')[9];
+                var topic = $location.absUrl().split('/')[8];
                 singleInit(topic);
             }
 

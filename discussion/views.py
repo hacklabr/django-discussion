@@ -250,13 +250,17 @@ class TopicViewSet(viewsets.ModelViewSet):
 
         # Test if the queryset must be of activities topics or regular ones
         activity = self.request.query_params.get('activity', None)
+        course = self.request.query_params.get('course', None)
         if activity:
             queryset = queryset.filter(forum__forum_type='activity')
             exclude_cur_user = self.request.query_params.get('exclude_cur_user', None)
             if exclude_cur_user:
                 queryset = queryset.exclude(author=self.request.user)
         else:
-            queryset = queryset.filter(forum__forum_type='discussion')
+            if course:
+                queryset = queryset.filter(forum__forum_type__in=['discussion', 'course'])
+            else:
+                queryset = queryset.filter(forum__forum_type='discussion')
             if not self.request.user.is_superuser:
                 queryset = queryset.filter(
                     Q(forum__is_public=True) |

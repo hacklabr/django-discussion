@@ -20,6 +20,7 @@
             $scope.forum.current_page = 1;
             $scope.load_page = 1;
             $scope.has_forum = true;
+            $scope.has_course = false;
 
             if(forum_id) {
                 singleInit();
@@ -37,6 +38,7 @@
                     }
                     else {
                         singleInit(forum_current);
+                        $scope.has_course = true;
                     }  
                 }
             }
@@ -65,7 +67,8 @@
                         page: 1,
                         page_size: $scope.forum_topics_page,
                         forum: forum_current,
-                        ordering: '-last_activity_at'},
+                        ordering: '-last_activity_at',
+                        course: $scope.has_course ? true : null},
                         function(page){
                             $scope.forum.topics = page.results;
                             $scope.forum_topics_total = page.count;
@@ -178,6 +181,27 @@
 
                 TopicPage.get({
                     forum: forum_id,
+                    search: $scope.search_topic.txt,  
+                    tag: $scope.tags ? $scope.tags.id : null,
+                    category: $scope.category ? $scope.category.id : null,
+                    page: $scope.load_page,
+                    page_size: $scope.forum_topics_page,
+                    ordering: '-last_activity_at'},
+                    function(page){
+                        let results = $scope.forum.topics.concat(page.results)
+                        $scope.forum.topics = results;
+                        $scope.forum_topics_total = page.count;
+                        $scope.topics_loaded = true;
+                        $scope.has_next_page = page.next !== null;
+                });
+            };
+
+            $scope.loadMoreCourse = () => {
+                $scope.load_page += 1;
+                var forum = $location.absUrl().split('/')[6]
+                
+                TopicPage.get({
+                    forum: forum,
                     search: $scope.search_topic.txt,  
                     tag: $scope.tags ? $scope.tags.id : null,
                     category: $scope.category ? $scope.category.id : null,

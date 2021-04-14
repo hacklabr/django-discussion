@@ -25,14 +25,23 @@
             if(forum_id) {
                 singleInit();
             } else {
-                if ($location.absUrl().split('/')[3] !== "course") {
+                var path_forum = $location.absUrl();
+                if (path_forum.split('/')[3] !== "course" && path_forum.split('/')[4] !== "course") {
                     normalInit();
                 }
             }
             
             $scope.ForumCourse = function(forum){
                 if (forum) {
-                    var forum_current = $location.absUrl().split('/')[6];
+                    var forum_current = $location.absUrl();
+
+                    if (forum_current.split('/')[3] === "legacy") {
+                        forum_current = forum_current.split('/')[7];
+                    }
+                    else {
+                        forum_current = forum_current.split('/')[6];
+                    }
+                  
                     if (forum_current === '#!' || !forum_current) {
                         $scope.has_forum = false;
                     }
@@ -198,8 +207,15 @@
 
             $scope.loadMoreCourse = () => {
                 $scope.load_page += 1;
-                var forum = $location.absUrl().split('/')[6]
-                
+                var forum = $location.absUrl();
+
+                    if (forum.split('/')[3] === "legacy") {
+                        forum = forum.split('/')[7];
+                    }
+                    else {
+                        forum = forum.split('/')[6];
+                    }
+
                 TopicPage.get({
                     forum: forum,
                     search: $scope.search_topic.txt,  
@@ -404,7 +420,15 @@
 
             $scope.NewForumCourse = function(forum){
                 if (forum) {
-                    var forum = $location.absUrl().split('/')[6]
+                    var forum = $location.absUrl();
+
+                    if (forum.split('/')[3] === "legacy") {
+                        forum = forum.split('/')[7];
+                    }
+                    else {
+                        forum = forum.split('/')[6];
+                    }
+
                     Forum.get({id:forum}, function(t) {
                         $scope.list_categories = t.category;
                         $scope.selected_forum = t;
@@ -512,7 +536,15 @@
             } 
             
             $scope.TopicCourse = function(topic_id){
-                var topic = $location.absUrl().split('/')[8];
+                var topic = $location.absUrl();
+
+                if (topic.split('/')[3] === "legacy") {
+                    topic = topic.split('/')[9];
+                }
+                else {
+                    topic = topic.split('/')[8];
+                }
+
                 singleInit(topic);
             }
 

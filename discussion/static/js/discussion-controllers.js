@@ -677,6 +677,8 @@
 
                 // Send the comment data to be saved by the API
                 comment.$save().then(function(comment) {
+                    $scope.topic.count_replies +=1;
+
                     angular.forEach(files, function(comment_file) {
                         comment_file.comment = comment.id;
                         delete comment_file.file;

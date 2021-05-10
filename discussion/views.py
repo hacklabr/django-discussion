@@ -16,7 +16,7 @@ from braces import views
 from .serializers import (BasicForumSerializer, CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer,
                                     TopicSerializer, CommentSerializer, ContentFileSerializer,
                                     TagSerializer, TopicNotificationSerializer, TopicLikeSerializer, ForumFileSerializer,
-                                    CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer)
+                                    CommentLikeSerializer, TopicFileSerializer, CommentFileSerializer, ForumPageSerializer)
 from .models import (Category, Forum, Topic, Comment, Tag, TopicNotification, TopicLike,
                                CommentLike, TopicFile, CommentFile, ContentFile, TopicRead, ForumFile)
 from courses.models import Course, Forum
@@ -159,6 +159,7 @@ class ForumPagination(PageNumberPagination):
 
 class ForumPageViewSet(ForumViewSet):
     pagination_class = ForumPagination
+    serializer_class = ForumPageSerializer
 
 
 class ForumSearchViewSet(viewsets.ReadOnlyModelViewSet):

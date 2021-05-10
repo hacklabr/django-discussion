@@ -100,18 +100,43 @@ class ForumSerializer(serializers.ModelSerializer):
             categories = request.query_params.getlist('categories', None)
             if categories:
                 queryset = queryset.filter(categories__id__in=categories)
-            tags = request.query_params.getlist('tags', None)
-            if tags:
-                queryset = queryset.filter(tags__id__in=tags)
+            #tags = request.query_params.getlist('tags', None)
+            #if tags:
+            #    queryset = queryset.filter(tags__id__in=tags)
 
             queryset = queryset.select_related('author')
             queryset = queryset.prefetch_related('categories', 'tags', 'forum')
 
             # only exec the query if any filter is present
-            if categories or tags:
+            #if categories or tags:
+            if categories:
                 return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at'), many=True, **{'context': self.context}).data
             else:
                 return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at')[:5], many=True, **{'context': self.context}).data
+
+
+class ForumPageSerializer(ForumSerializer):
+
+    class Meta:
+        model = Forum
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'forum_type', 'topics')
+
+    def get_topics(self, obj):
+        request = self.context.get('request')
+        if request:
+            queryset = Topic.objects.filter(forum=obj)
+            categories = request.query_params.getlist('categories', None)
+            if categories:
+                queryset = queryset.filter(categories__id__in=categories)
+
+            queryset = queryset.select_related('author')
+            queryset = queryset.prefetch_related('categories')
+
+            # only exec the query if any filter is present
+            if categories:
+                return SimpleTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at'), many=True, **{'context': self.context}).data
+            else:
+                return SimpleTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
 
 class BasicForumSerializer(ForumSerializer):
@@ -363,7 +388,7 @@ class BaseTopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
         fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
-                  'files', 'hidden_by', 'tags', 'categories', 'comments', 'count_likes', 'count_uses', 'count_replies', 'last_activity_at',
+                  'files', 'hidden_by', 'categories', 'comments', 'count_likes', 'count_uses', 'count_replies', 'last_activity_at',
                   'forum', 'read', 'is_pinned')
         depth = 1
 
@@ -376,6 +401,16 @@ class BaseTopicSerializer(serializers.ModelSerializer):
         except TopicRead.DoesNotExist:
             # If there is no instance, the topic is not read yet
             return False
+
+
+class SimpleTopicSerializer(BaseTopicSerializer):
+
+    class Meta:
+        model = Topic
+        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
+                  'hidden_by', 'categories', 'count_likes', 'count_uses', 'count_replies', 'last_activity_at',
+                  'read', 'is_pinned')
+        depth = 1
 
 
 class TopicLikeSerializer(serializers.ModelSerializer):

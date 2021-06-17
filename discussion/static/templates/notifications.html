@@ -1,9 +1,9 @@
 <ul class="notifications-list">
     <li class="notifications-item" ng-show="!notifications_ready">
-        <span class="info">Carregando notificações&hellip;</span>
+        <span class="info" translate>Loading notifications...</span>
     </li>
     <li class="notifications-item" ng-show="parsed_notifications.length === 0 && notifications_ready">
-        <span class="info">Sem notificações</span>
+        <span class="info" translate>No notifications</span>
     </li>
     <notification-item ng-repeat="notification in parsed_notifications | orderBy : 'date' : true">
         <li class="notifications-item" ng-class="{'not-read': notification.is_read===false }">

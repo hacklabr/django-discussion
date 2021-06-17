@@ -9,8 +9,8 @@ from courses_notifications.models import unread_notification_increment
 def comment_created_or_updated(instance, **kwargs):
     action.send(instance.author, verb='created comment', action_object=instance.topic, target=instance.topic.forum)
 
-    if instance.topic.forum.forum_type != 'discussion':
-        return
+    # if instance.topic.forum.forum_type == 'activity':
+    #    return
     # if this comment was just updated, no notifications must be sent
     if kwargs['created'] is False:
         return
@@ -96,8 +96,8 @@ def comment_created_or_updated(instance, **kwargs):
 def topic_reaction_created_or_updated(instance, **kwargs):
     action.send(instance.user, verb='reacted', action_object=instance.topic, target=instance.topic.forum)
 
-    if instance.topic.forum.forum_type != 'discussion':
-        return
+    # if instance.topic.forum.forum_type == 'activity':
+    #    return
 
     # Users that must be notified
     users = []
@@ -143,8 +143,8 @@ def topic_reaction_created_or_updated(instance, **kwargs):
 def comment_reaction_created_or_updated(instance, **kwargs):
     action.send(instance.user, verb='reacted', action_object=instance.comment.topic, target=instance.comment.topic.forum)
 
-    if instance.comment.topic.forum.forum_type != 'discussion':
-        return
+    # if instance.comment.topic.forum.forum_type != 'activity':
+    #    return
     # Users that must be notified
     users = []
 

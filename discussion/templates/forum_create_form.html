@@ -42,13 +42,13 @@
   </script>
   <div class="page container-fluid">
     <header class="page-header">
-      <h2>Novo fórum</h2>
+      <h2 translate>New forum</h2>
     </header>
     <form action="" method="post" class="forum-admin">
       {% csrf_token %}
       <div class="row">
         <div class="col-xs-12 col-md-3">
-          <label>Título</label>
+          <label translate>Title</label>
         </div>
         <div class="col-xs-12 col-md-9">
           {{ form.title }}
@@ -59,7 +59,7 @@
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-3">
-          <label>Texto</label>
+          <label translate>Text</label>
         </div>
         <div class="col-xs-12 col-md-9">
           {{ form.text }}
@@ -80,7 +80,7 @@
       -->
       <div class="row">
         <div class="col-xs-12 col-md-3">
-          <label>Grupos de usuário</label>
+          <label translate>User groups</label>
         </div>
         <div class="col-xs-12 col-md-9">
           {{ form.groups }}
@@ -91,13 +91,13 @@
       </div>
       <div class="row">
         <div class="col-xs-12 col-md-3">
-          <label>Tornar público</label>
+          <label translate>Make it public</label>
         </div>
         <div class="col-xs-12 col-md-9">
           {{ form.is_public }}
         </div>
       </div>
-      <input type="submit" class="btn btn-primary" value="Criar fórum"/>
+      <input type="submit" class="btn btn-primary pull-right" {%verbatim%}value="{{'Criar fórum' | translate}}"{%endverbatim%}/>
     </form>
   </div>
 {% endblock %}

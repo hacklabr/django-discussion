@@ -26,8 +26,8 @@
 {% block content %}
   <div class="page container-fluid forum-admin forum-list">
     <header class="page-header">
-      <div class="pull-right"><a class="btn btn-primary add" href="/discussion/admin/forum-create">novo fórum</a></div>
-      <h2>Lista de Fóruns</h2>
+      <div class="pull-right"><a class="btn btn-primary add" href="/discussion/admin/forum-create" translate>New forum</a></div>
+      <h2 translate>Forums' list</h2>
     </header>
     {% for forum in object_list %}
       <div class="row">
@@ -35,8 +35,8 @@
           <span><a href="/discussion/#!/forum/{{ forum.id }}">{{ forum.title }}</a></span>
         </div>
         <div class="col-xs-12 col-sm-5 actions">
-          <a class="btn btn-primary edit" href="{% url 'discussion:forum-update' forum.id %}">Editar</a>
-          <a class="btn btn-danger delete" href="{% url 'discussion:forum-delete' forum.id %}">Remover</a>
+          <a class="btn btn-primary edit" href="{% url 'discussion:forum-update' forum.id %}" translate>Edit</a>
+          <a class="btn btn-danger delete" href="{% url 'discussion:forum-delete' forum.id %}" translate>Delete</a>
         </div>
       </div>
     {% empty %}

@@ -25,12 +25,12 @@
 {% block content %}
   <div class="page container-fluid">
     <header class="page-header">
-      <h2>Remover fórum</h2>
+      <h2 translate>Delete forum</h2>
     </header>
-<form action="" method="post">{% csrf_token %}
-    <p>Você tem certeza de que quer remover "{{ object }}"?</p>
-    <input class="btn btn-primary" type="submit" value="Confirmar" />
-</form>
+    <form action="" method="post"  class="forum-admin">{% csrf_token %}
+      <p><span translate>Are you sure you want to remove</span> "{{ object }}"?</p>
+      <input class="btn btn-primary pull-right" type="submit" {%verbatim%}value="{{'Confirm'|translate}}"{%endverbatim%} />
+    </form>
   </div>
 {% endblock %}
 

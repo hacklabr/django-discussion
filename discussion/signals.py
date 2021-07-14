@@ -62,7 +62,7 @@ def comment_created_or_updated(instance, **kwargs):
                 users.append(react.user)
 
     # Remove the original author from the notifications list
-    users = [user for user in users if user != instance.author]
+    users = list(set([user for user in users if user != instance.author]))
 
     # Create (or update) the nedded notifications
     for one_user in users:
@@ -115,7 +115,7 @@ def topic_reaction_created_or_updated(instance, **kwargs):
         users.append(react.user)
 
     # Remove the original reaction author from the notifications list
-    users = [user for user in users if user != instance.user]
+    users = list(set([user for user in users if user != instance.user]))
 
     # Create (or update) the nedded notifications
     for one_user in users:
@@ -179,7 +179,7 @@ def comment_reaction_created_or_updated(instance, **kwargs):
             users.append(react.user)
 
     # Remove the original author from the notifications list
-    users = [user for user in users if user != instance.user]
+    users = list(set([user for user in users if user != instance.user]))
 
     # Create (or update) the nedded notifications
     for one_user in users:

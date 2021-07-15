@@ -73,14 +73,14 @@ def send_emails(users, notif_type, notif_author, notif_topic, notif_forum):
         message_es = Template(et.template).render(Context({'message': message_es}))
         send(bcc_es, message_es, subject_es, email_batch_size)
 
-        email_info_pt_br = get_email_info('en', notif_type)
+        email_info_pt_br = get_email_info('pt_br', notif_type)
         subject_pt_br = email_info_pt_br['subject']
         message_pt_br = email_info_pt_br['content'].format(notif_author, notif_topic, notif_forum)
         subject_pt_br = Template(et.subject).render(Context({'subject': subject_pt_br}))
         message_pt_br = Template(et.template).render(Context({'message': message_pt_br}))
         send(bcc_pt_br, message_pt_br, subject_pt_br, email_batch_size)
 
-        email_info_en = get_email_info('pt_br', notif_type)
+        email_info_en = get_email_info('en', notif_type)
         subject_en = email_info_en['subject']
         message_en = email_info_en['content'].format(notif_author, notif_topic, notif_forum)
         subject_en = Template(et.subject).render(Context({'subject': subject_en}))

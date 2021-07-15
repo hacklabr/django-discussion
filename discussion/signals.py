@@ -13,33 +13,32 @@ from courses.models import EmailTemplate
 import re
 
 
+def get_email_info(lang, notif_type):
+    email_info = {'subject': '', 'content': ''}
 
-def get_notification_description(lang, notification_type):
-    notification_description = ''
+    if notif_type == 'comment':
+        if lang == 'es':
+            email_info = {'subject': 'Nuevo Comentario', 'content': '{} comentó sobre el tema {} en el foro {}'}
+        elif lang == 'pt_br':
+            email_info = {'subject': 'New Comment', 'content': '{} comentou no tópico {} no fórum {}'}
+        elif lang == 'en':
+            email_info = {'subject': 'Novo Comentário', 'content': '{} comment on topic {} in forum {}'}
+    elif notif_type == 'comment_reaction':
+        if lang == 'es':
+            email_info = {'subject': 'Reacción al comentario', 'content': 'A {} le gustó un comentario en el tema {} del foro {}'}
+        elif lang == 'pt_br':
+            email_info = {'subject': 'Comment Reaction', 'content': '{} gostou de um comentário no tópico {} no fórum {}'}
+        elif lang == 'en':
+            email_info = {'subject': 'Reação ao comentário', 'content': '{} liked a comment at topic {} in forum {}'}
+    elif notif_type == 'topic_reaction':
+        if lang == 'es':
+            email_info = {'subject': 'Reacción al tema', 'content': 'A {} le gustó el tema {} en el foro {}'}
+        elif lang == 'pt_br':
+            email_info = {'subject': 'Topic Reaction', 'content': '{} gostou do tópico {} no fórum {}'}
+        elif lang == 'en':
+            email_info = {'subject': 'Reação aoa tópico', 'content': '{} liked the topic {} in forum {}'}
 
-    if notification_type == 'comment':
-        if lang == 'es':
-            notification_description = "{} comentó sobre el tema {} en el foro {}"
-        elif lang == 'pt_br':
-            notification_description = "{} comentou no tópico {} no fórum {}"
-        elif lang == 'en':
-            notification_description = "{} comment on topic {} in forum {}"
-    elif notification_type == 'comment_reaction':
-        if lang == 'es':
-            notification_description = "A {} le gustó el comentario {} en el foro {}"
-        elif lang == 'pt_br':
-            notification_description = "{} gostou do comentário {} no fórum {}"
-        elif lang == 'en':
-            notification_description = "{} liked the comment {} in forum {}"
-    elif notification_type == 'topic_reaction':
-        if lang == 'es':
-            notification_description = "A {} le gustó el tema {} en el foro {}"
-        elif lang == 'pt_br':
-            notification_description = "{} gostou do tópico {} no fórum {}"
-        elif lang == 'en':
-            notification_description = "{} liked the topic {} in forum {}"
-
-    return notification_description
+    return email_info
 
 def send(bcc, message, subject, email_batch_size):
     # Iterate over the bcc list to send emails in chunks
@@ -49,16 +48,16 @@ def send(bcc, message, subject, email_batch_size):
     while start < len(bcc):
         email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL,
                              [settings.DEFAULT_FROM_EMAIL, ], bcc[start:end])
-        email.content_subtype = "html"
+        email.content_subtype = 'html'
         email.send()
         start = end
         end = min(end + email_batch_size, len(bcc))
 
-def send_emails(users, event, notification_description):
+def send_emails(users, notif_type, notif_author, notif_topic, notif_forum):
     try:
         et = EmailTemplate.objects.get(name='notification')
     except EmailTemplate.DoesNotExist:
-        et = EmailTemplate(name='notification', subject="{{subject}}", template="{{message|safe}}")
+        et = EmailTemplate(name='notification', subject='{{subject}}', template='{{message|safe}}')
 
     email_batch_size = settings.PROFESSOR_MESSAGE_CHUNK_SIZE
 
@@ -67,20 +66,23 @@ def send_emails(users, event, notification_description):
         bcc_pt_br = [u.email for u in users if u.is_active and re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", u.email) and u.preferred_language == 'pt-br']
         bcc_en = [u.email for u in users if u.is_active and re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", u.email) and u.preferred_language == 'en']
 
-        subject_es = event
-        message_es = notification_description
+        email_info_es = get_email_info('es', notif_type)
+        subject_es = email_info_es['subject']
+        message_es = email_info_es['content'].format(notif_author, notif_topic, notif_forum)
         subject_es = Template(et.subject).render(Context({'subject': subject_es}))
         message_es = Template(et.template).render(Context({'message': message_es}))
         send(bcc_es, message_es, subject_es, email_batch_size)
 
-        subject_pt_br = event
-        message_pt_br = notification_description
+        email_info_pt_br = get_email_info('en', notif_type)
+        subject_pt_br = email_info_pt_br['subject']
+        message_pt_br = email_info_pt_br['content'].format(notif_author, notif_topic, notif_forum)
         subject_pt_br = Template(et.subject).render(Context({'subject': subject_pt_br}))
         message_pt_br = Template(et.template).render(Context({'message': message_pt_br}))
         send(bcc_pt_br, message_pt_br, subject_pt_br, email_batch_size)
 
-        subject_en = event
-        message_en = notification_description
+        email_info_en = get_email_info('pt_br', notif_type)
+        subject_en = email_info_en['subject']
+        message_en = email_info_en['content'].format(notif_author, notif_topic, notif_forum)
         subject_en = Template(et.subject).render(Context({'subject': subject_en}))
         message_en = Template(et.template).render(Context({'message': message_en}))
         send(bcc_en, message_en, subject_en, email_batch_size)
@@ -169,13 +171,10 @@ def comment_created_or_updated(instance, **kwargs):
         unread_notification_increment(one_user)
 
 
-    from django.utils.translation import get_language
-    lang = get_language()
-    notif_author = instance.author
+    notif_author = instance.author.first_name or instance.author.username
     notif_topic = instance.topic.title
     notif_forum = instance.topic.forum.title
-    notification_description = get_notification_description("comment", lang).format(notif_author, notif_topic, notif_forum)
-    send_emails(users, "New Comment", notification_description)
+    send_emails(users, "comment", notif_author, notif_topic, notif_forum)
 
     coment_revision = CommentHistory()
     coment_revision.create_or_update_revision(instance=instance)
@@ -229,13 +228,10 @@ def topic_reaction_created_or_updated(instance, **kwargs):
         # Increase the unread count for this user in 1
         unread_notification_increment(one_user)
 
-    from django.utils.translation import get_language
-    lang = get_language()
-    notif_author = instance.user
+    notif_author = instance.user.first_name or instance.user.username
     notif_topic = instance.topic.title
     notif_forum = instance.topic.forum.title
-    notification_description = get_notification_description("topic_reaction", lang).format(notif_author, notif_topic, notif_forum)
-    send_emails(users, "Topic Reaction", notification_description)
+    send_emails(users, "topic_reaction", notif_author, notif_topic, notif_forum)
 
 @receiver(post_save, sender=CommentLike)
 def comment_reaction_created_or_updated(instance, **kwargs):
@@ -302,13 +298,10 @@ def comment_reaction_created_or_updated(instance, **kwargs):
         # Increase the unread count for this user in 1
         unread_notification_increment(one_user)
 
-    from django.utils.translation import get_language
-    lang = get_language()
-    notif_author = instance.user
+    notif_author = instance.user.first_name or instance.user.username
     notif_topic = instance.comment.topic.title
     notif_forum = instance.comment.topic.forum.title
-    notification_description = get_notification_description("comment_reaction", lang).format(notif_author, notif_topic, notif_forum)
-    send_emails(users, "Comment Reaction", notification_description)
+    send_emails(users, "comment_reaction", notif_author, notif_topic, notif_forum)
 
 def topic_viewed(request, topic):
     # Todo test detail views

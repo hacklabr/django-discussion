@@ -1,8 +1,91 @@
 from actstream import action
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
+from django.template import Template, Context
+from django.core.mail import EmailMessage
+
 from discussion.models import Comment, CommentHistory, TopicNotification, TopicLike, TopicUse, CommentLike
 from courses_notifications.models import unread_notification_increment
+from courses.models import EmailTemplate
+
+import re
+
+
+def get_email_info(lang, notif_type):
+    email_info = {'subject': '', 'content': ''}
+
+    if notif_type == 'comment':
+        if lang == 'es':
+            email_info = {'subject': 'Nuevo Comentario', 'content': '{} comentó sobre el tema {} en el foro {}'}
+        elif lang == 'pt_br':
+            email_info = {'subject': 'New Comment', 'content': '{} comentou no tópico {} no fórum {}'}
+        elif lang == 'en':
+            email_info = {'subject': 'Novo Comentário', 'content': '{} comment on topic {} in forum {}'}
+    elif notif_type == 'comment_reaction':
+        if lang == 'es':
+            email_info = {'subject': 'Reacción al comentario', 'content': 'A {} le gustó un comentario en el tema {} del foro {}'}
+        elif lang == 'pt_br':
+            email_info = {'subject': 'Comment Reaction', 'content': '{} gostou de um comentário no tópico {} no fórum {}'}
+        elif lang == 'en':
+            email_info = {'subject': 'Reação ao comentário', 'content': '{} liked a comment at topic {} in forum {}'}
+    elif notif_type == 'topic_reaction':
+        if lang == 'es':
+            email_info = {'subject': 'Reacción al tema', 'content': 'A {} le gustó el tema {} en el foro {}'}
+        elif lang == 'pt_br':
+            email_info = {'subject': 'Topic Reaction', 'content': '{} gostou do tópico {} no fórum {}'}
+        elif lang == 'en':
+            email_info = {'subject': 'Reação aoa tópico', 'content': '{} liked the topic {} in forum {}'}
+
+    return email_info
+
+def send(bcc, message, subject, email_batch_size):
+    # Iterate over the bcc list to send emails in chunks
+    # Maximum chunk size is email_batch_size
+    start = 0
+    end = min(email_batch_size, len(bcc))
+    while start < len(bcc):
+        email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL,
+                             [settings.DEFAULT_FROM_EMAIL, ], bcc[start:end])
+        email.content_subtype = 'html'
+        email.send()
+        start = end
+        end = min(end + email_batch_size, len(bcc))
+
+def send_emails(users, notif_type, notif_author, notif_topic, notif_forum):
+    try:
+        et = EmailTemplate.objects.get(name='notification')
+    except EmailTemplate.DoesNotExist:
+        et = EmailTemplate(name='notification', subject='{{subject}}', template='{{message|safe}}')
+
+    email_batch_size = settings.PROFESSOR_MESSAGE_CHUNK_SIZE
+
+    if settings.I18N_SUPPORT:
+        bcc_es = [u.email for u in users if u.is_active and re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", u.email) and u.preferred_language == 'es']
+        bcc_pt_br = [u.email for u in users if u.is_active and re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", u.email) and u.preferred_language == 'pt-br']
+        bcc_en = [u.email for u in users if u.is_active and re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", u.email) and u.preferred_language == 'en']
+
+        email_info_es = get_email_info('es', notif_type)
+        subject_es = email_info_es['subject']
+        message_es = email_info_es['content'].format(notif_author, notif_topic, notif_forum)
+        subject_es = Template(et.subject).render(Context({'subject': subject_es}))
+        message_es = Template(et.template).render(Context({'message': message_es}))
+        send(bcc_es, message_es, subject_es, email_batch_size)
+
+        email_info_pt_br = get_email_info('en', notif_type)
+        subject_pt_br = email_info_pt_br['subject']
+        message_pt_br = email_info_pt_br['content'].format(notif_author, notif_topic, notif_forum)
+        subject_pt_br = Template(et.subject).render(Context({'subject': subject_pt_br}))
+        message_pt_br = Template(et.template).render(Context({'message': message_pt_br}))
+        send(bcc_pt_br, message_pt_br, subject_pt_br, email_batch_size)
+
+        email_info_en = get_email_info('pt_br', notif_type)
+        subject_en = email_info_en['subject']
+        message_en = email_info_en['content'].format(notif_author, notif_topic, notif_forum)
+        subject_en = Template(et.subject).render(Context({'subject': subject_en}))
+        message_en = Template(et.template).render(Context({'message': message_en}))
+        send(bcc_en, message_en, subject_en, email_batch_size)
 
 
 @receiver(post_save, sender=Comment)
@@ -62,7 +145,7 @@ def comment_created_or_updated(instance, **kwargs):
                 users.append(react.user)
 
     # Remove the original author from the notifications list
-    users = [user for user in users if user != instance.author]
+    users = list(set([user for user in users if user != instance.author]))
 
     # Create (or update) the nedded notifications
     for one_user in users:
@@ -86,6 +169,12 @@ def comment_created_or_updated(instance, **kwargs):
 
         # Increase the unread count for this user in 1
         unread_notification_increment(one_user)
+
+
+    notif_author = instance.author.first_name or instance.author.username
+    notif_topic = instance.topic.title
+    notif_forum = instance.topic.forum.title
+    send_emails(users, "comment", notif_author, notif_topic, notif_forum)
 
     coment_revision = CommentHistory()
     coment_revision.create_or_update_revision(instance=instance)
@@ -115,7 +204,7 @@ def topic_reaction_created_or_updated(instance, **kwargs):
         users.append(react.user)
 
     # Remove the original reaction author from the notifications list
-    users = [user for user in users if user != instance.user]
+    users = list(set([user for user in users if user != instance.user]))
 
     # Create (or update) the nedded notifications
     for one_user in users:
@@ -138,6 +227,11 @@ def topic_reaction_created_or_updated(instance, **kwargs):
 
         # Increase the unread count for this user in 1
         unread_notification_increment(one_user)
+
+    notif_author = instance.user.first_name or instance.user.username
+    notif_topic = instance.topic.title
+    notif_forum = instance.topic.forum.title
+    send_emails(users, "topic_reaction", notif_author, notif_topic, notif_forum)
 
 @receiver(post_save, sender=CommentLike)
 def comment_reaction_created_or_updated(instance, **kwargs):
@@ -179,7 +273,7 @@ def comment_reaction_created_or_updated(instance, **kwargs):
             users.append(react.user)
 
     # Remove the original author from the notifications list
-    users = [user for user in users if user != instance.user]
+    users = list(set([user for user in users if user != instance.user]))
 
     # Create (or update) the nedded notifications
     for one_user in users:
@@ -202,7 +296,12 @@ def comment_reaction_created_or_updated(instance, **kwargs):
         notification.save()
 
         # Increase the unread count for this user in 1
-        # unread_notification_increment(one_user)
+        unread_notification_increment(one_user)
+
+    notif_author = instance.user.first_name or instance.user.username
+    notif_topic = instance.comment.topic.title
+    notif_forum = instance.comment.topic.forum.title
+    send_emails(users, "comment_reaction", notif_author, notif_topic, notif_forum)
 
 def topic_viewed(request, topic):
     # Todo test detail views

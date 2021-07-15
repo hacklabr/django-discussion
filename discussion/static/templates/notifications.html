@@ -10,7 +10,7 @@
           <discussion ng-if="notification.action !== 'new_activity'">
               <span class="icon"><img ng-src="{{notification.user.image || '/static/img/avatar-default.png'}}"></span>
               <span class="info"><b><a ng-href="#!/profile/{{ notification.user.username}}">
-                {{notification.user.first_name || notification.topic.author.username}}</a></b>
+                {{notification.user.first_name || notification.user.username}}</a></b>
                  <span>{{(notification.action | actionFilter) | translate}}</span>
                   <span translate>topic</span> <a ng-href="/discussion/topic/#!/topic/{{notification.topic.id}}/">{{notification.topic.title}}</a>
                   <span translate>in forum</span> <a href="/discussion/#!/forum/{{notification.forum.id}}">{{notification.forum.title}}</a></span>

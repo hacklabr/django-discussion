@@ -61,7 +61,7 @@ def send_emails(users, notif_type, notif_author, topic, forum):
         et = EmailTemplate(name='notification', subject='{{subject}}', template='{{message|safe}}')
 
     email_batch_size = settings.PROFESSOR_MESSAGE_CHUNK_SIZE
-    origin = settings.DJANGO_SITE_DOMAIN | ''
+    origin = 'https://' + settings.SITE_DOMAIN
 
     if settings.I18N_SUPPORT:
         bcc_es = [u.email for u in users if u.is_active and re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", u.email) and u.preferred_language == 'es']
@@ -70,7 +70,7 @@ def send_emails(users, notif_type, notif_author, topic, forum):
 
         email_info_es = get_email_info('es', notif_type)
         subject_es = email_info_es['subject']
-        message_es = email_info_es['content'].format(notif_author, topic.title_es | topic.title, forum.name_es | forum.name)
+        message_es = email_info_es['content'].format(notif_author, topic.title_es or topic.title, forum.title_es or forum.title)
         message_es += '\nPuede acceder al tema mencionado en {}/#!/topic/{}'.format(origin, topic.id)
         subject_es = Template(et.subject).render(Context({'subject': subject_es}))
         message_es = Template(et.template).render(Context({'message': message_es}))
@@ -78,7 +78,7 @@ def send_emails(users, notif_type, notif_author, topic, forum):
 
         email_info_pt_br = get_email_info('pt_br', notif_type)
         subject_pt_br = email_info_pt_br['subject']
-        message_pt_br = email_info_pt_br['content'].format(notif_author, topic.title_pt_br | topic.title, forum.name_pt_br | forum.name)
+        message_pt_br = email_info_pt_br['content'].format(notif_author, topic.title_pt_br or topic.title, forum.title_pt_br or forum.title)
         message_pt_br += '\nVocê pode acessar o tópico mencionado em {}/#!/topic/{}'.format(origin, topic.id)
         subject_pt_br = Template(et.subject).render(Context({'subject': subject_pt_br}))
         message_pt_br = Template(et.template).render(Context({'message': message_pt_br}))
@@ -86,7 +86,7 @@ def send_emails(users, notif_type, notif_author, topic, forum):
 
         email_info_en = get_email_info('en', notif_type)
         subject_en = email_info_en['subject']
-        message_en = email_info_en['content'].format(notif_author, topic.title_en | topic.title, forum.name_en | forum.name)
+        message_en = email_info_en['content'].format(notif_author, topic.title_en or topic.title, forum.title_en or forum.title)
         message_en += '\nYou can acess the mentioned topic at {}/#!/topic/{}'.format(origin, topic.id)
         subject_en = Template(et.subject).render(Context({'subject': subject_en}))
         message_en = Template(et.template).render(Context({'message': message_en}))
@@ -234,8 +234,8 @@ def topic_reaction_created_or_updated(instance, **kwargs):
         unread_notification_increment(one_user)
 
     notif_author = instance.user.first_name or instance.user.username
-    topic = instance.topic.title
-    forum = instance.topic.forum.title
+    topic = instance.topic
+    forum = instance.topic.forum
     send_emails(users, "topic_reaction", notif_author, topic, forum)
 
 @receiver(post_save, sender=CommentLike)
@@ -304,8 +304,8 @@ def comment_reaction_created_or_updated(instance, **kwargs):
         unread_notification_increment(one_user)
 
     notif_author = instance.user.first_name or instance.user.username
-    topic = instance.comment.topic.title
-    forum = instance.comment.topic.forum.title
+    topic = instance.comment.topic
+    forum = instance.comment.topic.forum
     send_emails(users, "comment_reaction", notif_author, topic, forum)
 
 def topic_viewed(request, topic):

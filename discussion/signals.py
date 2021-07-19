@@ -20,23 +20,23 @@ def get_email_info(lang, notif_type):
         if lang == 'es':
             email_info = {'subject': 'Nuevo Comentario', 'content': '{} comentó sobre el tema {} en el foro {}'}
         elif lang == 'pt_br':
-            email_info = {'subject': 'New Comment', 'content': '{} comentou no tópico {} no fórum {}'}
+            email_info = {'subject': 'Novo Comentário', 'content': '{} comentou no tópico {} no fórum {}'}
         elif lang == 'en':
-            email_info = {'subject': 'Novo Comentário', 'content': '{} commented on topic {} in forum {}'}
+            email_info = {'subject': 'New Comment', 'content': '{} commented on topic {} in forum {}'}
     elif notif_type == 'comment_reaction':
         if lang == 'es':
             email_info = {'subject': 'Reacción al comentario', 'content': 'A {} le gustó un comentario en el tema {} del foro {}'}
         elif lang == 'pt_br':
-            email_info = {'subject': 'Comment Reaction', 'content': '{} gostou de um comentário no tópico {} no fórum {}'}
+            email_info = {'subject': 'Reação ao comentário', 'content': '{} gostou de um comentário no tópico {} no fórum {}'}
         elif lang == 'en':
-            email_info = {'subject': 'Reação ao comentário', 'content': '{} liked a comment at topic {} in forum {}'}
+            email_info = {'subject': 'Comment Reaction', 'content': '{} liked a comment at topic {} in forum {}'}
     elif notif_type == 'topic_reaction':
         if lang == 'es':
             email_info = {'subject': 'Reacción al tema', 'content': 'A {} le gustó el tema {} en el foro {}.'}
         elif lang == 'pt_br':
-            email_info = {'subject': 'Topic Reaction', 'content': '{} gostou do tópico {} no fórum {}.'}
+            email_info = {'subject': 'Reação ao tópico', 'content': '{} gostou do tópico {} no fórum {}.'}
         elif lang == 'en':
-            email_info = {'subject': 'Reação aoa tópico', 'content': '{} liked the topic {} in forum {}.'}
+            email_info = {'subject': 'Topic Reaction', 'content': '{} liked the topic {} in forum {}.'}
 
     return email_info
 
@@ -77,13 +77,13 @@ def send_emails(users, notif_type, notif_author, topic, forum, instance):
         comment_text = ''
         if notif_type == "comment" or notif_type == "comment_reaction":
             text = instance.text if notif_type == 'comment' else instance.comment.text
-            comment_text = ':\n\n"{}"\n'.format(cleanhtml(text))
+            comment_text = ':<br>"{}"<br>'.format(cleanhtml(text))
 
         email_info_es = get_email_info('es', notif_type)
         subject_es = email_info_es['subject']
         message_es = email_info_es['content'].format(notif_author, topic.title, forum.title)
         message_es += comment_text
-        message_es += '\nPuede acceder al tema mencionado en {}/#!/topic/{}'.format(origin, topic.id)
+        message_es += '<br>Puede acceder al tema mencionado en {}/#!/topic/{}'.format(origin, topic.id)
         subject_es = Template(et.subject).render(Context({'subject': subject_es}))
         message_es = Template(et.template).render(Context({'message': message_es}))
         send(bcc_es, message_es, subject_es, email_batch_size)
@@ -92,7 +92,7 @@ def send_emails(users, notif_type, notif_author, topic, forum, instance):
         subject_pt_br = email_info_pt_br['subject']
         message_pt_br = email_info_pt_br['content'].format(notif_author, topic.title, forum.title)
         message_pt_br += comment_text
-        message_pt_br += '\nVocê pode acessar o tópico mencionado em {}/#!/topic/{}'.format(origin, topic.id)
+        message_pt_br += '<br>Você pode acessar o tópico mencionado em {}/#!/topic/{}'.format(origin, topic.id)
         subject_pt_br = Template(et.subject).render(Context({'subject': subject_pt_br}))
         message_pt_br = Template(et.template).render(Context({'message': message_pt_br}))
         send(bcc_pt_br, message_pt_br, subject_pt_br, email_batch_size)
@@ -101,7 +101,7 @@ def send_emails(users, notif_type, notif_author, topic, forum, instance):
         subject_en = email_info_en['subject']
         message_en = email_info_en['content'].format(notif_author, topic.title, forum.title)
         message_en += comment_text
-        message_en += '\nYou can acess the mentioned topic at {}/#!/topic/{}'.format(origin, topic.id)
+        message_en += '<br>You can acess the mentioned topic at {}/#!/topic/{}'.format(origin, topic.id)
         subject_en = Template(et.subject).render(Context({'subject': subject_en}))
         message_en = Template(et.template).render(Context({'message': message_en}))
         send(bcc_en, message_en, subject_en, email_batch_size)

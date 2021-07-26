@@ -169,9 +169,6 @@ class TopicRead(models.Model):
     def __str__(self):
         return self.topic.title + " " + self.user.username + " " + str(self.is_read)
 
-    class Meta:
-        unique_together = ('user', 'topic')
-
 
 class Comment(BasePost):
     parent = models.ForeignKey('self',
@@ -203,22 +200,13 @@ class Reaction(models.Model):
 class TopicUse(Reaction):
     topic = models.ForeignKey(Topic, models.CASCADE, related_name='uses')
 
-    class Meta:
-        unique_together = ('user', 'topic')
-
 
 class TopicLike(Reaction):
     topic = models.ForeignKey(Topic, models.CASCADE, related_name='likes')
 
-    class Meta:
-        unique_together = ('user', 'topic')
-
 
 class CommentLike(Reaction):
     comment = models.ForeignKey(Comment, models.CASCADE, related_name='likes')
-
-    class Meta:
-        unique_together = ('user', 'comment')
 
 
 class TopicNotification(models.Model):
@@ -245,7 +233,6 @@ class TopicNotification(models.Model):
     is_active = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('user', 'topic')
         ordering = ['-date', '-pk']
         verbose_name = _("topic notification")
         verbose_name_plural = _("topics notification")

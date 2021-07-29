@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.contrib.auth.models import Group
+from django.db.models import Q
 
 from discussion.models import (Category, Forum, Topic, Comment, Tag, ForumFile,
                                TopicNotification, TopicLike, TopicRead,
@@ -71,7 +72,6 @@ class ForumFileSerializer(serializers.ModelSerializer):
 
 
 class ForumSerializer(serializers.ModelSerializer):
-
     author = BaseUserSerializer(read_only=True)
     latest_topics = serializers.SerializerMethodField()
     topics = serializers.SerializerMethodField()
@@ -125,6 +125,12 @@ class ForumPageSerializer(ForumSerializer):
         request = self.context.get('request')
         if request:
             queryset = Topic.objects.filter(forum=obj)
+            search = request.query_params.get('search', None)
+            if search:
+                queryset = queryset.filter(
+                    Q(title__icontains=search) |
+                    Q(content__icontains=search)
+                )
             categories = request.query_params.getlist('categories', None)
             if categories:
                 queryset = queryset.filter(categories__id__in=categories)

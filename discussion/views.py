@@ -132,6 +132,14 @@ class ForumViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_superuser:
             queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
 
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(topics__title__icontains=search) |
+                Q(topics__content__icontains=search)
+            )
+
         queryset = queryset.distinct()
         queryset = queryset.select_related('author')
         return queryset.prefetch_related('topics', 'category')
@@ -303,10 +311,11 @@ class TopicPageViewSet(TopicViewSet):
         search = self.request.query_params.get('search', None)
 
         if search:
-                queryset = queryset.filter(
-                    Q(title__icontains=search) |
-                    Q(content__icontains=search))
-                    
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(content__icontains=search)
+            )
+
         if category:
             queryset = queryset.filter(Q(categories__id=category))
 

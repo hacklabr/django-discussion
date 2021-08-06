@@ -168,18 +168,11 @@ def comment_created_or_updated(instance, **kwargs):
 
     # Create (or update) the nedded notifications
     for one_user in users:
-        # Check if the current user already has a pending notification for this topic
-        try:
-            notification = TopicNotification.objects.get(
-                user=one_user,
-                topic=instance.topic,
-            )
-        except TopicNotification.DoesNotExist:
-            notification = TopicNotification.objects.create(
-                user=one_user,
-                topic=instance.topic,
-                comment=instance,
-            )
+        notification = TopicNotification.objects.create(
+            user=one_user,
+            topic=instance.topic,
+            comment=instance,
+        )
 
         notification.action = 'new_comment'
         notification.comment = instance
@@ -227,17 +220,10 @@ def topic_reaction_created_or_updated(instance, **kwargs):
 
     # Create (or update) the nedded notifications
     for one_user in users:
-        # Check if the current user already has a pending notification for this topic
-        try:
-            notification = TopicNotification.objects.get(
-                user=one_user,
-                topic=instance.topic,
-            )
-        except TopicNotification.DoesNotExist:
-            notification = TopicNotification.objects.create(
-                user=one_user,
-                topic=instance.topic,
-            )
+        notification = TopicNotification.objects.create(
+            user=one_user,
+            topic=instance.topic,
+        )
 
         notification.action = 'new_reaction'
         notification.is_read = False
@@ -296,17 +282,10 @@ def comment_reaction_created_or_updated(instance, **kwargs):
 
     # Create (or update) the nedded notifications
     for one_user in users:
-        # Check if the current user already has a pending notification for this comment
-        try:
-            notification = TopicNotification.objects.get(
-                user=one_user,
-                topic=instance.comment.topic,
-            )
-        except TopicNotification.DoesNotExist:
-            notification = TopicNotification.objects.create(
-                user=one_user,
-                topic=instance.comment.topic,
-            )
+        notification = TopicNotification.objects.create(
+            user=one_user,
+            topic=instance.comment.topic,
+        )
 
         notification.comment = instance.comment
         notification.action = 'new_reaction_comment'

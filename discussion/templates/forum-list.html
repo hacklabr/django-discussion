@@ -32,7 +32,7 @@
     {% for forum in object_list %}
       <div class="row">
         <div class="col-xs-12 col-sm-7">
-          <span><a href="/discussion/#!/forum/{{ forum.id }}">{{ forum.title }}</a></span>
+          <span><a href="/#!/forum/{{ forum.id }}">{{ forum.title }}</a></span>
         </div>
         <div class="col-xs-12 col-sm-5 actions">
           <a class="btn btn-primary edit" href="{% url 'discussion:forum-update' forum.id %}" translate>Edit</a>

@@ -116,6 +116,26 @@ class CategoryViewSet(viewsets.ModelViewSet):
     #     return self.request.user.accounts.all()
 
 
+class CategoryPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+
+class CategoryPageViewSet(CategoryViewSet):
+    pagination_class = CategoryPagination
+
+    def get_queryset(self):
+        queryset = super(CategoryPageViewSet, self).get_queryset()
+        queryset.order_by('id')
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(Q(name__icontains=search))
+
+        print('ESTE QUERY', queryset)
+        return queryset
+
+
 class ForumViewSet(viewsets.ModelViewSet):
     """
     """

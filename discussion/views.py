@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework import filters
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -23,7 +23,6 @@ from courses.models import Course, Forum
 
 from .forms import ForumForm
 from .permissions import IsTopicAuthor, IsCommentAuthor, IsForumAuthor
-
 
 class ForumView(TemplateView):
     template_name = 'forum.html'
@@ -110,7 +109,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     # def get_queryset(self):
     #     return self.request.user.accounts.all()
@@ -132,7 +131,6 @@ class CategoryPageViewSet(CategoryViewSet):
         if search:
             queryset = queryset.filter(Q(name__icontains=search))
 
-        print('ESTE QUERY', queryset)
         return queryset
 
 

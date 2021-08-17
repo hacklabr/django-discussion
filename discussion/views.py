@@ -107,7 +107,7 @@ class ForumDeleteView(views.LoginRequiredMixin,
 class CategoryViewSet(viewsets.ModelViewSet):
     """
     """
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('name')
     serializer_class = CategorySerializer
     permission_classes = [IsAdminUser]
 
@@ -126,7 +126,6 @@ class CategoryPageViewSet(CategoryViewSet):
 
     def get_queryset(self):
         queryset = super(CategoryPageViewSet, self).get_queryset()
-        queryset.order_by('id')
         search = self.request.query_params.get('search', None)
         if search:
             queryset = queryset.filter(Q(name__icontains=search))

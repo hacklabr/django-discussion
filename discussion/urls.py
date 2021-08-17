@@ -8,7 +8,8 @@ from discussion.views import (
     ContentFileViewSet, ForumCreateView, ForumDeleteView, ForumFileViewSet,
     ForumListView, ForumSearchViewSet, ForumUpdateView, ForumView, ForumViewSet,
     TagViewSet, TopicFileViewSet, TopicLikeViewSet, TopicNotificationViewSet,
-    TopicPageViewSet, TopicReadViewSet, TopicTypeaheadViewSet, TopicViewSet, ForumPageViewSet
+    TopicPageViewSet, TopicReadViewSet, TopicTypeaheadViewSet, TopicViewSet, ForumPageViewSet,
+    CategoryPageViewSet
 )
 
 from rest_framework import routers
@@ -17,7 +18,8 @@ from rest_framework import routers
 app_name = 'discussion'
 
 router = routers.SimpleRouter(trailing_slash=False)
-router.register(r'category', BasicForumViewSet)
+router.register(r'category', CategoryViewSet)
+router.register(r'category_page', CategoryPageViewSet)
 router.register(r'forum', ForumViewSet) 
 router.register(r'basic_forum', BasicForumViewSet)
 router.register(r'forum_page', ForumPageViewSet)

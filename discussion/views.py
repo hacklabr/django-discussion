@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework import filters
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -23,7 +23,6 @@ from courses.models import Course, Forum
 
 from .forms import ForumForm
 from .permissions import IsTopicAuthor, IsCommentAuthor, IsForumAuthor
-
 
 class ForumView(TemplateView):
     template_name = 'forum.html'
@@ -108,12 +107,30 @@ class ForumDeleteView(views.LoginRequiredMixin,
 class CategoryViewSet(viewsets.ModelViewSet):
     """
     """
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('name')
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     # def get_queryset(self):
     #     return self.request.user.accounts.all()
+
+
+class CategoryPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+
+class CategoryPageViewSet(CategoryViewSet):
+    pagination_class = CategoryPagination
+
+    def get_queryset(self):
+        queryset = super(CategoryPageViewSet, self).get_queryset()
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(Q(name__icontains=search))
+
+        return queryset
 
 
 class ForumViewSet(viewsets.ModelViewSet):

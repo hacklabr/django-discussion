@@ -83,7 +83,7 @@ def send_emails(users, notif_type, notif_author, topic, forum, instance):
         subject_es = email_info_es['subject']
         message_es = email_info_es['content'].format(notif_author, topic.title, forum.title)
         message_es += comment_text
-        message_es += '<br>Puede acceder al tema mencionado en {}/#!/topic/{}'.format(origin, topic.id)
+        message_es += '<br>Puede Inicia sesiónl tema mencionado en {}/#!/topic/{}'.format(origin, topic.id)
         subject_es = Template(et.subject).render(Context({'subject': subject_es}))
         message_es = Template(et.template).render(Context({'message': message_es}))
         send(bcc_es, message_es, subject_es, email_batch_size)

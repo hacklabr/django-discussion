@@ -412,7 +412,9 @@
             $scope.categories = Category.query();
             $scope.tags = Tag.query();
             $scope.new_topic = new Topic();
+            $scope.category = new Category();
             $scope.pinned = false;
+            $scope.new_category_open = false;
 
             $scope.user = CurrentUser;
 
@@ -437,6 +439,15 @@
                 }   
             }
 
+            $scope.save_category = function() {
+                $scope.sending = true;
+                $scope.category.name = $scope.category.name_en;
+                $scope.category.description = $scope.category.description_en;
+                $scope.category.$save(function(category){
+                    $window.location.reload(true);
+                });
+            }
+
             $scope.save_topic = function(type) {
                 $scope.sending = true;
                 $scope.new_topic.forum = $scope.selected_forum.id;
@@ -454,7 +465,7 @@
                         window.location.href = window.location.pathname.replace("new_topic", "topic/" + topic.id);
                     } else
                     {
-                    var url = '/discussion/topic/#!/topic/'+topic.id;
+                    var url = '/topic/#!/topic/'+topic.id;
                     $window.location.href = url;
                     }
                 });
@@ -530,6 +541,7 @@
 
             $scope.topic_pinned = false;
             $scope.user = CurrentUser;
+            $scope.categories = Category.query();
 
             if ($routeParams.topicId) {
                 singleInit();
@@ -570,7 +582,7 @@
 
                 //Filter the topics from Forum
                 Forum.get({id: topic.forum}, function(t) {
-                    $scope.forum_categories = t.category;
+                    $scope.forum_categories = $scope.categories;
                     
                     let filteredGroups = t.groups_ids.filter(value => $scope.user.groups_ids.includes(value));
                     if(filteredGroups.length > 0) {

@@ -31,6 +31,7 @@
     function TopicCtrl ($scope, $stateParams, $sce, $location, $anchorScroll, Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
         $scope.topic_pinned = false;
         $scope.user = CurrentUser;
+        $scope.categories = Category.query();
 
         $scope.topic = Topic.get({id: $stateParams.topicId}, function(topic){
             // Mark topic as read
@@ -44,7 +45,7 @@
 
             //Filter the topics from Forum
             Forum.get({id:$scope.topic.forum}, function(t) {
-                $scope.forum_categories = t.category;
+                $scope.forum_categories = $scope.categories;
 
                 let filteredGroups = t.groups_ids.filter(value => $scope.user.groups_ids.includes(value));
                 if(filteredGroups.length > 0) {

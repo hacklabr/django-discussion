@@ -262,9 +262,10 @@ class TopicViewSet(viewsets.ModelViewSet):
         # Mark the last notification relative to the current topic-user pair as read
         # The following operation is in a try-except block to account for the unlikely case where the user has never recieved a notification about the current topic. This is possible for new users.
         try:
-            notification = TopicNotification.objects.get(topic=topic, user=request.user)
-            notification.is_read = True
-            notification.save(skip_date=True)
+            notifications = TopicNotification.objects.filter(topic=topic, user=request.user)
+            for notification in notifications:
+                notification.is_read = True
+                notification.save(skip_date=True)
         except TopicNotification.DoesNotExist:
             # There isn't a topic notification associated to the current topic-user pair
             pass

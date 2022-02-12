@@ -81,15 +81,12 @@ class ForumListView(views.LoginRequiredMixin,
 
     def get_queryset(self):
         queryset = super(ForumListView, self).get_queryset()
-        no_course_id = []
-        for forum in queryset:
-            course = Course.objects.filter(forum=forum.id)
-            if forum.forum_type == 'course' and not course:
-                no_course_id.append(forum.id)
+        
+        queryset = queryset.filter(
+            Q(forum_type='discussion') | (Q(forum_type='course') & Q(course=None)),
+        )
 
-        queryset = queryset.filter(Q(forum_type='discussion') | Q(id__in=no_course_id))
-
-        return queryset.distinct()
+        return queryset
 
 
 class ForumUpdateView(views.LoginRequiredMixin,

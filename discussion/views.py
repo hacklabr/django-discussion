@@ -12,6 +12,7 @@ from django.urls import reverse_lazy
 from django_filters.rest_framework import DjangoFilterBackend
 from braces import views
 
+from datetime import datetime
 
 from .serializers import (BasicForumSerializer, CategorySerializer, ForumSerializer, ForumSearchSerializer, TopicSearchSerializer,
                                     TopicSerializer, CommentSerializer, ContentFileSerializer,
@@ -151,6 +152,23 @@ class ForumViewSet(viewsets.ModelViewSet):
         queryset = queryset.order_by('id')
         if not self.request.user.is_superuser:
             queryset = queryset.filter(Q(is_public=True) | Q(groups__in=self.request.user.groups.all()))
+
+        # Remove Foruns of type course with no course associated, 
+        # in draft or that has not started
+        now = datetime.now().date()
+        queryset = queryset.exclude(
+            Q(forum_type='course') & (
+                Q(course=None) |
+                Q(course__status='draft') |
+                Q(course__start_date__gt=datetime.now().date())
+            )
+        )
+
+        # Remove foruns of type activity, we don't want then on any user
+        # visible list, only inside its specific activity
+        queryset = queryset.exclude(
+            Q(forum_type='activity'),
+        )
 
         search = self.request.query_params.get('search', None)
         if search:

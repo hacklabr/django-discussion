@@ -74,25 +74,18 @@ class ForumFileSerializer(serializers.ModelSerializer):
 
 class ForumSerializer(serializers.ModelSerializer):
     author = BaseUserSerializer(read_only=True)
-    latest_topics = serializers.SerializerMethodField()
     topics = serializers.SerializerMethodField()
     files = ForumFileSerializer(many=True, read_only=True)
     groups_ids = serializers.SerializerMethodField()
 
     class Meta:
         model = Forum
-        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'latest_topics', 'forum_type', 'topics', 'files', 'groups_ids',)
+        fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'forum_type', 'topics', 'files', 'groups_ids',)
         depth = 1
     
     def get_groups_ids(self, obj):
         groups = obj.groups.all().values_list('id', flat=True)
         return groups
-
-    def get_latest_topics(self, obj):
-        queryset = Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5]
-        queryset = queryset.select_related('author')
-        queryset = queryset.prefetch_related('categories', 'tags', 'forum')
-        return BaseTopicSerializer(Topic.objects.filter(forum=obj).order_by('-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
     def get_topics(self, obj):
         request = self.context.get("request")
@@ -110,10 +103,11 @@ class ForumSerializer(serializers.ModelSerializer):
 
             # only exec the query if any filter is present
             #if categories or tags:
-            if categories:
-                return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at'), many=True, **{'context': self.context}).data
-            else:
+            latest_topics = request.query_params.getlist('latest_topics', None)
+            if latest_topics:
                 return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at')[:5], many=True, **{'context': self.context}).data
+            else:
+                return BaseTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at'), many=True, **{'context': self.context}).data
 
 
 class ForumPageSerializer(ForumSerializer):

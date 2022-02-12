@@ -90,7 +90,15 @@ class ForumSerializer(serializers.ModelSerializer):
     def get_topics(self, obj):
         request = self.context.get("request")
         if request:
-            queryset = Topic.objects.filter(forum=obj)
+            queryset = obj.topics.all()
+
+            search = request.query_params.get('search', None)
+            if search:
+                queryset = queryset.filter(
+                    Q(title__icontains=search) |
+                    Q(content__icontains=search)
+                )
+
             categories = request.query_params.getlist('categories', None)
             if categories:
                 queryset = queryset.filter(categories__id__in=categories)
@@ -115,29 +123,6 @@ class ForumPageSerializer(ForumSerializer):
     class Meta:
         model = Forum
         fields = ('id', 'title', 'text', 'slug', 'timestamp', 'is_public', 'author', 'category', 'forum_type', 'topics')
-
-    def get_topics(self, obj):
-        request = self.context.get('request')
-        if request:
-            queryset = Topic.objects.filter(forum=obj)
-            search = request.query_params.get('search', None)
-            if search:
-                queryset = queryset.filter(
-                    Q(title__icontains=search) |
-                    Q(content__icontains=search)
-                )
-            categories = request.query_params.getlist('categories', None)
-            if categories:
-                queryset = queryset.filter(categories__id__in=categories)
-
-            queryset = queryset.select_related('author')
-            queryset = queryset.prefetch_related('categories')
-
-            # only exec the query if any filter is present
-            if categories:
-                return SimpleTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at'), many=True, **{'context': self.context}).data
-            else:
-                return SimpleTopicSerializer(queryset.order_by('-is_pinned', '-last_activity_at')[:5], many=True, **{'context': self.context}).data
 
 
 class BasicForumSerializer(ForumSerializer):

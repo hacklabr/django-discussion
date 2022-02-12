@@ -7,6 +7,7 @@ from discussion.models import (Category, Forum, Topic, Comment, Tag, ForumFile,
                                TopicNotification, TopicLike, TopicRead,
                                CommentLike, TopicFile, CommentFile, ContentFile)
 
+
 class BaseUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()

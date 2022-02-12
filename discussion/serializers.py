@@ -341,30 +341,6 @@ class TopicSerializer(serializers.ModelSerializer):
             # If there is no instance, the topic is not read yet
             return False
 
-class BaseTopicSerializer(serializers.ModelSerializer):
-
-    read = serializers.SerializerMethodField()
-    author = BaseUserSerializer(read_only=True)
-    files = TopicFileSerializer(many=True, read_only=True)
-    is_pinned = serializers.BooleanField(read_only=True)
-
-    class Meta:
-        model = Topic
-        fields = ('id', 'created_at', 'updated_at', 'is_hidden', 'slug', 'title', 'content', 'is_public', 'author',
-                  'files', 'hidden_by', 'categories', 'comments', 'count_likes', 'count_uses', 'count_replies', 'last_activity_at',
-                  'forum', 'read', 'is_pinned')
-        depth = 1
-
-    def get_read(self, obj):
-        request = self.context.get("request")
-        # If there is a TopicRead instance, return the content of "is_read" field
-        try:
-            topic_read = TopicRead.objects.get(topic=obj, user=request.user)
-            return topic_read.is_read
-        except TopicRead.DoesNotExist:
-            # If there is no instance, the topic is not read yet
-            return False
-
 
 class SimpleTopicSerializer(BaseTopicSerializer):
 

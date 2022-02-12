@@ -166,6 +166,9 @@ class TopicRead(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, verbose_name=_('user'), related_name=_('%(class)s'))
     is_read = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = (('user', 'topic'),)
+
     def __str__(self):
         return self.topic.title + " " + self.user.username + " " + str(self.is_read)
 

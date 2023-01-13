@@ -17,6 +17,7 @@
         'ngAnimate',
         'duScroll',
         'LocalStorageModule',
+        'ang-dialogs',
         'shared',
         'djangular'
     ]);

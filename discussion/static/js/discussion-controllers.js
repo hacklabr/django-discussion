@@ -30,7 +30,7 @@
                     normalInit();
                 }
             }
-            
+
             $scope.ForumCourse = function(forum){
                 if (forum) {
                     var forum_current = $location.absUrl();
@@ -41,20 +41,20 @@
                     else {
                         forum_current = forum_current.split('/')[6];
                     }
-                  
+
                     if (forum_current === '#!' || !forum_current) {
                         $scope.has_forum = false;
                     }
                     else {
                         singleInit(forum_current);
                         $scope.has_course = true;
-                    }  
+                    }
                 }
             }
 
             function singleInit(id) {
                 var forum_current = forum_id;
-                
+
                 if (id) {
                     forum_current = id;
                 }
@@ -71,7 +71,7 @@
                             $scope.list_tags.push(tags);
                         });
                     });
-                  
+
                     $scope.forum.page = TopicPage.get({
                         page: 1,
                         page_size: $scope.forum_topics_page,
@@ -171,7 +171,7 @@
 
                 TopicPage.get({
                     forum: forum_id,
-                    search: $scope.search_topic.txt,  
+                    search: $scope.search_topic.txt,
                     tag: $scope.tags ? $scope.tags.id : null,
                     category: $scope.category ? $scope.category.id : null,
                     page: 1,
@@ -182,7 +182,7 @@
                         $scope.forum_topics_total = page.count;
                         $scope.topics_loaded = true;
                         $scope.has_next_page = page.next !== null;
-                });  
+                });
             };
 
             $scope.loadMore = () => {
@@ -190,7 +190,7 @@
 
                 TopicPage.get({
                     forum: forum_id,
-                    search: $scope.search_topic.txt,  
+                    search: $scope.search_topic.txt,
                     tag: $scope.tags ? $scope.tags.id : null,
                     category: $scope.category ? $scope.category.id : null,
                     page: $scope.load_page,
@@ -218,7 +218,7 @@
 
                 TopicPage.get({
                     forum: forum,
-                    search: $scope.search_topic.txt,  
+                    search: $scope.search_topic.txt,
                     tag: $scope.tags ? $scope.tags.id : null,
                     category: $scope.category ? $scope.category.id : null,
                     page: $scope.load_page,
@@ -238,7 +238,7 @@
 
                 TopicPage.get({
                     forum: forum_id,
-                    search: txt !== '' ? txt : null,  
+                    search: txt !== '' ? txt : null,
                     tag: $scope.tags ? $scope.tags.id : null,
                     category: $scope.category ? $scope.category.id : null,
                     page: 1,
@@ -436,7 +436,7 @@
                         $scope.selected_forum = t;
                         $scope.new_topic.forum = t.id;
                     });
-                }   
+                }
             }
 
             $scope.save_category = function() {
@@ -507,7 +507,7 @@
                     $scope.pinned = true;
                 } else {
                     $scope.pinned = false;
-                } 
+                }
             }
 
             $scope.uploadTopicFiles = function (file, topic) {
@@ -532,12 +532,12 @@
         }
     ]);
 
-    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$anchorScroll',
+    app.controller('TopicCtrl', ['$scope', '$routeParams', '$sce', '$location', '$window', '$anchorScroll', '$dialogs',
 //    'uiTinymceConfig',
-    'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile',
-        function ($scope, $routeParams, $sce, $location, $anchorScroll,
+    'Forum', 'Category', 'Tag', 'Topic', 'TopicFile', 'TopicRead', 'Comment', 'TopicLike', 'CommentLike', 'CommentFile', 'CurrentUser', 'ContentFile', 'gettextCatalog',
+        function ($scope, $routeParams, $sce, $location, $window, $anchorScroll, $dialogs,
 //        uiTinymceConfig,
-        Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile) {
+        Forum, Category, Tag, Topic, TopicFile, TopicRead, Comment, TopicLike, CommentLike, CommentFile, CurrentUser, ContentFile, gettextCatalog) {
 
             $scope.topic_pinned = false;
             $scope.user = CurrentUser;
@@ -545,8 +545,25 @@
 
             if ($routeParams.topicId) {
                 singleInit();
-            } 
-            
+            }
+
+            $scope.deleteTopic = function (topic) {
+                $dialogs.showConfirmationDialog(
+                    gettextCatalog.getString('If you delete this topic it cannot be recovered and comments will be lost!'), {
+                        title: gettextCatalog.getString('Delete this topic?'),
+                        closable: true,
+                        buttonOkText: gettextCatalog.getString('Delete'),
+                        callback (option) {
+                            if (option === 'ok') {
+                                Topic.delete({ id: topic.id }, () => {
+                                    $window.location.href = '/#!/forum';
+                                });
+                            }
+                        },
+                    }
+                );
+            }
+
             $scope.TopicCourse = function(topic_id){
                 var topic = $location.absUrl();
 
@@ -562,7 +579,7 @@
 
             function singleInit(topic_id) {
                 var topic_current = $routeParams.topicId;
-                
+
                 if (topic_id) {
                     topic_current = topic_id;
                 }
@@ -583,13 +600,13 @@
                 //Filter the topics from Forum
                 Forum.get({id: topic.forum}, function(t) {
                     $scope.forum_categories = $scope.categories;
-                    
+
                     let filteredGroups = t.groups_ids.filter(value => $scope.user.groups_ids.includes(value));
                     if(filteredGroups.length > 0) {
                         $scope.topic_pinned = true;
                     } else {
                         $scope.topic_pinned = false;
-                    } 
+                    }
                 }
                 );
 

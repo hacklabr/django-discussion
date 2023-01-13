@@ -246,7 +246,7 @@ class TopicViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend, )
     ordering_fields = ('last_activity_at')
     filter_fields = ('forum', )
-    permission_classes = (IsAuthenticated, IsTopicAuthor, )
+    permission_classes = (IsTopicAuthor, IsAuthenticated, )
     pagination_class = None
 
     def perform_create(self, serializer):
@@ -259,29 +259,15 @@ class TopicViewSet(viewsets.ModelViewSet):
         TopicRead.objects.filter(topic=topic).update(is_read=False)
 
     def retrieve(self, request, *args, **kwargs):
-        # Retrieve the topic that must be shown
-        try:
-            topic = Topic.objects.get(id=kwargs['pk'])
-        except Topic.DoesNotExist:
-            return Response({'message': u'Tópico não encontrado'},
-                            status=status.HTTP_404_NOT_FOUND)
-        except ValueError:
-            return Response({
-                'message': u'Identificador inválido "%s"' % kwargs['pk']
-            }, status.HTTP_400_BAD_REQUEST)
 
-        if not self.request.user.is_superuser and self.request.user != topic.author \
-           and not topic.forum.is_public:
-            user_groups = set(list(self.request.user.groups.all()))
-            forum_groups = set(list(topic.forum.groups.all()))
-            if len(user_groups.intersection(forum_groups)) == 0:
-                return Response({'message': u"Você não tem acesso a esse Tópico"},
-                                status=status.HTTP_403_FORBIDDEN)
+        topic = self.get_object()
 
         topicSer = self.get_serializer(topic)
 
         # Mark the last notification relative to the current topic-user pair as read
-        # The following operation is in a try-except block to account for the unlikely case where the user has never recieved a notification about the current topic. This is possible for new users.
+        # The following operation is in a try-except block to account for the unlikely
+        # case where the user has never recieved a notification about the current topic,
+        # this is possible for new users.
         try:
             notifications = TopicNotification.objects.filter(topic=topic, user=request.user)
             for notification in notifications:
@@ -296,24 +282,22 @@ class TopicViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super(TopicViewSet, self).get_queryset()
 
-        # Test if the queryset must be of activities topics or regular ones
-        activity = self.request.query_params.get('activity', None)
-        course = self.request.query_params.get('course', None)
-        if activity:
-            queryset = queryset.filter(forum__forum_type='activity')
-            exclude_cur_user = self.request.query_params.get('exclude_cur_user', None)
-            if exclude_cur_user:
-                queryset = queryset.exclude(author=self.request.user)
-        else:
-            if course:
-                queryset = queryset.filter(forum__forum_type__in=['discussion', 'course'])
+        # Only ilter if its a list, case when pk arg is not present 
+        if not self.kwargs.get('pk', False):
+            # Test if the queryset must be of activities topics or regular ones
+            activity = self.request.query_params.get('activity', None)
+            if activity:
+                queryset = queryset.filter(forum__forum_type='activity')
+                exclude_cur_user = self.request.query_params.get('exclude_cur_user', None)
+                if exclude_cur_user:
+                    queryset = queryset.exclude(author=self.request.user)
             else:
-                queryset = queryset.filter(forum__forum_type='discussion')
-            if not self.request.user.is_superuser:
-                queryset = queryset.filter(
-                    Q(forum__is_public=True) |
-                    Q(forum__groups__in=self.request.user.groups.all())
-                )
+                queryset = queryset.filter(forum__forum_type__in=['discussion', 'course'])
+                if not self.request.user.is_superuser:
+                    queryset = queryset.filter(
+                        Q(forum__is_public=True) |
+                        Q(forum__groups__in=self.request.user.groups.all())
+                    )
 
             # If there are search fields in the request, do the search
             search = self.request.query_params.get('search', None)
@@ -324,44 +308,25 @@ class TopicViewSet(viewsets.ModelViewSet):
                     Q(tags__name__icontains=search) |
                     Q(categories__name__icontains=search))
 
+            category = self.request.query_params.get('category', None)
+            if category:
+                queryset = queryset.filter(Q(categories__id=category))
+
+            tag = self.request.query_params.get('tag', None)
+            if tag:
+                queryset = queryset.filter(Q(tags__id=tag))
+
+            queryset = queryset.distinct()
+
+            limit_to = self.request.query_params.get('limit', None)
+            if limit_to:
+                queryset = queryset[:int(limit_to)]
+
         return queryset
 
-    def filter_queryset(self, queryset):
-
-        queryset = super(TopicViewSet, self).filter_queryset(queryset)
-
-        queryset = queryset.distinct()
-
-        limit_to = self.request.query_params.get('limit', None)
-        if limit_to:
-            queryset = queryset[:int(limit_to)]
-
-        return queryset       
-        
 
 class TopicPageViewSet(TopicViewSet):
     pagination_class = TopicPagination
-
-    def get_queryset(self):
-        queryset = super(TopicPageViewSet, self).get_queryset()
-
-        category = self.request.query_params.get('category', None)
-        tag = self.request.query_params.get('tag', None)
-        search = self.request.query_params.get('search', None)
-
-        if search:
-            queryset = queryset.filter(
-                Q(title__icontains=search) |
-                Q(content__icontains=search)
-            )
-
-        if category:
-            queryset = queryset.filter(Q(categories__id=category))
-
-        if tag:
-            queryset = queryset.filter(Q(tags__id=tag))
-
-        return queryset
 
 
 class TopicReadViewSet(viewsets.ModelViewSet):

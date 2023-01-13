@@ -25,16 +25,16 @@ class IsTopicAuthor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS:
-            if isinstance(obj, Topic):
-                from django.db.models import Q
-                if obj.author == request.user or \
-                            Q().intersect(obj.groups.all(), self.request.user.groups.all()).exist():
-                    return True
-        elif request.user and request.user.is_superuser:
+        
+        if request.user and request.user.is_superuser:
             return True
         elif request.user.is_authenticated and isinstance(obj, Topic) and obj.author == request.user:
             return True
+        elif request.method in permissions.SAFE_METHODS:
+            if isinstance(obj, Topic):
+                from django.db.models import Q
+                if obj.forum.groups.all().intersection(request.user.groups.all()).exists():
+                    return True
 
 
 class IsCommentAuthor(permissions.BasePermission):
